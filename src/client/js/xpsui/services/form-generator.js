@@ -143,10 +143,8 @@
 				} else if (schemaFragment.enum) {
 					field = angular.element('<div xpsui-select-view></div>');
 					field.attr('xpsui-schema', schemaPath);
-				} else if (schemaFragment.render && schemaFragment.render.component) {
-					if (schemaFragment.render.component === 'xpsui-uploadable-file') {
-						field = angular.element('<div xpsui-uploadable-file class="xpsui-uploadable-file-view"></div>');
-					}
+				} else if (schemaFragment.render && schemaFragment.render.component && schemaFragment.render.component === 'xpsui-uploadable-file') {
+					field = angular.element('<div xpsui-uploadable-file class="xpsui-uploadable-file-view"></div>');
 				} else {
 					field = angular.element('<div xpsui-string-view></div>');
 				}
