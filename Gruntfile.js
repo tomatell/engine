@@ -42,7 +42,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('doc', 'yuidoc');
 
 	grunt.registerTask('x', ['copy:x', 'sass:x', 'uglify']);
-	grunt.registerTask('default', ['build', 'x', 'unitTest', 'dataVersionCheck']);
+	grunt.registerTask('default', ['build', 'x', 'unitTest', 'dataVersionCheck', 'eslint']);
 
 	grunt.registerTask('portal', ['uglify:xpsui', 'build:server', 'build:client']);
 

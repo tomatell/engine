@@ -22,13 +22,13 @@
 
 		FormGenerator.prototype.generateLabel = function(schemaFragment) {
 			// TODO translation
-			var isRequired = (schemaFragment.required ? ' x-required': '');
+			var isRequired = (schemaFragment.required ? ' x-required' : '');
 			var fieldsetClass = 'x-fieldset-label';
 
-			return angular.element('<div class="' + fieldsetClass + ' ' + isRequired + '" >' 
+			return angular.element('<div class="' + fieldsetClass + ' ' + isRequired + '" >'
 				+ '<span>' + (schemaFragment.transCode ?
 					$translate.instant(schemaFragment.transCode) : schemaFragment.title
-				) + '</span>' 
+				) + '</span>'
 			+ '</div>');
 		};
 
@@ -67,7 +67,7 @@
 			} else if (mode === this.MODE.EDIT) {
 				if (schemaFragment.type === 'array') {
 					if (schemaFragment.items && schemaFragment.items.render && schemaFragment.items.render.component ) {
-						field = angular.element('<div xpsui-array-control-edit="'+schemaFragment.items.render.component+'"></div>');
+						field = angular.element('<div xpsui-array-control-edit="' + schemaFragment.items.render.component + '"></div>');
 					} else {
 						field = angular.element('<div xpsui-array-control-edit></div>');
 					}
@@ -76,12 +76,12 @@
 					field = angular.element('<div xpsui-objectlink2-edit></div>');
 					field.attr('xpsui-schema', schemaPath);
 				} else if(schemaFragment.uploadableImage
-					|| (schemaFragment.render && schemaFragment.render.component === 'psui-uploadable-image')){
+					|| (schemaFragment.render && schemaFragment.render.component === 'psui-uploadable-image')) {
 					field = angular.element('<div xpsui-uploadable-image xpsui-imageresizor /></div>');
 					field.attr('xpsui-schema', schemaPath);
-					var width = schemaFragment.uploadableImage ? 
+					var width = schemaFragment.uploadableImage ?
 						schemaFragment.uploadableImage.width : schemaFragment.render.width;
-					var height = schemaFragment.uploadableImage ? 
+					var height = schemaFragment.uploadableImage ?
 						schemaFragment.uploadableImage.height : schemaFragment.render.height;
 
 					field.attr('psui-width', width);
@@ -90,18 +90,18 @@
 				} else if (schemaFragment.enum) {
 					field = angular.element('<div xpsui-select-edit></div>');
 					field.attr('xpsui-schema', schemaPath);
-				} else if (schemaFragment.render && schemaFragment.render.component  ){
-					if ( schemaFragment.render.component=="psui-textarea" ) {
+				} else if (schemaFragment.render && schemaFragment.render.component) {
+					if ( schemaFragment.render.component === 'psui-textarea' ) {
 						field = angular.element('<div xpsui-textarea-edit></div>');
-					} else if ( schemaFragment.render.component=="psui-datepicker" ) {
+					} else if ( schemaFragment.render.component === 'psui-datepicker' ) {
 						field = angular.element('<div xpsui-date-edit xpsui-calendar ></div>');
-					} else if (schemaFragment.render.component=="psui-contenteditable") {
+					} else if (schemaFragment.render.component === 'psui-contenteditable') {
 						field = angular.element('<div xpsui-contenteditable></div>');
 
-					} else if (schemaFragment.render.component=="xpsui-uploadable-file") {
+					} else if (schemaFragment.render.component === 'xpsui-uploadable-file') {
 						field = angular.element('<div xpsui-uploadable-file></div>');
 					} else {
-						field = angular.element('<div>Unsupported render component '+schemaFragment.render.component+'</div>');
+						field = angular.element('<div>Unsupported render component ' + schemaFragment.render.component + '</div>');
 					}
 				} else {
 					field = angular.element('<div xpsui-string-edit></div>');
@@ -113,7 +113,7 @@
 			} else {
 				if (schemaFragment.type === 'array') {
 					if (schemaFragment.items && schemaFragment.items.render && schemaFragment.items.render.component) {
-						field = angular.element('<div xpsui-array-control-view="'+schemaFragment.items.render.component+'"></div>');
+						field = angular.element('<div xpsui-array-control-view="' + schemaFragment.items.render.component + '"></div>');
 
 					} else {
 						field = angular.element('<div xpsui-array-control-view></div>');
@@ -127,24 +127,24 @@
 					|| (schemaFragment.render && schemaFragment.render.component === 'psui-uploadable-image')) {
 
 					field = angular.element('<div xpsui-uploadable-image-view></div>');
-					var width = schemaFragment.uploadableImage ? 
+					width = schemaFragment.uploadableImage ?
 							schemaFragment.uploadableImage.width : schemaFragment.render.width;
-					var height = schemaFragment.uploadableImage ? 
+					height = schemaFragment.uploadableImage ?
 						schemaFragment.uploadableImage.height : schemaFragment.render.height;
 					var style = 'width: 100% !important;'
-						+ (height ? 'height:'+height+'px !important;':'height:150px;')
+						+ (height ? 'height:' + height + 'px !important;' : 'height:150px;')
 						+ 'background-size: contain;'
 						+ 'background-repeat: no-repeat;'
 						+ 'background-position: top left;';
 					field = angular.element('<div style="' + style + 'background-image: url(\'{{' + modelPath + '?' + modelPath + ':\'/img/no_photo.jpg\'}}\')"></div>');
-				} else if(schemaFragment.type === "date"
+				} else if(schemaFragment.type === 'date'
 					|| (schemaFragment.render && schemaFragment.render.component === 'psui-datepicker')) {
 					field = angular.element('<div xpsui-date-view></div>');
 				} else if (schemaFragment.enum) {
 					field = angular.element('<div xpsui-select-view></div>');
 					field.attr('xpsui-schema', schemaPath);
-				} else if (schemaFragment.render && schemaFragment.render.component  ){
-					if (schemaFragment.render.component=="xpsui-uploadable-file") {
+				} else if (schemaFragment.render && schemaFragment.render.component) {
+					if (schemaFragment.render.component === 'xpsui-uploadable-file') {
 						field = angular.element('<div xpsui-uploadable-file class="xpsui-uploadable-file-view"></div>');
 					}
 				} else {
@@ -184,7 +184,7 @@
 			if (schemaFragment.readOnly) {
 				mode = this.MODE.VIEW;
 			}
-			value.append(this.generateValidations(this.generateField(schemaFragment, schemaPath, modelPath, mode),schemaFragment, schemaPath, modelPath, mode));
+			value.append(this.generateValidations(this.generateField(schemaFragment, schemaPath, modelPath, mode), schemaFragment, schemaPath, modelPath, mode));
 			row.append(value);
 
 			return row;
@@ -201,7 +201,7 @@
 		 * @param mode
 		 */
 		FormGenerator.prototype.generateForm = function(scope, elm, schemaFragment, schemaPath, modelPath, mode) {
-			var p, localSchemaPath, localModelPath, localFragment, component, labelComponent, fieldComponent;
+			var p, localSchemaPath, localModelPath, localFragment, component;
 
 			if (!schemaFragment) {
 				log.warn('Schema fragment not defined, existing');
@@ -214,7 +214,7 @@
 				// schema fragment has defined type
 				// @todo schema root missing type property
 				//if (schemaFragment.type === 'object') {
-				if (typeof schemaFragment.properties == 'object') {
+				if (typeof schemaFragment.properties === 'object') {
 					for (p in schemaFragment.properties) {
 						component = null;
 						localSchemaPath = schemaPath.concat('.properties.', p);
@@ -256,7 +256,7 @@
 						}
 
 						//component = componentGenerator.generate(schemaFragment.properties[p], localSchemaPath, localModelPath, mode || this.MODE.VIEW);
-						if(component){
+						if(component) {
 							elm.append(component);
 							$compile(component)(scope);
 						}
@@ -264,7 +264,7 @@
 						log.groupEnd();
 					}
 				} else {
-						log.warn('Schema fragment type "%s" not implemented yet', schemaFragment.type);
+					log.warn('Schema fragment type "%s" not implemented yet', schemaFragment.type);
 				}
 			} else {
 				log.warn('Schema fragment has not explicit type defined');
