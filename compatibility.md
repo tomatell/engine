@@ -14,3 +14,7 @@ The requests collection in the database also needs to be divided. There are scri
 
 	- splitMigrationCheck.sh - doesn't actually modify the database, it only reports where it would move each request
 	- splitMigration.sh - performs the division, drops the 'requests' collection if it ends up being empty
+
+## 3 - Structure of bank records import changed
+
+It is necesary to migrate structure of bank imports. Run `tools/migrations/3.sh`
