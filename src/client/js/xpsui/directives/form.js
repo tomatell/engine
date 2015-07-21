@@ -109,7 +109,6 @@
 								var action = schema.clientActions[actionIndex];
 
 								var actionElm;
-								console.log('xxxxxxx'+action.__DIRECTIVE__);
 								switch (action.__DIRECTIVE__){
 									case 'action-link':
 										actionElm = angular.element('<a xpsui-form-action-link psui-options="schemaFormOptions.schema.clientActions['+actionIndex+']" psui-model="'+attrs.xpsuiModel+'" class="btn-primary"></a>');
