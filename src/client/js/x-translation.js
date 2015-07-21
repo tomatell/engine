@@ -182,6 +182,7 @@
 			"security.user.edit.added.profiles":"Pridelené profily",
 			"security.user.edit.available.profiles":"Dostupné profily",
 			"security.profile.edit.modification.done":"Úspešne uložené",
+			"server.side.exception":"Výnimka na strane servera",
 
 			"schema.editor.save": "Uložiť",
 			"schema.editor.edit": "Upraviť",
@@ -726,6 +727,7 @@
 			"security.user.edit.profile":"Profily používateľa",
 			"security.user.edit.added.profiles":"Pridelené profily",
 			"security.user.edit.available.profiles":"Dostupné profily",
+			"server.side.exception":"Výnimka na strane servera",
 
 			"schema.editor.save": "Uložit",
 			"schema.editor.edit": "Upravit",
@@ -1241,6 +1243,7 @@
 			"personal.change.password.passwords.not.equal": "Passwords are not equal",
 			"personal.change.password.password.changed": "Password changed",
 			"personal.change.password.password.not.changed": "Password not changed",
+			"server.side.exception":"Server side exception",
 
 			"queryfilter.ops.EXISTS": "exists",
 			"queryfilter.ops.NOT_EXISTS": "not exists",
@@ -1784,6 +1787,7 @@ $translateProvider.translations('ja', {
 			"security.user.edit.added.profiles":"Pridelené profily",
 			"security.user.edit.available.profiles":"Dostupné profily",
 			"security.profile.edit.modification.done":"Úspešne uložené",
+			"server.side.exception":"Výnimka na strane servera",
 
 			"schema.editor.save": "Uložiť",
 			"schema.editor.edit": "Upraviť",
