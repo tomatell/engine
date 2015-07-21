@@ -11,12 +11,11 @@
 		 * @teams - array of objects that will be used to define match
 		 * @terms - array of object that will be used to define round, its size limits result
 		 * @returns - object in form
-				[{ round:<index>,term:<round_term>,,matches:[{home:teams[x1],visitors:teams[y1],board:<board_index>},...] },...]
+				[{ round:<index>,term:<round_term>,matches:[{home:teams[x1],visitors:teams[y1],board:<board_index>},...] },...]
 		 */
 		function bergerTable (teams,terms) {
 			var floatTable = [];
 			var n, i, increment=1, atype=1, minmove=0, flipcolors=0;
-
 
 			if (teams.length%2===1){
 				teams.push({complement:true});
@@ -24,20 +23,28 @@
 
 			n = teams.length;
 
-
 			var nr = n-1; // Number of rounds
 
 			var n2 = n / 2;
 			var x, j, temp, colorFlag, incr;
 
-			var max_round = terms.length ;
+			var max_round = terms.length;
 
 			var test_r = 0;
 			var outRounds=[];
 
+			var textPrefix = 'A-';
+			var match_id = 0;
+
 			for (var r=1; r<= max_round; r++) {	// r is the round number.
-						var outRound={round:r,term:terms[r-1],matches:[]};
-						outRounds.push(outRound);
+			
+				var outRound={round:r,term:terms[r-1],matches:[]};
+				outRounds.push(outRound);
+
+				if (r == nr+1) {
+					match_id=0;
+					textPrefix = 'B-';
+				}
 
 				if (r == 1) {		 // Round 1 initially seat the players
 
@@ -66,6 +73,11 @@
 					increment=2;
 
 				while (1) {	 //Must get out of this loop with break
+					
+					match_id++;
+
+					var matchPrefix=textPrefix+match_id;
+
 					if (i === 0)	 //At ghost board, color determined by round number
 						colorFlag = ((r-test_r)%2) ? 1 : 0;
 					else			//On other boards, board number determines it
@@ -73,10 +85,10 @@
 
 					colorFlag ^= flipcolors; //Will reverse color assignment if checked
 
-					var match={home: teams[floatTable[colorFlag?nr-i:i]-1] ,visitors:teams[floatTable[colorFlag?i:nr-i]-1] ,boar:i};
+					var match={home: teams[floatTable[colorFlag?nr-i:i]-1] ,visitors:teams[floatTable[colorFlag?i:nr-i]-1] ,boar:i ,matchNumber:matchPrefix};
 
 					if (i===0){
-							match={home:match.visitors,visitors:match.home,board:i};
+						match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix};
 					}
 
 					if (match.home.complement){
@@ -87,19 +99,19 @@
 						outRound.matches.push(match);
 					}
 
-						if (minmove && (i===0) && (r % 2)===0)
-									 i = 1;
-						else
-							i+= increment;
-						if (i >= n2)
-							if (increment == 1)	//Board number option
-								break;
-							else	{	//Come back to display the boards we missed
-								increment = -2;
-								i = ((i > n2) ? i - 3 : --i) ;
-							}
-						if ((i < 1) && (increment == -2)) //Finished with NOT board number option, exit loop
+					if (minmove && (i===0) && (r % 2)===0)
+						i = 1;
+					else
+						i+= increment;
+					if (i >= n2)
+						if (increment == 1)	//Board number option
 							break;
+						else	{	//Come back to display the boards we missed
+							increment = -2;
+							i = ((i > n2) ? i - 3 : --i) ;
+						}
+					if ((i < 1) && (increment == -2)) //Finished with NOT board number option, exit loop
+						break;
 				}
 			}
 
@@ -113,7 +125,6 @@
 			var saved=0;
 			var all=[];
 
-
 			entity.saving=true;
 
 			entity.generated.map(function(round){
@@ -124,16 +135,18 @@
 					toSave.baseData.awayClub=match.visitors;
 					toSave.baseData.matchRound={registry:"schedules",oid:round.term.id};
 					toSave.baseData.competition=entity.baseData.competition;
+					toSave.baseData.ageCategory=entity.baseData.ageCategory;
 					toSave.baseData.competitionPart={registry:"competitionParts",oid:entity.id};
 					toSave.baseData.matchDate=round.term.baseData.date;
 					toSave.baseData.state='Otvorený';
+					toSave.baseData.matchNumber=entity.baseData.prefix+match.matchNumber;		
+					
 					all.push( $http({url: '/udao/saveBySchema/'+saveSchema, method: 'PUT',data: toSave}));
 				});
 			});
 			$q.all(all).then(function(){
 			 		callback(null);
 			});
-
 		}
 
 		function generateBerger(entity,callback){
