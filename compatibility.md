@@ -18,3 +18,8 @@ The requests collection in the database also needs to be divided. There are scri
 ## 3 - Structure of bank records import changed
 
 It is necesary to migrate structure of bank imports. Run `tools/migrations/3.sh`
+
+## 4 - Array component changed
+
+1. Update the schemas in each dataset to use the new array structure
+2. Migrate existing db's by running `tools/migrations/4.sh`

@@ -272,8 +272,8 @@ a:HOVER {
 }
 
 .psui-attachment-name {
-	min-width: 70px;
-	margin-bottom: 6px;
+	padding-top: 6px;
+	padding-bottom: 6px;
 }
 
 .psui-attachment-name em {
@@ -282,7 +282,6 @@ a:HOVER {
 
 .xpsui-uploadable-file-edit {
 	position: relative;
-	margin-left: 80px;
 }
 
 .xpsui-uploadable-file-view .psui-attachment-name span {

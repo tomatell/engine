@@ -384,12 +384,36 @@
 		padding: 6px 2px 2px 0px;
 	}
 
+	.flex-form-array-row {
+		display: flex;
+		display: -webkit-box;
+		display: -webkit-flex;
+		flex-direction: row;
+		-webkit-flex-direction: row;
+		flex-wrap: wrap;
+		-webkit-flex-wrap: wrap;
+		background-color: white;
+		color: black;
+		border-bottom: 1px solid #ddd;
+		justify-content: space-around;
+		padding: 6px 2px 6px 0px;
+	}
+
 	.flex-form-data-col {
 		white-space: wrap;
 		flex-direction: column;
 		-webkit-flex-direction: column;
 		overflow: hidden;
 		position: relative;
+	}
+
+	.flex-form-editable-data-col {
+		white-space: wrap;
+		flex-direction: column;
+		-webkit-flex-direction: column;
+		overflow: visible;
+		position: relative;
+		padding: 0px 6px 0px 6px;
 	}
 
 	.flex-form-data-action {

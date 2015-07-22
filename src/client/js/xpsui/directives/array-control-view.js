@@ -4,20 +4,24 @@
 	angular.module('xpsui:directives')
 	.directive('xpsuiArrayControlView', ['$compile', function($compile) {
 
-		var  objectLinkTemplate='<div ng-repeat="ae in ngModel track by $id(ae)">'
-
-				+ '<div  xpsui-objectlink2-view xpsui-validity-mark xpsui-schema="xpsuiSchema.items" ng-model="ngModel[$index]"></div>'
-				+ '</div>';
-				// + '<button ng-click="appendNew();"><i></i>{{"generic.search.add" | translate}}</button>';
-
-		var  uploadablefileTemplate='<div ng-repeat="ae in ngModel track by $id(ae)" class="xpsui-uploadable-file-view">'
-					+ '<div  xpsui-uploadable-file xpsui-validity-mark '
-					+ '   xpsui-schema="xpsuiSchema.items" '
-					+ '   ng-model="ngModel[$index]"></div>'
-				+ '</div><div class="xpsui-uploadable-file-nofiles" ng-show="!ngModel || ngModel.length==0">{{"generic.nofiles.label" | translate}}</div>';
+		var template = '<fieldset class="flex-form-fieldset" style="padding-left: 0px; padding-right: 0px;">'
+		+ '<div class="flex-form-headers" >'
+		+ ' <div ng-repeat="(key, value) in xpsuiSchema.items"'
+		+ '  class="flex-form-header"'
+		+ '  ng-style="{\'flex\': fieldWeigth(value), \'-webkit-flex\': fieldWeigth(value) }">'
+		+ ' {{value.transCode || value.title | translate}}'
+		+ ' </div>'
+		+ '</div>'
+		+ '<div ng-repeat="item in ngModel" class="flex-form-array-row row-{{($index%2)?\'odd\':\'even\'}}">'
+		+ ' <div ng-repeat="(key, value) in xpsuiSchema.items" '
+		+ '  ng-style="{\'flex\': fieldWeigth(value), \'-webkit-flex\': fieldWeigth(value) }"' 
+		+ '  class="flex-form-editable-data-col "'
+		+ '  xpsui-by-schema-field-view xpsui-schema="value"'
+		+ '  xpsui-model="$parent.item[key]">x</div>'
+		+ '</div>'
 
 		function getTemplate(renderComponent){
-			return (renderComponent==="xpsui-uploadable-file")?uploadablefileTemplate:objectLinkTemplate;
+			return template;
 		}
 
 		function isEmptyObj(obj) {
@@ -47,6 +51,16 @@
 
 				scope.$watchCollection('ngModel', modelChanged);
 
+				scope.fieldWeigth = function(field) {
+					if (field.render && field.render.width) {
+						if (field.render.width == 'narrow') {
+							return '2 0 100px';
+						} else if (field.render.width == 'wide') {
+							return '50 0 150px';
+						}
+					}
+					return '10 0 200px';
+				}
 
 			}
 

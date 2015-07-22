@@ -26,7 +26,6 @@
 					var field = formGenerator.generateField(schemaFragment, schemaPath, modelPath, formGenerator.MODE.EDIT);
 
 					elm.empty();
-					$parse(modelPath).assign(scope, null);
 
 					elm.append(field);
 					$compile(field)(scope);

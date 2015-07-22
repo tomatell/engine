@@ -45,7 +45,7 @@
 				var clubIds = [];
 				for (var pos=0; pos<$scope.model.listOfTeam.team.length; pos++) {
 					(function (position) {
-						var rosterId = $scope.model.listOfTeam.team[position].oid;
+						var rosterId = $scope.model.listOfTeam.team[position].team.oid;
 						$http({
 							method : 'GET',
 							url : '/udao/getBySchema/uri~3A~2F~2Fregistries~2Frosters~23views~2Frosters~2Fview/' + rosterId,

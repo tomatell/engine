@@ -86,7 +86,9 @@ ObjectMangler.prototype.mangle = function(obj, schema, callback) {
 
 		if (schemaFragment && schemaFragment[consts.TYPE_KEYWORD] === 'array' && objFragment && Array.isArray(objFragment)) {
 			for (i = 0; i < objFragment.length; i++) {
-				propDivers.push(propDiverFuncFactory(ctx,objFragment[i], schemaFragment[consts.ITEMS_KEYWORD], objPath.concat('.', i)));
+				for(var key in objFragment[i]){
+					propDivers.push(propDiverFuncFactory(ctx,objFragment[i][key], schemaFragment[consts.ITEMS_KEYWORD][key], objPath.concat('.', i, '.', key)));
+				}
 			}
 		} else if (!schemaFragment || !schemaFragment[consts.OBJECT_LINK_KEYWORD]){
 			// Dive into properties and mangle them
