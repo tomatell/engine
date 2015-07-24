@@ -22,9 +22,10 @@
 		+ '   <i class="icon-minus"></i> {{\'generic.search.remove\' | translate}}'
 		+ '  </button>'
 		+ '</div>'
-		+ ' <div class="pull-right">'
+		+ '<div class="xpsui-array-control-noItems" ng-show="!ngModel || ngModel.length==0">{{"generic.noItems.label" | translate}}</div>'
+		+ '<div class="pull-right">'
 		+ ' <button ng-click="appendNew();" class="btn-clear"><i class="icon-add"></i> {{"generic.search.add" | translate}}</button>'
-		+ ' </div>'
+		+ '</div>'
 		+ ' </fieldset>';
 
 		function getTemplate(renderComponent) {

@@ -19,6 +19,8 @@
 		+ '  xpsui-by-schema-field-view xpsui-schema="value"'
 		+ '  xpsui-model="$parent.item[key]">x</div>'
 		+ '</div>'
+		+ '<div class="xpsui-array-control-noItems" ng-show="!ngModel || ngModel.length==0">{{"generic.noItems.label" | translate}}</div>'
+		+ '</fieldset>'
 
 		function getTemplate(renderComponent){
 			return template;
