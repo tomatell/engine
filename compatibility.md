@@ -23,3 +23,11 @@ It is necesary to migrate structure of bank imports. Run `tools/migrations/3.sh`
 
 1. Update the schemas in each dataset to use the new array structure
 2. Migrate existing db's by running `tools/migrations/4.sh`
+
+## No version change
+config.js needs to contain these e-mail addresses
+- eventProcessingErrorSender
+- eventProcessingError
+- massmailSenderAddress
+- requestNotifSender
+- requestSolverAddress

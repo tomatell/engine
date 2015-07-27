@@ -25,9 +25,11 @@ var config = {
 		portalClient: process.cwd() + '/data/portal/client'
 	},
 	mails:{
-		eventProcessingError: 'peter.ladanyi@unionsoft.sk',
-		massmailSenderAddress:'caihp@unionsoft.eu',
-		requestSolverAddress:'peter.ladanyi@unionsoft.sk'
+		eventProcessingErrorSender: 'websupport@unionsoft.sk',
+		eventProcessingError: 'websupport@unionsoft.sk',
+		massmailSenderAddress:'websupport@unionsoft.sk',
+		requestNotifSender: 'websupport@unionsoft.sk',
+		requestSolverAddress:'websupport@unionsoft.sk'
 	},
 	schemaRegistry:{
 		schemas : [ 'permissions.json', 'login.json', 'systemCredentials.json', 'people.json',
