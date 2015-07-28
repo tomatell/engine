@@ -81,13 +81,8 @@
 					var form = controller[1];
 
 					scope.$watch(function() {return form.xpsui.submitPrepare}, function(newVal) {
-						if (newVal === true) {
-							var ngVal = ngModel.$modelValue;
-							if (angular.isObject(ngVal) && Object.getOwnPropertyNames(ngVal).length == 0) {
-								ngModel.$setViewValue("");
-							} else {
-								ngModel.$setViewValue(ngModel.$modelValue);
-							}
+						if (newVal) {
+							validationMark.removeClass('ng-pristine');
 						}
 					});
 				}

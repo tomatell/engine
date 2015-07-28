@@ -251,6 +251,7 @@
 			"psui-objectlink.btn.cancel": "Zrušiť",
 
 			"errors.validation.required": "Povinné pole",
+			"errors.validation.objLinkRequired": "Povinné pole",
 			"errors.validation.psuiUnique": "Hodnota už v systéme existuje",
 			"errors.validation.parse":"Nesprávny formát",
 			"schema.editor.schema.editing":"Úprava schémy",
@@ -792,6 +793,7 @@
 			"security.user.edit.reset.password":"Resetovat heslo",
 			"security.user.missing.permissions":"Nedostatečná práva {{data}}",
 			"errors.validation.required": "Povinné pole",
+			"errors.validation.objLinkRequired": "Povinné pole",
 			"errors.validation.psuiUnique": "Hodnota už v systéme existuje",
 			"errors.validation.parse":"Nesprávný formát",
 			"security.user.edit.login.data":"Přihlašovací údaje",
@@ -1318,6 +1320,7 @@
 			"psui-objectlink.btn.save": "Save",
 			"psui-objectlink.btn.cancel": "Cancel",
 			"errors.validation.required": "Required field",
+			"errors.validation.objLinkRequired": "Required field",
 			"errors.validation.psuiUnique": "Value exists in system",
 			"errors.validation.parse":"Incorrect format",
 			"schema.editor.schema.editing": "Schema editor",
@@ -1862,6 +1865,7 @@ $translateProvider.translations('ja', {
 			"psui-objectlink.btn.cancel": "Zrušiť",
 
 			"errors.validation.required": "Povinné pole",
+			"errors.validation.objLinkRequired": "Povinné pole",
 			"errors.validation.psuiUnique": "Hodnota už v systéme existuje",
 			"errors.validation.parse":"Nesprávny formát",
 			"schema.editor.schema.editing":"Úprava schémy",
