@@ -2161,11 +2161,10 @@ $translateProvider.translations('ja', {
 		$translateProvider.fallbackLanguage(['en']);
 		
 		$translateProvider.registerAvailableLanguageKeys(['en','cz','sk','ja'], {
-			'en_US': 'en',
-			'en_GB': 'en',
-			'cs': 'cz',
-			'sk': 'sk',
-			'ja': 'ja',
+			'en*': 'en',
+			'ja*': 'ja',
+			'cs*': 'cz',
+			'sk*': 'sk',
 			'*': 'en' // must be last
 		});
 		$translateProvider.determinePreferredLanguage();
