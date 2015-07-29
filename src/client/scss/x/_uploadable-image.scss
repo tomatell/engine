@@ -1,12 +1,27 @@
 .xpsui-uploadable-image {
+	position: relative;
 	cursor: pointer;
 	text-align: center;
 	background-repeat: no-repeat;
-
 	width: 100%;
 	height: $uploadable-image-height;
 	background-size: contain;
-	background-position: top left;
+	background-position: center;
+
+	.xpsui-progress-indicator{
+		position: absolute;
+		height: 25px;
+		width: 100%;
+		bottom: 0;
+		border: 1px grey solid;
+		background-color: white;
+
+		div{
+			background-color: $color-main;
+			height: 100%;
+			border: 1px white solid;
+		}
+	}
 
 	.xpsui-modal-dialog {
 		position: fixed;
