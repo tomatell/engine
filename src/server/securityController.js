@@ -26,7 +26,8 @@ var DEFAULT_CFG = {
 	tokenExpiration : 3600000,
 	generatedPasswordLen : 8,
 	captchaSite:'6LfOUQITAAAAAOgMxsnYmhkSY0lZw0tej0C4N2XS',
-	captchaSecret:'6LfOUQITAAAAAMXVttdodZHJ1SbzKkQ00l43fzFl'
+	captchaSecret:'6LfOUQITAAAAAMXVttdodZHJ1SbzKkQ00l43fzFl',
+	remCookie: 'rememberMe'
 };
 
 //
@@ -427,13 +428,13 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 					}
 					// if ('System User' in  permissions&&permissions['System User'] ){
 						self.createToken(user.systemCredentials.login.loginName, req.headers['x-forwarded-for'] || req.ip, function(token) {
-							self.storeToken(token, user.id,user.systemCredentials.login.loginName, req.headers['x-forwarded-for'] || req.ip, function(err) {
+							self.storeToken(token, user.id,user.systemCredentials.login.loginName, req.headers['x-forwarded-for'] || req.ip, req.body.rememberMe, function(err) {
 								if (err) {
 									log.error('Failed to store login token', err);
 									resp.next('Internal Error');
 									return;
 								}
-								self.setCookies(resp, token, user.systemCredentials.login.loginName);
+								self.setCookies(resp, token, user.systemCredentials.login.loginName, req.body.rememberMe);
 								log.info('user logged in',user.id);
 
 								self.resolveProfiles(user,function(err,u){
@@ -496,7 +497,7 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 				return;
 			}
 
-			self.setProfileCookie(resp,req.body.profileId);
+			self.setProfileCookie(resp,req.body.profileId, req.body.rememberMe);
 			resp.sendStatus(200);
 
 		});
@@ -660,9 +661,34 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 	/**
 	* Minimalistic version of user return
 	*/
-	function deflateUser(user,permissions){
+	function deflateUser(user, permissions) {
 		log.silly(permissions);
-		return {id:user.id,systemCredentials:{login:{loginName:user.systemCredentials.login.loginName},permissions:permissions,profiles:user.systemCredentials.profiles||[]}};
+		var name = '';
+		var surName = '';
+		if(!user.photoInfo || user.photoInfo.photo === undefined) {
+			user.photoInfo = {};
+			user.photoInfo.photo = 'img/no_photo.jpg';
+		}
+		if(!user.baseData.name.v) {
+			name = user.baseData.name;
+		} else {
+
+			name = user.baseData.name.v;
+		}
+		if(!user.baseData.surName.v) {
+			surName = user.baseData.surName;
+		} else {
+			surName = user.baseData.surName.v;
+		}
+
+		return {
+			id: user.id,
+			systemCredentials: {login: {loginName: user.systemCredentials.login.loginName},
+			permissions: permissions, profiles: user.systemCredentials.profiles || []},
+			photoInfo: {photo: user.photoInfo.photo},
+			baseData: {name: name, surName: surName}
+		};
+
 	}
 
 	this.verifyUserPassword = function(user, passwordSample, callback) {
@@ -697,7 +723,7 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 		callback(uuid.v4());
 	};
 
-	this.storeToken = function(tokenId, userId, user, ip, callback) {
+	this.storeToken = function(tokenId, userId, user, ip, rememberMe, callback) {
 
 		var now = new Date().getTime();
 		var token = {
@@ -707,7 +733,8 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 				ip : ip,
 				created : now,
 				valid : true,
-				touched : now
+				touched : now,
+				rememberMe: rememberMe
 		};
 
 		log.verbose('Storing security token', token);
@@ -715,25 +742,47 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 
 	};
 
-	this.setCookies = function(resp, token, loginName) {
+	this.setCookies = function(resp, token, loginName, rememberMe) {
+		if(rememberMe) {
+			resp.cookie(cfg.securityTokenCookie, token, {
+				expires: new Date(Date.now() + 3600000 * 24 * 36500),
+				httpOnly: true,
+				secure: process.env.NODE_ENV != 'test'
+			});
+			resp.cookie(cfg.loginNameCookie, loginName, {
+				expires: new Date(Date.now() + 3600000 * 24 * 36500),
+				httpOnly: false,
+			});
+		} else {
+			resp.cookie(cfg.securityTokenCookie, token, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV != 'test'
+			});
+			resp.cookie(cfg.loginNameCookie, loginName, {
+				httpOnly: false
+			});
+		}
 
-		resp.cookie(cfg.securityTokenCookie, token, {
-				httpOnly : true,
-				secure : process.env.NODE_ENV != 'test'
-		});
-		resp.cookie(cfg.loginNameCookie, loginName, {
-			httpOnly : false
+		resp.cookie(cfg.remCookie, rememberMe, {
+			expires: new Date(Date.now() + 3600000 * 24 * 36500),
+			httpOnly: false
 		});
 		log.verbose('setCookies',loginName );
 	};
 
-	this.setProfileCookie = function(resp, profile) {
-
-		resp.cookie(cfg.profileCookie, profile, {
+	this.setProfileCookie = function(resp, profile, rememberMe) {
+		if(rememberMe) {
+			resp.cookie(cfg.profileCookie, profile, {
 				httpOnly : true,
 				secure : process.env.NODE_ENV != 'test'
-		});
-
+			});
+		} else {
+			resp.cookie(cfg.profileCookie, profile, {
+				expires: new Date(Date.now() + 3600000 * 24 * 36500),
+				httpOnly : true,
+				secure : process.env.NODE_ENV != 'test'
+			});
+		}
 		log.verbose('setProfileCookie',profile );
 	};
 
@@ -1090,7 +1139,7 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 
 		log.silly('Cookies received', req.cookies);
 
-		if (tokenId !== null) {
+		if (tokenId) {
 			log.debug('security token found', tokenId);
 			tokenDao.list({
 				crits : [ {
@@ -1108,7 +1157,7 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 					var token = tokens[0];
 					// TODO validate IP
 					var now = new Date().getTime();
-					if (token.valid && (req.headers['x-forwarded-for'] || req.ip) === token.ip && token.touched > (now - cfg.tokenExpiration)) {
+					if (token.valid && (req.headers['x-forwarded-for'] || req.ip) === token.ip && token.touched > (now - cfg.tokenExpiration) || req.cookies['rememberMe'] ) {
 						token.touched = now;
 						// TODO maybe some filtering for updates
 						tokenDao.update(token, function(err) {

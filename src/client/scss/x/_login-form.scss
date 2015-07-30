@@ -45,3 +45,25 @@
 	}
 
 }
+
+.x-fieldset-rememberme-chk {
+	position: relative;
+	display: block;
+	.x-rememberme-chk {
+		border: none;
+		display: block;
+		height: 24px;
+		width: 24px;
+		margin-top: 46px;
+		margin-left: auto;
+		margin-right: auto;
+		position: absolute;
+	}
+	.rememberme-label {
+		margin-top: 50px;
+		display: block;
+		margin-left: 32px;
+		margin-right: auto;
+		position: absolute;
+	}
+}

@@ -124,9 +124,7 @@
 			}
 		});
 		$routeProvider.when('/help', {templateUrl: '/dataset/get/partials/x-help.html', controller: 'xpsui:HelpPageCtrl'});
-
-		$routeProvider.otherwise({templateUrl: '/partials/x-login.html', controller: 'xpsui:SecurityLoginCtrl'});
-
+		$routeProvider.otherwise('/dashboard', {templateUrl: '/partials/x-dashboard.html', controller: 'xpsui:DashboardCtrl', permissions:['System User']});
 		loggingProvider.setLevel(5);
 	}])
 	/**

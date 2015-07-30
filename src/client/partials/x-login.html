@@ -39,9 +39,11 @@
 								ng-options="prof.name for prof in profiles"></select>
 						</div>
 					</div>
-
+					<div class="x-fieldset-rememberme-chk">
+							<input type="checkbox" id="x-rememberme-chk" class="x-rememberme-chk" name="x-rememberme-chk" ng-model="rememberMe" ng-true-value="true" ng-false-value="false" checked="unchecked"/>
+							<label for="x-rememberme-chk" class="rememberme-label">Remember me</label>
+					</div>
 					<div ng-disabled="profiles" class="x-fieldset-row">
-						<div class="x-fieldset-label">&nbsp;</div>
 						<div class="x-fieldset-value">
 							<div>
 								<button ng-show="profiles" ng-click="selectProfile()" class="btn-primary"><i></i> {{'login.selected.profile.continue' | translate}}</button>
