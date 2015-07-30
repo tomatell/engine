@@ -29,7 +29,7 @@
 							$rootScope.security.currentUser=data;
 							
 							if (!navigationService.back()) {
-								$location.path('/personal-page');
+								$location.path('/dashboard');
 							}
 							});
 						});
@@ -50,7 +50,7 @@
 					 SecurityService.getCurrentUser().success(function(data){
 						$rootScope.security.currentUser=data;
 						if (!navigationService.back()) {
-							$location.path('/personal-page');
+							$location.path('/dashboard');
 						}
 					});
 				});
