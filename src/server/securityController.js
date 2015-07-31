@@ -1032,14 +1032,18 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 			from : 'websupport@unionsoft.sk',
 			to : email,
 			subject : '['+serviceUrl+'] Zmena hesla',
+			text: renderService.render(renderModule.templates.MAIL_USER_PASSWORD_RESET,{userName:userName,userPassword:newPass,serviceUrl:serviceUrl}),
 			html : renderService.render(renderModule.templates.MAIL_USER_PASSWORD_RESET_HTML,{userName:userName,userPassword:newPass,serviceUrl:serviceUrl})
 		};
-//		html : '<h3>New Password</h3><h4> Your new password is: <b>' + newPass + ' </b> </h4>'
 
-		log.verbose('Sending mail ', mailOptions);
-
-		transport.sendMail(mailOptions);
-
+		log.debug('Preparing to send a reset password mail to: ', '{{email}} username: {{userName}}');
+		transport.sendMail(mailOptions, function(error, info) {
+			if(error){
+				return log.debug('Error sending a reset password mail to: ', '{{email}} error: {{error}}');
+			} else {
+				log.debug('Successfully sent a reset password mail to: ', '{{email}} Message sent: {{info.messageId}}');
+			}
+		})
 	};
 
 	this.sendForgottenPasswordMail = function(email,tokenId,user,serviceUrl) {
@@ -1050,14 +1054,18 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 			from : 'websupport@unionsoft.sk',
 			to : email,
 			subject : '['+serviceUrl+'] Zmena hesla',
+			text : renderService.render(renderModule.templates.MAIL_FORGOTTEN_PASSWORD,{userName:userName,tokenId:tokenId,serviceUrl:serviceUrl}),
 			html : renderService.render(renderModule.templates.MAIL_FORGOTTEN_PASSWORD_HTML,{userName:userName,tokenId:tokenId,serviceUrl:serviceUrl})
 		};
-		//		html : '<h3>New Password</h3><h4> Your new password is: <b>' + newPass + ' </b> </h4>'
 
-		log.verbose('Sending mail ', mailOptions);
-
-		transport.sendMail(mailOptions);
-
+		log.debug('Preparing to send a forgotten password mail to: ', '{{email}} username: {{userName}}');
+		transport.sendMail(mailOptions, function(error, info) {
+			if(error){
+				return log.debug('Error sending a forgotten password mail to: ', '{{email}} error: {{error}}');
+			} else {
+				log.debug('Successfully sent a forgotten password mail to: ', '{{email}} Message sent: {{info.messageId}}');
+			}
+		});
 	};
 
 	/**
