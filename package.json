@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "chai-as-promised": "^4.1.1",
-    "grunt-contrib-eslint": "0.0.5",
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-contrib-yuidoc": "^0.5.2",
     "grunt-debug-task": "^0.1.5",
@@ -51,6 +50,7 @@
     "grunt-mocha-istanbul": "^2.1.0",
     "grunt-protractor-runner": "^1.2.1",
     "grunt-protractor-webdriver": "^0.2.0",
+    "gruntify-eslint": "^0.1.1",
     "karma": "^0.12.28",
     "karma-chai": "*",
     "karma-chai-plugins": "^0.2.4",
