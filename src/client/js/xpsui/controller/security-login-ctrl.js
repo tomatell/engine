@@ -8,29 +8,34 @@
 		'$location',
 		'xpsui:NotificationFactory', 
 		'xpsui:NavigationService' ,
-		function($scope, SecurityService, $rootScope, $location,notificationFactory, navigationService) {
+		'$cookies',
+		function($scope, SecurityService, $rootScope, $location,notificationFactory, navigationService, $cookies) {
 			// FIXME remove this in production
 			// $scope.user = 'johndoe';
 			// $scope.password = 'johndoe';
 			$scope.user = '';
 			$scope.password = '';
+			if($cookies.rememberMe) {
+				$scope.rememberMe = true;
+			} else {
+				$scope.rememberMe = false;
+			}
 
 			/**
-			 * Login button click
-			 */
+			* Login button click
+			*/
 			$scope.login = function() {
-				SecurityService.getLogin($scope.user, $scope.password).success(function(user) {
-					if (user.systemCredentials.profiles.length>1){
+				SecurityService.getLogin($scope.user, $scope.password, $scope.rememberMe).success(function(user) {
+					//$cookies.rememberMe = $scope.rememberMe;
+					if (user.systemCredentials.profiles.length > 1) {
 						$scope.profiles=user.systemCredentials.profiles;
-					}
-					else {
+					} else {
 						SecurityService.selectProfile(user.systemCredentials.profiles[0].id).success(function(){
 							SecurityService.getCurrentUser().success(function(data){
-							$rootScope.security.currentUser=data;
-							
-							if (!navigationService.back()) {
-								$location.path('/dashboard');
-							}
+								$rootScope.security.currentUser=data;
+								if (!navigationService.back()) {
+									$location.path('/dashboard');
+								}
 							});
 						});
 					}
@@ -42,7 +47,7 @@
 					var mes = {translationCode:'login.authentication.failed',time:5000};
 					notificationFactory.error(mes);
 				});
-			};
+			}
 
 			$scope.selectProfile=function(){
 				if (!$scope.selectedProfile) return;
@@ -59,7 +64,7 @@
 			$scope.resetPassword = function() {
 				SecurityService.getResetPassword($scope.user);
 			};
-		} 
+		}
 	]);
 
 }(window.angular));
