@@ -164,17 +164,19 @@
 				}
 
 				elm.on('keypress keydown', function(evt) {
-					if (evt.which === 27) {
-						// key escape
-						rollback();
-						evt.preventDefault();
-					} else if (evt.which === 13) {
-						// key enter
-						commit();
-						evt.preventDefault();
-					} else if (evt.which === 9) {
-						// key tab
-						commit();
+					if (mode === 'edit'){
+						if (evt.which === 27) {
+							// key escape
+							rollback();
+							evt.preventDefault();
+						} else if (evt.which === 13) {
+							// key enter
+							commit();
+							evt.preventDefault();
+						} else if (evt.which === 9) {
+							// key tab
+							commit();
+						}
 					}
 				});
 
