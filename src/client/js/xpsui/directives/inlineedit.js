@@ -57,8 +57,8 @@
 				$compile(editElm)(scope);
 
 				var buttonsElm = angular.element('<div class="x-inlineedit-buttons x-hidden"></div>');
-				var commitButton = angular.element('<button class="x-component-button x-inlineedit-commit-button"><i class="fa fa-check"></i><span>Uložiť</span></button>');
-				var rollbackButton = angular.element('<button class="x-component-button x-inlineedit-rollback-button"><i class="fa fa-remove"></i><span>Zrušiť</span></button>');
+				var commitButton = angular.element('<button class="btn-secondary x-inlineedit-commit-button"><i class="fa fa-check"></i><span>Uložiť</span></button>');
+				var rollbackButton = angular.element('<button class="btn-secondary x-inlineedit-rollback-button"><i class="fa fa-remove"></i><span>Zrušiť</span></button>');
 				selfCtrl.setCommitButton(commitButton);
 				
 				buttonsElm.append(commitButton).append(rollbackButton);

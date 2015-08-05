@@ -17,7 +17,7 @@ body{
 	background-color: $header-bg;
 	border: 1px solid white;
 }
-
+@media screen and (max-width: 1960px) {
 button.btn-primary, a.btn-primary, a.btn-primary:HOVER, a.btn-primary:VISITED {
 	color: $color-main-reverse;
 	background-color: $color-main;
@@ -40,6 +40,60 @@ button.btn-secondary:hover, button.btn-secondary:active {
 	background-color: $color-secondary-highlight;
 	border-color: $color-secondary-highlight-darker;
 }
+}
+@media screen and (max-width: 900px) {
+button.btn-primary, a.btn-primary, a.btn-primary:HOVER, a.btn-primary:VISITED {
+	color: $color-main-reverse;
+	background-color: $color-main;
+	border-color: $color-main-darker;
+}
+
+button.btn-primary:hover, button.btn-primary:active,
+		a.btn-primary:hover, a.btn-primary:active {
+	background-color: $color-main-highlight;
+	border-color: $color-main-highlight-darker;
+}
+
+button.btn-secondary {
+	color: $color-main-reverse;
+	background-color: $color-secondary;
+	border-color: $color-secondary-darker;
+}
+
+button.btn-secondary:hover, button.btn-secondary:active {
+	background-color: $color-secondary-highlight;
+	border-color: $color-secondary-highlight-darker;
+}
+}
+@media screen and (max-width: 500px) {
+button.btn-primary, a.btn-primary, a.btn-primary:HOVER, a.btn-primary:VISITED {
+	color: $color-main-reverse;
+	background-color: $color-main;
+	border-color: $color-main-darker;
+	height: 70px;
+}
+
+button.btn-primary:hover, button.btn-primary:active,
+		a.btn-primary:hover, a.btn-primary:active {
+	background-color: $color-main-highlight;
+	border-color: $color-main-highlight-darker;
+	height: 70px;
+}
+
+button.btn-secondary {
+	color: $color-main-reverse;
+	background-color: $color-secondary;
+	border-color: $color-secondary-darker;
+	height: 70px;
+}
+
+button.btn-secondary:hover, button.btn-secondary:active {
+	background-color: $color-secondary-highlight;
+	border-color: $color-secondary-highlight-darker;
+	height: 70px;
+}
+}
+
 
 button[disabled="disabled"], 
 		button[disabled="disabled"]:hover,
