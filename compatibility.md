@@ -31,3 +31,9 @@ config.js needs to contain these e-mail addresses
 - massmailSenderAddress
 - requestNotifSender
 - requestSolverAddress
+
+## 5 - RefereeReport schema changes
+
+1. webNumber field changed and relocated in schema
+2. RefereeReports are used just in SZH instance, so migration is necessary only there
+2. Migrate existing db's by running`tools/migrations/5.sh`
