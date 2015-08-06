@@ -139,7 +139,7 @@
 						+ (height ? 'height:' + height + 'px !important;' : 'height:150px;')
 						+ 'background-size: contain;'
 						+ 'background-repeat: no-repeat;'
-						+ 'background-position: top left;';
+						+ 'background-position: top center;';
 					field = angular.element('<div style="' + style + 'background-image: url(\'{{' + modelPath + '?' + modelPath + ':\'/img/no_photo.jpg\'}}\')"></div>');
 				} else if(schemaFragment.type === 'date'
 					|| (schemaFragment.render && schemaFragment.render.component === 'psui-datepicker')) {
