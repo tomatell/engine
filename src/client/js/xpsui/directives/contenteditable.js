@@ -243,7 +243,6 @@
 
 				var buttonsHide = function() {
 					buttonsHolder.addClass('x-zero-height');
-					console.log('dddd');
 				};
 
 				var buttonsShow = function() {

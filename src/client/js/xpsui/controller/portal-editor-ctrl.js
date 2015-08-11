@@ -533,7 +533,6 @@
       $scope.model = {};
       angular.copy($scope.templates.article, $scope.model);
       $scope.viewTemplate = $scope.getViewTemplate();
-
       enterEditMode();
     };
 
@@ -580,7 +579,7 @@
 
     $scope.showBlockSelector = function showBlockSelector() {
       $scope.blockSelectorShown = true;
-		document.querySelector('body').classList.add('x-dropdown-open');
+		  document.querySelector('body').classList.add('x-dropdown-open');
     };
 
     $scope.hideBlockSelector = function hideBlockSelector() {
@@ -591,7 +590,7 @@
     $scope.selectBlock = function(block) {
       $scope.blockSelectorShown = false;
       document.querySelector('body').classList.remove('x-dropdown-open');
-      $scope.model.data.push($scope.blocks[block]);
+      $scope.model.data.push(angular.copy($scope.blocks[block]));
       $scope.$broadcast('modechange');
     };
 
