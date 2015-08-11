@@ -26,6 +26,7 @@ var securityServiceModule = require('./securityService.js');
 var securityService= new securityServiceModule.SecurityService();
 
 var schemaRegistryModule = require('./schemaRegistry.js');
+var templateRegistryModule = require('./templateRegistry.js');
 var csvImportModule = require('./csvImportService.js');
 
 var schemaControllerModule = require('./schemaController.js');
@@ -64,11 +65,34 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 			return path.join(config.paths.schemas, item);
 	});
 
+	// Get portal template paths
+	var templateListPaths = [];
+	if(config.paths.portalTemplates) {
+		templateListPaths = JSON.parse(
+			fs.readFileSync(path.join(config.paths.portalTemplates, '_template_index.json')))
+			.map(function(item) {
+				return path.join(config.paths.portalTemplates, item);
+			}
+		);
+	}
+
+	// Get portal widget paths
+	var blockListPaths = [];
+	if(config.paths.portalBlocks) {
+		blockListPaths = JSON.parse(
+			fs.readFileSync(path.join(config.paths.portalBlocks, '_block_index.json')))
+			.map(function(item) {
+				return path.join(config.paths.portalBlocks, item);
+			}
+		);
+	}
+
 
 	var eventHandlers = path.join(config.paths.schemas, '_event_handlers.json');
 
 
 	var schemaRegistry = new schemaRegistryModule.SchemaRegistry({schemasList:schemasListPaths});
+	var templateRegistry = new templateRegistryModule.TemplateRegistry({templateList: templateListPaths, blockList: blockListPaths});
 
 	var eventScheduler=new eventSchedulerModule.EventScheduler(mongoDriver);
 
@@ -132,6 +156,9 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 	app.get('/schema/ls*',securityService.hasPermFilter('System Admin').check,bodyParser.json(),function(req,res){schemaCtrl.schemaList(req,res);});
 	app.get('/schema/get/*',securityService.hasPermFilter('System Admin').check,bodyParser.json(),function(req,res){schemaCtrl.schemaRead(req,res);});
 	app.put('/schema/replace/*',securityService.hasPermFilter('System Admin').check,bodyParser.json(),function(req,res){schemaCtrl.schemaReplace(req,res);});
+
+	app.get('/portal/templates/getAll', securityService.hasPermFilter('System User').check, bodyParser.json(), function(req, res) {templateRegistry.getAllTemplates(req, res); });
+	app.get('/portal/blocks/getAll', securityService.hasPermFilter('System User').check, bodyParser.json(), function(req, res) {templateRegistry.getAllBlocks(req, res); });
 
 	app.get('/user/permissions/:id',securityService.hasPermFilter('Security - write').check,bodyParser.json(),function(req,res){securityCtrl.getUserPermissions(req,res);});
 	app.post('/user/permissions/update',securityService.hasPermFilter('Security - write').check, bodyParser.json(),function(req,res){securityCtrl.updateUserPermissions(req,res);});

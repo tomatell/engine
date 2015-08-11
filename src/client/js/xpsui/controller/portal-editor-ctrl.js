@@ -2,506 +2,36 @@
   'use strict';
 
   angular.module('xpsui:controllers')
-  .controller('xpsui:PortalEditorCtrl', ['$scope', '$sce', '$http', 'xpsui:NotificationFactory', 
-    '$route', '$routeParams', '$location', 'xpsui:DateUtil', 
-    function($scope, $sce, $http, notificationFactory, $route, $routeParams, $location, dateUtils) {
-    $scope.model = {
-    };
+  .controller('xpsui:PortalEditorCtrl', ['$scope', '$sce', '$http', 'xpsui:NotificationFactory',
+    '$route', '$routeParams', '$location', 'xpsui:DateUtil', '$q',
+    function($scope, $sce, $http, notificationFactory, $route, $routeParams, $location, dateUtils, $q) {
+		$scope.model = {};
+		$scope.showButtons = false;
 
-    $scope.templates = {
-      'index' : {
-        name: 'Titulok',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-headline.svg',
-        meta: {
-          template: 'index',
-          isIndex: false,
-          isMenu: false,
-          parentMenu: null,
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
+		var templatePromise =
+			$http({
+				method: 'GET',
+				url: '/portal/templates/getAll',
+				data: {}
+			});
 
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      },
-      'article' : {
-        name: 'Article',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-article.svg',
-        meta: {
-          template: 'article',
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
+		var blocksPromise =
+			$http({
+				method: 'GET',
+				url: '/portal/blocks/getAll',
+				data: {}
+			});
 
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      },
-      'location' : {
-        name: 'Location',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-article.svg',
-        meta: {
-          template: 'location',
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
+		console.log($routeParams);
 
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      },
-      'news' : {
-        name: 'News',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-article.svg',
-        meta: {
-          template: 'news',
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
+		$q.all([templatePromise, blocksPromise]).then(function(response) {
+			$scope.templates = response[0].data;
+			$scope.blocks = response[1].data;
+			$scope.showButtons = true;
+		}, function(error) {
+			notificationFactory.error(error.data);
+		});
 
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      },
-      'video' : {
-        name: 'Video',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-article.svg',
-        meta: {
-          template: 'video',
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
-
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      },
-      'photo' : {
-        name: 'photo',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-article.svg',
-        meta: {
-          template: 'photo',
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
-
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      },
-      'riderszone' : {
-        name: 'Riderszone',
-        desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa aj ako link v zozname článkov',
-        icon: 'img/block-article.svg',
-        meta: {
-          template: 'riderszone',
-          enabled: true,
-          publishFrom: dateUtils.nowToReverse(),
-          tags: []
-        },
-        data: [
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'title',
-              element: '<div></div>'
-            },
-            data: '<h1>...Titulok článku...</h1>'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'abstract',
-              element: '<section class="abstract"></section>'
-            },
-            data: '...Abstrakt článku, krátky popis a zhrnutie...'
-          },
-          {
-            meta: {
-              type: 'pure-html',
-              name: 'contentBlock',
-              element: '<section class="content"></section'
-
-            },
-            data: '<p>...Obsah článku...</p>'
-          }
-        ]
-      }
-    };
-
-    $scope.blocks = {
-      title: {
-          meta: {
-            name: 'title',
-            element: '<div></div>',
-            type: 'pure-html',
-            title: 'Titulok',
-            desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa ak ako link v zozname článkov',
-            icon: 'img/block-headline.svg'
-          },
-          data: '<h1>...Titulok článku...</h1>',
-          css: { cssClass: '' }
-        },
-      abstract: {
-          meta: {
-            name: 'abstract',
-            element: '<section class="abstract"></section>',
-            type: 'pure-html',
-            title: 'Abstrakt',
-            desc: 'Krátke zhrnutie článku',
-            icon: 'img/block-abstract.svg'
-          },
-          data: '...Abstrakt článku...'
-        },
-      content: {
-          meta: {
-            name: 'content',
-            element: '<section class="content"></section>',
-            type: 'pure-html',
-            title: 'Obsah',
-            desc: 'Obsah článku obsahujúci hlavnú časť textu',
-            icon: 'img/block-content.svg'
-          },
-          data: '<p>...Obsah článku...</p>'
-        },
-        matchResults: {
-            meta: {
-              name: 'match-results',
-              element: '<section class="x-portal-competition-matches"><header>Výsledky</header></section>',
-              type: 'match-results',
-              title: 'Výsledky',
-              desc: 'Časť obsahujúa výsledky súťaží.',
-              icon: 'img/block-content.svg'
-            },
-            data: '<h1>Výsledky súťaží</h1>'
-          },
-        matchResultsAll: {
-            meta: {
-              name: 'match-results-all',
-              element: '<section class="x-portal-competition-matches"><header>Rozlosovanie</header></section>',
-              type: 'match-results-all',
-              title: 'Rozlosovanie',
-              desc: 'Časť obsahujúa rozlosovanie súťaží.',
-              icon: 'img/block-content.svg'
-            },
-            data: ''
-          },
-//          matchStandings: {
-//              meta: {
-//                name: 'match-standings',
-//                element: '<section class="x-portal-competition-matches"><header>Poradie</header></section>',
-//                type: 'match-standings',
-//                desc: '<h1>Poradie</h1><p>Časť obsahujúa poradie podľa výsledkov súťaží.</p>',
-//                icon: 'img/block-content.png',
-//              },
-//              data: '<h1>Poradie</h1>'
-//            },
-          link: {
-              meta: {
-                name: 'link',
-                title: 'Linka',
-                desc: 'Linka na inú stránku',
-                icon: 'img/block-link.svg',
-                type: 'link',
-              },
-              data: {
-                  href: 'www.example.com',
-                  newWindow: false,
-                  title: 'Example link',
-                }
-            },
-      image: {
-          meta: {
-            name: 'image',
-            element: '<div></div>',
-            type: 'image',
-            title: 'Obrázok',
-            desc: 'Veľký obrázok do článku',
-            icon: 'img/block-image.svg',
-          },
-          data: {
-            img: ''
-          }
-        },
-        image1170: {
-            meta: {
-              name: 'image1170',
-              element: '<div></div>',
-              type: 'image1170',
-              title: 'Obrázok 1170px x 570px',
-              desc: 'Obrázok 1170px x 570px.',
-              icon: 'img/block-image.svg',
-            },
-            data: {
-              img: ''
-            }
-          },
-        video: {
-            meta: {
-              name: 'video',
-              title: 'Embedované video',
-              desc: 'Embedované video s titulkom a textom',
-              icon: 'img/block-video.svg',
-              type: 'video',
-            },
-            data: {
-                src: '',
-                title: 'Embedované video',
-                subTitle: 'video',
-                text: 'text k videu',
-              }
-          },
-        fileList: {
-            meta: {
-              name: 'file-list',
-              element: '<div></div>',
-              type: 'file-list',
-              title: 'Súbory',
-              desc: 'Zoznam súborov',
-              icon: 'img/block-filelist.svg',
-            },
-            data: {
-              files: []
-            }
-          },
-      category: {
-          meta: {
-            name: 'category',
-            element: '<div></div>',
-            type: 'category',
-            title: 'Kategória',
-            desc: 'Zoznam článkov v danej kategórii',
-            icon: 'img/block-category.svg',
-          },
-          data: {
-            tags: []
-          }
-        },
-        overview: {
-            meta: {
-              name: 'overview',
-              element: '<div></div>',
-              type: 'overview',
-              title: 'Prehľad',
-              desc: 'Prehľad článkov pod sebou.',
-              icon: 'img/block-overview.svg',
-            },
-            data: {
-              tags: []
-            }
-          },
-        ranking: {
-            meta: {
-              name: 'ranking',
-              element: '<div></div>',
-              type: 'ranking',
-              title: 'Poradie',
-              desc: 'Výsledky / poradie súťažiacich.',
-              icon: 'img/block-ranking.svg',
-            },
-            data: {
-              results: []
-            }
-          },
-      gallery: {
-          meta: {
-            name: 'gallery',
-            element: '<div></div>',
-            type: 'gallery',
-            title: 'Galéria',
-            desc: 'Galéria fotografií',
-            icon: 'img/block-gallery.svg',
-          },
-          data: {
-            images: []
-          }
-        },
-      showcase: {
-          meta: {
-            name: 'showcase',
-            element: '<div></div>',
-            type: 'showcase',
-            title: 'Výklad',
-            desc: 'Najhorúcejšie články v prelínajúcom zobrazení výkladného okna',
-            icon: 'img/block-topics.svg',
-          },
-          data: {
-            tags: []
-          },
-          css: { cssClass: '' }
-        },
-      showcasevideo: {
-          meta: {
-            name: 'showcasevideo',
-            element: '<div></div>',
-            type: 'showcasevideo',
-            title: 'Výklad s videami',
-            desc: 'Videá v prelínajúcom zobrazení výkladného okna',
-            icon: 'img/block-videoshowcase.svg',
-          },
-          data: {
-            tags: []
-          },
-          css: { cssClass: '' }
-        },
-      };
-
-    //$scope.templateUrl = 'portal/templates/article.html';
-
-    //$scope.model = angular.copy($scope.templates.article);
-
-    console.log($routeParams);
     if ($routeParams.id) {
       $http({
         url: '/udao/get/portalArticles/' + $routeParams.id,
@@ -542,7 +72,10 @@
 
     $scope.addNew = function addNew() {
       $scope.model = {};
-      angular.copy($scope.templates.article, $scope.model);
+      angular.copy($scope.templates.Article, $scope.model);
+      if($scope.model.meta.publishFrom === null) {
+      	$scope.model.meta.publishFrom = dateUtils.nowToReverse();
+      }
       $scope.viewTemplate = $scope.getViewTemplate();
       enterEditMode();
     };
@@ -631,6 +164,7 @@
         // Change the color of the close button to black.
     	$scope.color = "black";
     }
+
     
 
     

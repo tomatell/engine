@@ -73,3 +73,7 @@ Script print all player in semicolon-separated values (;).
 
 ## 12 - migrate idInfo.currnetId idInfo.currentId in SVF instance
 - migrate existing db's by running`tools/migrations/12.sh`
+
+## 13 - Portal templates and blocks moved to dataset
+- db migration is not needed for this version
+- instances with portal need to contain JSON blocks and templates + their indexes in portal/client/blocks and portal/client/templates

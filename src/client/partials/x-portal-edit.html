@@ -1,8 +1,8 @@
 <h1>{{'portal.edit.title' | translate}}</h1>
 <fieldset class="form-group" style="background-color: black; padding: 10px;" ng-show="mode !== 'edit'">
 <div class="btn-group pull-right">
-	<button class="btn btn-primary btn-ok" ng-click="edit();"><i class="icon-pencil"></i>{{'portal.edit.edit' | translate}}</button>
-	<button class="btn btn-primary btn-ok" ng-click="addNew();"><i class="icon-add-circle"></i>{{'portal.edit.new' | translate}}</button>
+	<button class="btn btn-primary btn-ok" ng-show="showButtons" ng-click="edit();"><i class="icon-pencil"></i>{{'portal.edit.edit' | translate}}</button>
+	<button class="btn btn-primary btn-ok" ng-show="showButtons" ng-click="addNew();"><i class="icon-add-circle"></i>{{'portal.edit.new' | translate}}</button>
 </div>
 </fieldset>
 <div ng-show="mode === 'edit'">
