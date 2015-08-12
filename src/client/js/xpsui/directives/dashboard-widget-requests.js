@@ -104,14 +104,13 @@
 				content.append(blocks);
 
 				var label_loading = $translate.instant('generic.loading');
-
-				var contentBlock1Elm = angular.element('<div>' + label_loading + '</div>');
-				var contentBlock2Elm = angular.element('<div>' + label_loading + '</div>');
-				var contentBlock3Elm = angular.element('<div>' + label_loading + '</div>');
-				var contentBlock4Elm = angular.element('<div>' + label_loading + '</div>');
 				
 				//If the user can solve requests, the request solver search results are used
 				if (scope.hasPermissions(['Registry - read'])){
+					var contentBlock1Elm = angular.element('<div>' + label_loading + '</div>');
+					var contentBlock2Elm = angular.element('<div>' + label_loading + '</div>');
+					var contentBlock3Elm = angular.element('<div>' + label_loading + '</div>');
+
 					var contentBlock1Title = $translate.instant('dashboard.widget.members.openRequests');
 					var contentBlock2Title = $translate.instant('dashboard.widget.data.openRequests');
 					var contentBlock3Title = $translate.instant('dashboard.widget.transfer.openRequests');
@@ -119,9 +118,23 @@
 					getCount('uri://registries/registrationRequests#views/peopleRegistrationSolver/search', contentBlock1Elm, 'showRegistrationsSolver()');
 					getCount('uri://registries/dataChangeRequests#views/dataChangeSolver/search', contentBlock2Elm, 'showDataChangesSolver()');
 					getCount('uri://registries/transferRequests#views/transferSolver/search', contentBlock3Elm, 'showTransfersSolver()');
+
+					var block1 = createWidgetBlock(contentBlock1Title, contentBlock1Elm)
+					blocks.append(block1);
+
+					var block2 = createWidgetBlock(contentBlock2Title, contentBlock2Elm)
+					blocks.append(block2);
+
+					var block3 = createWidgetBlock(contentBlock3Title, contentBlock3Elm)
+					blocks.append(block3);
 				} 
 				// If the user can only create requests, the request applicant search results are used
 				else if (scope.hasPermissions(['Registry Requests'])){
+					var contentBlock1Elm = angular.element('<div>' + label_loading + '</div>');
+					var contentBlock2Elm = angular.element('<div>' + label_loading + '</div>');
+					var contentBlock3Elm = angular.element('<div>' + label_loading + '</div>');
+					var contentBlock4Elm = angular.element('<div>' + label_loading + '</div>');
+
 					var contentBlock1Title = $translate.instant('dashboard.widget.members.openRequests');
 					var contentBlock2Title = $translate.instant('dashboard.widget.data.openRequests');
 					var contentBlock3Title = $translate.instant('dashboard.widget.transfer.openRequests');
@@ -131,19 +144,19 @@
 					getCount('uri://registries/dataChangeRequests#views/dataChangeApplicant/search', contentBlock2Elm,'showDataChanges()');
 					getCount('uri://registries/transferRequests#views/transferApplicant/search', contentBlock3Elm, 'showTransfers()');
 					getCount('uri://registries/transferRequests#views/transferSolverClubFrom/search', contentBlock4Elm, 'showTransfersSolverClubFrom()');
+
+					var block1 = createWidgetBlock(contentBlock1Title, contentBlock1Elm)
+					blocks.append(block1);
+
+					var block2 = createWidgetBlock(contentBlock2Title, contentBlock2Elm)
+					blocks.append(block2);
+
+					var block3 = createWidgetBlock(contentBlock3Title, contentBlock3Elm)
+					blocks.append(block3);
+
+					var block4 = createWidgetBlock(contentBlock4Title, contentBlock4Elm)
+					blocks.append(block4);
 				} 
-
-				var block1 = createWidgetBlock(contentBlock1Title, contentBlock1Elm)
-				blocks.append(block1);
-
-				var block2 = createWidgetBlock(contentBlock2Title, contentBlock2Elm)
-				blocks.append(block2);
-
-				var block3 = createWidgetBlock(contentBlock3Title, contentBlock3Elm)
-				blocks.append(block3);
-
-				var block4 = createWidgetBlock(contentBlock4Title, contentBlock4Elm)
-				blocks.append(block4);
 
 				elm.append(titleBar);
 				elm.append(content);
