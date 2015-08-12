@@ -13,11 +13,12 @@
 		 * @returns - object in form
 				[{ round:<index>,term:<round_term>,matches:[{home:teams[x1],visitors:teams[y1],board:<board_index>},...] },...]
 		 */
-		function bergerTable (teams,terms) {
+		function bergerTable(teams,terms) {
+
 			var floatTable = [];
 			var n, i, increment=1, atype=1, minmove=0, flipcolors=0;
 
-			if (teams.length%2===1){
+			if (teams.length%2===1) {
 				teams.push({complement:true});
 			}
 
@@ -41,13 +42,12 @@
 				var outRound={round:r,term:terms[r-1],matches:[]};
 				outRounds.push(outRound);
 
-				if (r == nr+1) {
+				if(r == nr+1) {
 					match_id=0;
 					textPrefix = 'B-';
 				}
 
-				if (r == 1) {		 // Round 1 initially seat the players
-
+				if(r == 1) {		 // Round 1 initially seat the players
 					incr=n-3; j = 0;
 
 					for (i = 1; i < n; i++) {
@@ -56,8 +56,7 @@
 						j = j % (n-1);
 					}
 					floatTable[nr]=n;	// Identifies the "ghost" player, will not move
-				}
-				else {			 // Other rounds, rotate the players "clockwise"
+				}else {			// Other rounds, rotate the players "clockwise"
 					temp = floatTable[n-2];
 					for (i=n-2;	i > 0 ; i--) {
 						floatTable[i] = floatTable[i-1];
@@ -65,8 +64,9 @@
 					floatTable[0] = temp;
 				}
 				if (r == n) {
-					 flipcolors ^= 1; // Swap colors for 2nd half
-					 test_r = 1; }
+					flipcolors ^= 1; // Swap colors for 2nd half
+					test_r = 1; 
+				}
 
 				i=0; // i is the board number about to be displayed, changed at bottom of loop
 				if (atype == '1')
@@ -85,15 +85,16 @@
 
 					colorFlag ^= flipcolors; //Will reverse color assignment if checked
 
-					var match={home: teams[floatTable[colorFlag?nr-i:i]-1] ,visitors:teams[floatTable[colorFlag?i:nr-i]-1] ,boar:i ,matchNumber:matchPrefix};
 
-					if (i===0){
-						match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix};
+					var match={home:teams[floatTable[colorFlag?nr-i:i]-1].team ,visitors:teams[floatTable[colorFlag?i:nr-i]-1].team ,boar:i ,matchNumber:matchPrefix, homeClub:teams[floatTable[colorFlag?nr-i:i]-1].club ,visitorClub:teams[floatTable[colorFlag?i:nr-i]-1].club};
+
+					if (i===0) {
+						match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix, homeClub:match.visitorClub, visitorClub:match.homeClub};
 					}
 
-					if (match.home.complement){
+					if (match.home.complement) {
 						outRound.notPlaying=match.visitors;
-					} else if (match.visitors.complement){
+					} else if (match.visitors.complement) {
 						outRound.notPlaying=match.home;
 					} else {
 						outRound.matches.push(match);
@@ -119,83 +120,133 @@
 			// console.log(JSON.stringify(outRounds));
 			return outRounds;
 		}
-		function saveBerger(entity,callback){
 
-			var saveSchema= schemaUtilFactory.encodeUri("uri://registries/refereeReports#views/refereeReports/new");
+		function saveBerger(entity,callback) {
+
+			var saveSchema= schemaUtilFactory.encodeUri('uri://registries/refereeReports#views/refereeReports/new');
 			var saved=0;
 			var all=[];
 
 			entity.saving=true;
 
-			entity.generated.map(function(round){
-				round.matches.map(function(match){
+			entity.generated.map(function(round) {
+				round.matches.map(function(match) {
 					var toSave={};
 					toSave.baseData={};
-					toSave.baseData.homeClub=match.home;
-					toSave.baseData.awayClub=match.visitors;
-					toSave.baseData.matchRound={registry:"schedules",oid:round.term.id};
-					toSave.baseData.competition=entity.baseData.competition;
-					toSave.baseData.ageCategory=entity.baseData.ageCategory;
-					toSave.baseData.competitionPart={registry:"competitionParts",oid:entity.id};
+					toSave.baseData.competition={schema:'uri://registries/competitions#views/competitions/view',oid:entity.baseData.competition.oid};
+					toSave.baseData.season={schema:'uri://registries/seasons#views/seasons/view',oid:entity.competitionData.baseData.season.oid};
+					toSave.baseData.competitionPart={schema:'uri://registries/competitionPart#views/competitionPart/view',oid:entity.id};
+					toSave.baseData.ageCategory={schema:'uri://registries/ageCategory#views/ageCategory/view',oid:entity.competitionData.baseData.ageCategory.oid};
+					toSave.baseData.homeClubSec={schema:'uri://registries/organizations#views/club/view',oid:match.homeClub.oid};
+					toSave.baseData.awayClubSec={schema:'uri://registries/organizations#views/club/view',oid:match.visitorClub.oid};
+					toSave.baseData.homeClub={schema:'uri://registries/rosters#views/rosters/view',oid:match.home.oid};
+					toSave.baseData.awayClub={schema:'uri://registries/rosters#views/rosters/view',oid:match.visitors.oid};
+					toSave.baseData.matchRound={schema:'uri://registries/schedule#views/schedule/view',oid:round.term.id};
 					toSave.baseData.matchDate=round.term.baseData.date;
 					toSave.baseData.state='Otvorený';
-					toSave.baseData.matchNumber=entity.baseData.prefix+match.matchNumber;		
-					
+
+					if (entity.baseData.prefix) {
+						toSave.baseData.matchNumber=entity.baseData.prefix+match.matchNumber;
+					};
+												
 					all.push( $http({url: '/udao/saveBySchema/'+saveSchema, method: 'PUT',data: toSave}));
 				});
 			});
-			$q.all(all).then(function(){
-			 		callback(null);
+			$q.all(all).then(function() {
+				callback(null);
 			});
 		}
 
-		function generateBerger(entity,callback){
-			var searchSchema="uri://registries/schedule#views/schedule/search";
+		function generateBerger(entity,callback) {
+			var searchSchema='uri://registries/schedule#views/schedule/search';
 			$http({
 				method : 'POST',
 				url : '/search/' + schemaUtilFactory.encodeUri(searchSchema),
 				data : {
 					crits :[{
-						f : "baseData.competitionPart.oid",
+						f : 'baseData.competitionPart.oid',
 						v : entity.id,
-						op : "eq"
+						op : 'eq'
 					}],
-					sorts: [ { f:"baseData.date", o: "asc"}]
+					sorts: [ { f:'baseData.date', o: 'asc'}]
 				}
-			}).success(function(terms){
+			}).success(function(terms) {
 				var teams=entity.listOfTeam.team;
 
-				entity.generated=bergerTable(teams,terms);
-				callback();
-			}).error(function(err){
+				var n = teams.length;
+				
+				//get competition object
+				var getSchemaCompetition = 'uri://registries/competitions#views/competitions/';
+				$http({ 
+					method : 'GET',
+					url: '/udao/getBySchema/'+schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri(getSchemaCompetition, 'view'))+'/'+ entity.baseData.competition.oid
+				})
+				.success(function(dataCom) {
+					console.log(JSON.stringify(dataCom, null, 4));
+					entity.competitionData = dataCom;
+
+					//get roster object
+					var getSchemaRoster = 'uri://registries/rosters#views/rosters/';
+					var httpArray = [];
+
+					for (var i = 0; i < n; i++) {
+						httpArray.push(
+							$http({ 
+								method : 'GET',
+								url: '/udao/getBySchema/'+schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri(getSchemaRoster, 'view'))+'/'+ entity.listOfTeam.team[i].team.oid
+							})
+						);
+					};
+
+					$q.all(httpArray).then(function(listOfRoster) {
+						if(!entity.rosters) {
+							entity.rosters = {};
+						}
+						entity.rosters = listOfRoster;
+						var rosters = entity.rosters;
+
+						for (var i = 0; i < n; i++) {
+							teams[i].club = rosters[i].data.baseData.club;
+						}
+
+						entity.generated=bergerTable(teams,terms);
+
+						callback();
+					});
+
+				}).error(function(err) {
+					callback(err);
+				});
+
+			}).error(function(err) {
 				callback(err);
 			});
 		}
 
-		function generateUserAccounting(entity,callback){
+		function generateUserAccounting(entity,callback) {
 
 			$http({
 				method : 'GET',
 				url : '/info/accounting/user/' + entity.id,
 
-			}).success(function(info){
+			}).success(function(info) {
 				entity.accounting=info;
 				callback();
-			}).error(function(err){
+			}).error(function(err) {
 				callback(err);
 			});
 		}
 
-		function generateClubAccounting(entity,callback){
+		function generateClubAccounting(entity,callback) {
 
 			$http({
 				method : 'get',
 				url : '/info/accounting/club/' + entity.id,
 
-			}).success(function(info){
+			}).success(function(info) {
 				entity.accounting=info;
 				callback();
-			}).error(function(err){
+			}).error(function(err) {
 				callback(err);
 			});
 		}
@@ -226,28 +277,28 @@
 			});
 		};
 
-
-		service.generate=function(entity,type,callback){
-			switch (type){
-				case "BERGER":
+		service.generate=function(entity,type,callback) {
+			switch (type) {
+				case 'BERGER':
 					generateBerger(entity,callback);
 					break;
-				case "USER-ACCOUNTING":
+				case 'USER-ACCOUNTING':
 					generateUserAccounting(entity,callback);
 					break;
-				case "CLUB-ACCOUNTING":
+				case 'CLUB-ACCOUNTING':
 					generateClubAccounting(entity,callback);
 					break;
 			}
 		};
-		service.save=function(entity,type,callback){
-			switch (type){
-				case "BERGER":
+		service.save=function(entity,type,callback) {
+			switch (type) {
+				case 'BERGER':
 					saveBerger(entity,callback);
 					break;
 			}
 		};
+
 		return service;
-	} ]);
+	}]);
 
 }(window.angular));
