@@ -97,6 +97,7 @@ div.x-fieldset-row {
 			color: #555555;
 			min-height: 100px;
 			resize:both;
+			font-size: $base-font-size;
 	}
 
 	@media (max-width: $screen-sm) {
