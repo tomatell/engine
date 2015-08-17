@@ -372,23 +372,29 @@ var UniversalDaoService = function(mongoDriver, schemaRegistry, eventRegistry) {
 		@param query criteria to search data
 		@param callback { form any(err,userError,data)}
 	*/
-	this.searchBySchema = function(schemaName,userCtx,query,callback) {
+	this.searchBySchema = function(schemaName, userCtx, query, callback) {
 
-		log.silly('searching in ',schemaName,' for', query);
+		log.silly('searching in %s, for %s', schemaName, query);
 
 		var schema = schemaRegistry.getSchema(schemaName);
-		var dao = new universalDaoModule.UniversalDao(mongoDriver, {
-			collectionName: schema.compiled.table
-		});
 
+		if (!schema) {
+			log.error('schema %s is registered', schemaName);
+			callback(new Error('Schema is not registered'));
+			return;
+		}
 
 		var compiledSchema = schema.compiled;
 
 		if (!compiledSchema) {
 			log.error('schema %s is not compiled', schemaName);
-			throw new Error('Schema is not compiled');
+			callback(new Error('Schema is not compiled'));
+			return;
 		}
 
+		var dao = new universalDaoModule.UniversalDao(mongoDriver, {
+			collectionName: schema.compiled.table
+		});
 
 		if (!securityService.hasRightForAction(compiledSchema,securityServiceModule.actions.READ,userCtx.perm)){
 			log.warn('user has not rights to search in schema',schemaName);
