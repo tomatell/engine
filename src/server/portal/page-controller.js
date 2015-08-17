@@ -216,12 +216,58 @@ PageController.prototype.saveSchema = function(req, res, next) {
 			if (err) {
 				log.error('error: %j ', err);
 				res.sendStatus(500);
+				//FIXME probably next not return
 				return;
 			}
 
 			res.json(body);
 			res.end();
 		});
+};
+
+/*
+ * Renders refereeReport in template defined by report itself.
+ *
+ * FIXME this is wrong design, creating selarate controller for every function
+ * Maybe we can separate whit to sports modules and than it makes sences to have
+ * matchResult page that is required for every sports
+ */
+PageController.prototype.renderRefereeReport = function(req, res, next) {
+	var mid = null;
+
+	if (req.params && req.params.mid) {
+		mid = req.params.mid;
+	} else {
+		log.error('Not all required parameters provided');
+		next(new Error('Not all required parameters provided'));
+		return;
+	}
+
+	// get match
+	this.refereeReportsDao.get(mid, function(err, data) {
+		if (err) {
+			log.error('Failed to get refereeReport %s', mid);
+			next(err);
+			return;
+		}
+
+
+		if (data && data.baseData && data.baseData.printTemplate) {
+			var templateName = data.baseData.printTemplate + '.html';
+			swig.renderFile(path.join(config.portalTemplatesPath, templateName), data, function(swigErr, output) {
+				if (swigErr) {
+					log.error('Failed to render %s', templateName, swigErr);
+					next(swigErr);
+					return;
+				}
+				res.send(output);
+			});
+		} else {
+			log.error('RefereeReport %s does not contain printTemplate', mid);
+			next(new Error('RefereeReport does not contain printTemplate'));
+			return;
+		}
+	});
 };
 
 PageController.prototype.renderPage = function(req, res, next) {
@@ -365,7 +411,7 @@ PageController.prototype.renderPage = function(req, res, next) {
 					var templateName = locals.article.meta.template + '.html';
 					swig.renderFile(path.join(config.portalTemplatesPath, templateName), locals, function(err, output) {
 						if (err) {
-							log.error('Failed to render %s', 'index.html', err);
+							log.error('Failed to render %s', templateName, err);
 							next(err);
 							return;
 						}
