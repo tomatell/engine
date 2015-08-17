@@ -157,9 +157,9 @@
 						tags: [],
 						subElements: []
 					});
-					openIcon.addClass('glyphicon-minus-sign');
+					openIcon.addClass('icon-minus');
 					openIcon.removeClass('glyphicon-record');
-					openIcon.removeClass('glyphicon-plus-sign');
+					openIcon.removeClass('icon-add');
 					children.removeClass('x-hidden');
 				};
 
