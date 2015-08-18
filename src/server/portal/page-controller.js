@@ -5,10 +5,13 @@ var log = require('../logging.js').getLogger('page-controller.js');
 var config = require('../config.js');
 var QueryFilter = require('../QueryFilter.js');
 var universalDaoModule = require('../UniversalDao.js');
+var schemaRegistryModule = require('../schemaRegistry.js');
+var universalDaoServiceModule = require('../UniversalDaoService.js');
 var swig = require('swig');
 var path = require('path');
 var request = require('request');
-var config = require(path.join(process.cwd(), '/build/server/config.js'));
+var fs = require('fs');
+var safeUrlEncoder = require('../safeUrlEncoder.js');
 
 var articlesCollection = 'portalArticles';
 var menuCollection = 'portalMenu';
@@ -25,6 +28,18 @@ function PageController(mongoDriver) {
 	this.competitionDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitions'});
 	this.refereeReportsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'refereeReports'});
 	this.rostersDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'rosters'});
+
+	// Load and register schemas
+	var schemasListPaths = JSON.parse(
+		fs.readFileSync(path.join(config.paths.schemas, '_index.json')))
+		.map(function(item) {
+			return path.join(config.paths.schemas, item);
+		});
+
+	var schemaRegistry = new schemaRegistryModule.SchemaRegistry({schemasList: schemasListPaths});
+	this.uDaoService = new universalDaoServiceModule.UniversalDaoService(mongoDriver, schemaRegistry, {
+		emitEvent: function() {}
+	});
 }
 
 PageController.prototype.competitionsList = function(req, res, next) {
@@ -233,21 +248,22 @@ PageController.prototype.saveSchema = function(req, res, next) {
  * matchResult page that is required for every sports
  */
 PageController.prototype.renderRefereeReport = function(req, res, next) {
-	var mid = null;
+	var mid, schemaName = null;
 
-	if (req.params && req.params.mid) {
+	if (req.params && req.params.mid && req.params.schemaName) {
 		mid = req.params.mid;
+		schemaName = safeUrlEncoder.decode(req.params.schemaName);
+
 	} else {
 		log.error('Not all required parameters provided');
 		next(new Error('Not all required parameters provided'));
 		return;
 	}
 
-	// get match
-	this.refereeReportsDao.get(mid, function(err, data) {
-		if (err) {
+	this.uDaoService.getBySchema(schemaName, {perm:{"Registry - read" : true}}, mid, function(err, userError, data) {
+		if (err || userError) {
 			log.error('Failed to get refereeReport %s', mid);
-			next(err);
+			next(err || userError);
 			return;
 		}
 
@@ -567,6 +583,13 @@ module.exports = {
 	competitionResults: function(req, res, next) {
 		if (pageController) {
 			pageController.competitionResults(req, res, next);
+		} else {
+			throw new Error('page-controller module not initialized');
+		}
+	},
+	competitionRefereeReports: function(req, res, next) {
+		if (pageController) {
+			pageController.renderRefereeReport(req, res, next);
 		} else {
 			throw new Error('page-controller module not initialized');
 		}

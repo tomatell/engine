@@ -66,7 +66,7 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 	app.get('/competition/list', pageController.competitionsList);
 	app.get('/competition/matches/:cid', pageController.competitionMatches);
 	app.get('/competition/results/:cid', pageController.competitionResults);
-	app.get('/competition/refereeReport/:mid', pageController.renderRefereeReport);
+	app.get('/competition/refereeReport/:schemaName/:mid', pageController.competitionRefereeReports);
 
 	app.use(express.static(path.join(process.cwd(), 'data', 'portal')));
 	app.use('/portal', express.static(path.join(process.cwd(), 'data', 'portal', 'client')));
