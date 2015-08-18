@@ -6,17 +6,17 @@
 
 		var template = '<fieldset class="flex-form-fieldset" style="padding-left: 0px; padding-right: 0px;">'
 		+ '<div class="flex-form-headers" >'
-		+ ' <div ng-repeat="(key, value) in xpsuiSchema.items"' 
-		+ '  class="flex-form-header"' 
-		+ '  ng-style="{\'flex\': fieldWeigth(value), \'-webkit-flex\': fieldWeigth(value) }">'
-		+ ' {{value.transCode || value.title | translate}}'
+		+ ' <div ng-repeat="key in keys(xpsuiSchema.items)"'
+		+ '  class="flex-form-header"'
+		+ '  ng-style="{\'flex\': fieldWeigth(xpsuiSchema.items[key]), \'-webkit-flex\': fieldWeigth(xpsuiSchema.items[key]) }">'
+		+ ' {{xpsuiSchema.items[key].transCode || xpsuiSchema.items[key].title | translate}}'
 		+ ' </div>'
 		+ '</div>'
 		+ '<div ng-repeat="item in ngModel" class="flex-form-array-row row-{{($index%2)?\'odd\':\'even\'}}">'
-		+ ' <div ng-repeat="(key, value) in xpsuiSchema.items" '
-		+ '  ng-style="{\'flex\': fieldWeigth(value), \'-webkit-flex\': fieldWeigth(value) }"' 
+		+ ' <div ng-repeat="key in keys(xpsuiSchema.items)" '
+		+ '  ng-style="{\'flex\': fieldWeigth(xpsuiSchema.items[key]), \'-webkit-flex\': fieldWeigth(xpsuiSchema.items[key]) }"'
 		+ '  class="flex-form-editable-data-col"'
-		+ '  xpsui-by-schema-field-edit xpsui-schema="value"'
+		+ '  xpsui-by-schema-field-edit xpsui-schema="xpsuiSchema.items[key]"'
 		+ '  xpsui-model="$parent.item[key]">x</div>'
 		+ '  <button ng-click="removeByIndex($index);" class="btn-clear">'
 		+ '   <i class="icon-minus"></i> {{\'generic.search.remove\' | translate}}'
@@ -51,6 +51,10 @@
 				};
 
 				scope.$watchCollection('ngModel', modelChanged);
+
+				scope.keys = function(obj) {
+					return obj ? Object.keys(obj) : [];
+				};
 
 				scope.removeByIndex = function(idx) {
 					scope.ngModel.splice(idx,1);
