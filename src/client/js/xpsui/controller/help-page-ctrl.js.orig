@@ -3,10 +3,12 @@
 
 	angular.module('xpsui:controllers')
 	.controller('xpsui:HelpPageCtrl', [
+<<<<<<< HEAD
 		"$scope", 
 		function($scope) {
 			$scope.greeting = 'Help';
 			console.log($scope.greeting);
+=======
 		"$scope",
 		"$location",
 		'$cookies', 
@@ -25,6 +27,7 @@
 
 			
 			//console.log($scope.greeting);
+>>>>>>> 2a8b022... [FIXED #101274396] Portal menu editor wrong indentation of submenus that are empty
 		}
 	]);
 }(window.angular));
