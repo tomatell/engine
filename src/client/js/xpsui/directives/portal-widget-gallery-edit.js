@@ -21,7 +21,7 @@
 
 				var content = angular.element('<div style="padding-left: 1px;">' +
 						'<div ng-repeat="photo in data.data.images" class="psui-wrapper" style="display: inline-block; padding: 0px; position: relative;">' +
-							'<div style="position: absolute; left: 5px; top: 5px;">' +
+							'<div style="width: 162px; position: absolute; left: 45px; top: 5px; z-index: 100;">' +
 								'<i class="action-button icon-chevron-left" ng-click="photoLeft($index);"></i>'+
 								'<i class="action-button icon-trash" ng-click="photoRemove($index);"></i>'+
 								'<i class="action-button icon-chevron-right" ng-click="photoRight($index);"></i>'+
