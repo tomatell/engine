@@ -13,8 +13,11 @@ var DEFAULT_CFG = {
 var templates = {
 	MAIL_USER_PASSWORD_RESET: 'user-reset-password-txt.tmpl',
 	MAIL_USER_PASSWORD_RESET_HTML: 'user-reset-password-html.tmpl',
+	MAIL_FORGOTTEN_PASSWORD: 'user-forgotten-password-txt.tmpl',
 	MAIL_FORGOTTEN_PASSWORD_HTML: 'user-forgotten-password-html.tmpl',
+	REQUEST_CREATED: 'requests-created-txt.tmpl',
 	REQUEST_CREATED_HTML: 'requests-created-html.tmpl',
+	REQUEST_UPDATED: 'requests-updated-txt.tmpl',
 	REQUEST_UPDATED_HTML: 'requests-updated-html.tmpl'
 };
 

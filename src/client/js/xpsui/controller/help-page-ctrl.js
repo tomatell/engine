@@ -3,13 +3,9 @@
 
 	angular.module('xpsui:controllers')
 	.controller('xpsui:HelpPageCtrl', [
-		"$scope", 
-		function($scope) {
-			$scope.greeting = 'Help';
-			console.log($scope.greeting);
 		"$scope",
 		"$location",
-		'$cookies', 
+		'$cookies',  
 		function($scope, $location, $cookies) {
 			if ($cookies.loginName) {
 				$scope.loggedin=true;
@@ -22,9 +18,6 @@
 			$scope.genQrcode = function() {
 				$scope.qrcode = '{"loginName": "' + $cookies.loginName + '", "url":"' + url + '"}';
 			}
-
-			
-			//console.log($scope.greeting);
 		}
 	]);
 }(window.angular));
