@@ -137,10 +137,11 @@
 				header.append(name);
 				header.append(actionButtons);
 
-				if (scope.index && scope.index.subElements && scope.index.subElements.length < 1) {
+				if (scope.index.name != 'ROOT' && scope.index && scope.index.subElements && scope.index.subElements.length < 1) {
 					openIcon.removeClass('icon-minus');
 					openIcon.removeClass('icon-add');
-					openIcon.addClass('glyphicon-record');
+					openIcon.addClass('icon-circle-o');
+					console.log('name: ' + scope.index.subElements);
 				}
 
 				elm.append(header);
