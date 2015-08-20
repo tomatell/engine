@@ -148,7 +148,9 @@
 					if (entity.baseData.prefix) {
 						toSave.baseData.matchNumber=entity.baseData.prefix+match.matchNumber;
 					};
-												
+
+					toSave.baseData.printTemplate=entity.baseData.printTemplate;	
+					
 					all.push( $http({url: '/udao/saveBySchema/'+saveSchema, method: 'PUT',data: toSave}));
 				});
 			});

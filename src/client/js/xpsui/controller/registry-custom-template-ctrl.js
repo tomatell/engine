@@ -24,12 +24,12 @@
 
 			if ($routeParams.template == 'createMember.html') {
 				$http({ method : 'GET',
-					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2FregistrationRequests~23views~2FpeopleRegistrationApplicant~2Fview'
+					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2FregistrationRequests~23views~2FpeopleRegistrationSolver~2Fview'
 						+ '/' + $routeParams.id})
 				.success(function(data, status, headers, config) {
 					delete data.id;
 					var copyFields = [
-					                  { 'path': 'model.obj', 'value': data }
+									{ 'path': 'model.obj', 'value': data }
 					];
 					var uri = '/registry/new/uri~3A~2F~2Fregistries~2Fpeople~23views~2Ffullperson';
 					navigationService.navigateToPath(uri, copyFields);
@@ -42,11 +42,11 @@
 
 			if ($routeParams.template == 'createTransfer.html') {
 				$http({ method : 'GET',
-					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2FtransferRequests~23views~2FtransferApplicant~2Fview'
+					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2FtransferRequests~23views~2FtransferSolver~2Fview'
 						+ '/' + $routeParams.id})
 				.success(function(data, status, headers, config) {
 					var copyFields = [
-					                  { 'path': 'model.obj.baseData', 'value': data.transferData }
+									{ 'path': 'model.obj.baseData', 'value': data.transferData }
 					];
 					var uri = '/registry/new/uri~3A~2F~2Fregistries~2Ftransfers~23views~2Ftransfers';
 					navigationService.navigateToPath(uri, copyFields);

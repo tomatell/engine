@@ -37,3 +37,10 @@ config.js needs to contain these e-mail addresses
 1. webNumber field changed and relocated in schema
 2. RefereeReports are used just in SZH instance, so migration is necessary only there
 2. Migrate existing db's by running`tools/migrations/5.sh`
+
+## 6 - RefereeReport schema changes data upgrade script
+- assigns home and away clubs acording setup in rosters
+
+## 7 - Gender shortcut fix in rosters and people
+- unifies gented to F for females
+
