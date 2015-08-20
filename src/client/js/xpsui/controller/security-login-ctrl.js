@@ -9,7 +9,8 @@
 		'xpsui:NotificationFactory', 
 		'xpsui:NavigationService' ,
 		'$cookies',
-		function($scope, SecurityService, $rootScope, $location,notificationFactory, navigationService, $cookies) {
+		'xpsui:config',
+		function($scope, SecurityService, $rootScope, $location, notificationFactory, navigationService, $cookies, config) {
 			// FIXME remove this in production
 			// $scope.user = 'johndoe';
 			// $scope.password = 'johndoe';
@@ -34,7 +35,7 @@
 							SecurityService.getCurrentUser().success(function(data){
 								$rootScope.security.currentUser=data;
 								if (!navigationService.back()) {
-									$location.path('/dashboard');
+									$location.path(config.get('after_login_url') || '/dashboard');
 								}
 							});
 						});
@@ -55,7 +56,7 @@
 					 SecurityService.getCurrentUser().success(function(data){
 						$rootScope.security.currentUser=data;
 						if (!navigationService.back()) {
-							$location.path('/dashboard');
+							$location.path(config.get('after_login_url') || '/dashboard');
 						}
 					});
 				});

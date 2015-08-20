@@ -44,3 +44,7 @@ config.js needs to contain these e-mail addresses
 ## 7 - Gender shortcut fix in rosters and people
 - unifies gented to F for females
 
+## 8 - Frontend configuration
+- /data/js/config.js file should be present
+- system is backward compatible somehow but config should be added even application survives without it
+
