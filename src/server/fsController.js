@@ -5,6 +5,7 @@ var express = require('express');
 var extend = require('extend');
 var path = require('path');
 var fsCtrlModule = require('./fsService.js');
+var url = require('url');
 
 var DEFAULT_CFG = {
 	rootPath : '/tmp',
@@ -55,7 +56,7 @@ var create = function(options) {
 	if (prop.allowedOperations.indexOf('get') > -1) {
 		log.verbose('Registering allowed opperation get');
 		app.get('/get/*', function(req, resp) {
-			var path = req.url.substring(5);
+			var path = url.parse(req.url).pathname.substring(5);
 
 			app.fsCtrl.get(path, resp, function(err) {
 				if (err) {
