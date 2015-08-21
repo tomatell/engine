@@ -20,6 +20,35 @@ var async = require('async');
 
 var pageController;
 
+function safeExtract(obj, path, defaultVal) {
+	function i(iObj, pathArr) {
+		// function dives one level into obj and removes first element in array
+		if(iObj && pathArr.length > 0) {
+			var f = pathArr.shift();
+			if (iObj.hasOwnProperty(f)) {
+				return i(iObj[f], pathArr);
+			} else {
+				return undefined;
+			}
+		} else {
+			return iObj;
+		}
+	}
+
+	if (obj && path) {
+		var v = i(obj, path.split('.'));
+		if (v) {
+			return v;
+		} else {
+			return defaultVal;
+		}
+	} else {
+		return defaultVal;
+	}
+}
+
+
+
 function PageController(mongoDriver) {
 	this.mongoDriver = mongoDriver;
 
@@ -249,10 +278,34 @@ PageController.prototype.saveSchema = function(req, res, next) {
  */
 PageController.prototype.renderRefereeReport = function(req, res, next) {
 	var mid, schemaName = null;
+	function timeToTimerV(vstr) {
+		var sstr = vstr.split(':');
 
-	if (req.params && req.params.mid && req.params.schemaName) {
-		mid = req.params.mid;
-		schemaName = safeUrlEncoder.decode(req.params.schemaName);
+		if (sstr.length !== 2) {
+			return 0;
+		}
+
+		var r = (parseInt(sstr[0]) * 60) + parseInt(sstr[1]);
+
+		if (isNaN(r)) {
+			return 0;
+		}
+
+		return r;
+	}
+
+	function findPlayerIdxByJersey(arr, jersey) {
+		for (var p in arr) {
+			if (arr[p].dressNumber === jersey) {
+				return arr[p];
+			}
+		}
+	}
+
+	if (req.query && req.query.id) {
+		mid = req.query.id;
+		schemaName = 'uri~3A~2F~2Fregistries~2FrefereeReports~23views~2FrefereeReports-km~2Fview';
+		schemaName = 'uri://registries/refereeReports#views/refereeReports-km/view';
 
 	} else {
 		log.error('Not all required parameters provided');
@@ -260,7 +313,7 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 		return;
 	}
 
-	this.uDaoService.getBySchema(schemaName, {perm:{"Registry - read" : true}}, mid, function(err, userError, data) {
+	this.uDaoService.getBySchema(schemaName, {perm: {"Registry - read" : true, 'RefereeReport - read - KM': true}}, mid, function(err, userError, data) {
 		if (err || userError) {
 			log.error('Failed to get refereeReport %s', mid);
 			next(err || userError);
@@ -270,6 +323,113 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 
 		if (data && data.baseData && data.baseData.printTemplate) {
 			var templateName = data.baseData.printTemplate + '.html';
+
+			// modify data
+			var d = safeExtract(data, 'baseData.matchDate', '');
+			if (d && d.length === 8) {
+				data.baseData.matchDate = d.substring(6, 8).concat('.', d.substring(4, 6), '.', d.substring(0, 4));
+			}
+
+			var e;
+			if (data && data.technicalData && data.technicalData.events) {
+				data.technicalData1 = {
+					events: []
+				};
+				data.technicalData2 = {
+					events: []
+				};
+
+				var hcounter = 0;
+				var acounter = 0;
+				
+				for (var e in data.technicalData.events) {
+					var evt = {
+						time: data.technicalData.events[e].time,
+						home: data.technicalData.events[e].home,
+						away: data.technicalData.events[e].away,
+						action: data.technicalData.events[e].action,
+						timer: timeToTimerV(data.technicalData.events[e].time)
+					};
+
+					var player;
+					if (evt.home && evt.home !== '') {
+						if (data.listOfPlayersHome && data.listOfPlayersHome.players) {
+							player = findPlayerIdxByJersey(data.listOfPlayersHome.players, evt.home);
+						}
+						if (evt.action === 'N') {
+							evt.action = 'Napom';
+							player.punish = (player.punish || '').concat('N');
+						} else if (evt.action === '2') {
+							evt.action = 'Vyluc2m';
+							player.punish = (player.punish || '').concat('2');
+						} else if (evt.action === 'D') {
+							evt.action = 'Diskv';
+							player.punish = (player.punish || '').concat('D');
+						} else if (evt.action === '0') {
+							evt.action = 'Nepr7m';
+							player.events1 = (player.events1 || '').concat('\u277C;');
+						} else if (evt.action === 'G') {
+							evt.action = (++hcounter) + ':' + acounter;
+							if (evt.timer < (30 * 60 + 1)) {
+								player.events1 = (player.events1 || '').concat(hcounter + ';');
+							} else {
+								player.events2 = (player.events2 || '').concat(hcounter + ';');
+							}
+
+							player.points = (player.points || 0) + 1;
+						} else if (evt.action === '7') {
+							evt.action = (++hcounter) + ':' + acounter;
+							if (evt.timer < (30 * 60 + 1)) {
+								player.events1 = (player.events1 || '').concat('[', hcounter, '];');
+							} else {
+								player.events2 = (player.events2 || '').concat('[', hcounter, '];');
+							}
+							player.points = (player.points || 0) + 1;
+						}
+					} else if (evt.away && evt.away !== '') {
+						if (data.listOfPlayersGuest && data.listOfPlayersGuest.players) {
+							player = findPlayerIdxByJersey(data.listOfPlayersGuest.players, evt.away);
+						}
+						if (evt.action === 'N') {
+							evt.action = 'Napom';
+							player.punish = (player.punish || '').concat('N');
+						} else if (evt.action === '2') {
+							evt.action = 'Vyluc2m';
+							player.punish = (player.punish || '').concat('2');
+						} else if (evt.action === 'D') {
+							evt.action = 'Diskv';
+							player.punish = (player.punish || '').concat('D');
+						} else if (evt.action === '0') {
+							evt.action = 'Nepr7m';
+							player.events1 = (player.events1 || '').concat('\u277C;');
+						} else if (evt.action === 'G') {
+							evt.action = (++hcounter) + ':' + (++acounter);
+							if (evt.timer < (30 * 60 + 1)) {
+								player.events1 = (player.events1 || '').concat(acounter + ';');
+							} else {
+								player.events2 = (player.events2 || '').concat(acounter + ';');
+							}
+
+							player.points = (player.points || 0) + 1;
+						} else if (evt.action === '7') {
+							evt.action = (hcounter) + ':' + (++acounter);
+							if (evt.timer < (30 * 60 + 1)) {
+								player.events1 = (player.events1 || '').concat('[', acounter, '];');
+							} else {
+								player.events2 = (player.events2 || '').concat('[', acounter, '];');
+							}
+							player.points = (player.points || 0) + 1;
+						}
+					}
+
+					if (evt.timer < (30 * 60 + 1)) {
+						data.technicalData1.events.push(evt);
+					} else {
+						data.technicalData2.events.push(evt);
+					}
+				}
+			}
+
 			swig.renderFile(path.join(config.portalTemplatesPath, templateName), data, function(swigErr, output) {
 				if (swigErr) {
 					log.error('Failed to render %s', templateName, swigErr);

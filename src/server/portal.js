@@ -61,12 +61,12 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 	var pageController = require('./portal/page-controller.js');
 	pageController.init(mongoDriver);
 
-	app.get('/:page?', pageController.renderPage);
 	app.get('/article/:aid?/:page?', pageController.renderPage);
 	app.get('/competition/list', pageController.competitionsList);
 	app.get('/competition/matches/:cid', pageController.competitionMatches);
 	app.get('/competition/results/:cid', pageController.competitionResults);
-	app.get('/competition/refereeReport/:schemaName/:mid', pageController.competitionRefereeReports);
+	app.get('/competition/refereeReport', pageController.competitionRefereeReports);
+	app.get('/:page?', pageController.renderPage);
 
 	app.use(express.static(path.join(process.cwd(), 'data', 'portal')));
 	app.use('/portal', express.static(path.join(process.cwd(), 'data', 'portal', 'client')));
