@@ -616,7 +616,7 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 		if (!gr) {
 			return;
 		}
-		if (gr.baseData.parent.oid) {
+		if (gr.baseData.parent && gr.baseData.parent.oid) {
 			this.resolveGroupPermissions(gr.baseData.parent.oid, allgroups, permissions);
 		}
 
