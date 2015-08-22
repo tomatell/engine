@@ -356,6 +356,11 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 						if (data.listOfPlayersHome && data.listOfPlayersHome.players) {
 							player = findPlayerIdxByJersey(data.listOfPlayersHome.players, evt.home);
 						}
+
+						if (!player) {
+							continue;
+						}
+
 						if (evt.action === 'N') {
 							evt.action = 'Napom';
 							player.punish = (player.punish || '').concat('N');
@@ -390,6 +395,11 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 						if (data.listOfPlayersGuest && data.listOfPlayersGuest.players) {
 							player = findPlayerIdxByJersey(data.listOfPlayersGuest.players, evt.away);
 						}
+
+						if (!player) {
+							continue;
+						}
+
 						if (evt.action === 'N') {
 							evt.action = 'Napom';
 							player.punish = (player.punish || '').concat('N');
