@@ -372,7 +372,11 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 							player.punish = (player.punish || '').concat('D');
 						} else if (evt.action === '0') {
 							evt.action = 'Nepr7m';
-							player.events1 = (player.events1 || '').concat('\u277C;');
+							if (evt.timer < (30 * 60 + 1)) {
+								player.events1 = (player.events1 || '').concat('\u277C;');
+							} else {
+								player.events2 = (player.events2 || '').concat('\u277C;');
+							}
 						} else if (evt.action === 'G') {
 							evt.action = (++hcounter) + ':' + acounter;
 							if (evt.timer < (30 * 60 + 1)) {
@@ -411,7 +415,11 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 							player.punish = (player.punish || '').concat('D');
 						} else if (evt.action === '0') {
 							evt.action = 'Nepr7m';
-							player.events1 = (player.events1 || '').concat('\u277C;');
+							if (evt.timer < (30 * 60 + 1)) {
+								player.events1 = (player.events1 || '').concat('\u277C;');
+							} else {
+								player.events2 = (player.events2 || '').concat('\u277C;');
+							}
 						} else if (evt.action === 'G') {
 							evt.action = (++hcounter) + ':' + (++acounter);
 							if (evt.timer < (30 * 60 + 1)) {
