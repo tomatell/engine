@@ -85,17 +85,19 @@
 
 					colorFlag ^= flipcolors; //Will reverse color assignment if checked
 
+					var pHome = teams[floatTable[colorFlag?nr-i:i]-1];
+					var pVisitors = teams[floatTable[colorFlag?i:nr-i]-1];
 
-					var match={home:teams[floatTable[colorFlag?nr-i:i]-1].team ,visitors:teams[floatTable[colorFlag?i:nr-i]-1].team ,boar:i ,matchNumber:matchPrefix, homeClub:teams[floatTable[colorFlag?nr-i:i]-1].club ,visitorClub:teams[floatTable[colorFlag?i:nr-i]-1].club};
+					var match={home:pHome.team ,visitors:pVisitors.team ,boar:i ,matchNumber:matchPrefix, homeClub:teams[floatTable[colorFlag?nr-i:i]-1].club ,visitorClub:teams[floatTable[colorFlag?i:nr-i]-1].club};
 
 					if (i===0) {
 						match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix, homeClub:match.visitorClub, visitorClub:match.homeClub};
 					}
 
-					if (match.home.complement) {
-						outRound.notPlaying=match.visitors;
-					} else if (match.visitors.complement) {
-						outRound.notPlaying=match.home;
+					if (pHome.complement) {
+						outRound.notPlaying=pVisitors;
+					} else if (pVisitors.complement) {
+						outRound.notPlaying=pHome;
 					} else {
 						outRound.matches.push(match);
 					}
