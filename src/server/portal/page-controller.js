@@ -421,7 +421,7 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 								player.events2 = (player.events2 || '').concat('\u277C;');
 							}
 						} else if (evt.action === 'G') {
-							evt.action = (++hcounter) + ':' + (++acounter);
+							evt.action = (hcounter) + ':' + (++acounter);
 							if (evt.timer < (30 * 60 + 1)) {
 								player.events1 = (player.events1 || '').concat(acounter + ';');
 							} else {
