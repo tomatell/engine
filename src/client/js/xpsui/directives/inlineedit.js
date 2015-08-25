@@ -129,7 +129,7 @@
 					enterViewMode();
 
 					scope.$apply(function() {
-						$parse(modelPath).assign(scope, oldValue); 
+						$parse(modelPath).assign(scope, oldValue);
 					});
 
 					formControl.releaseFocus(elm);
@@ -186,7 +186,7 @@
 					elm.attr('tabindex', '0');
 				
 					elm.on('focus', function(e) {
-						if (formControl.acquireFocus(elm)) {
+						if (formControl.acquireFocus(elm) && mode !== formGenerator.MODE.EDIT) {
 							enterEditMode();
 						}
 					});
