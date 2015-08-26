@@ -42,9 +42,13 @@ config.js needs to contain these e-mail addresses
 - assigns home and away clubs acording setup in rosters
 
 ## 7 - Gender shortcut fix in rosters and people
-- unifies gented to F for females
+- unifies gender to F for females
 
 ## 8 - Frontend configuration
 - /data/js/config.js file should be present
 - system is backward compatible somehow but config should be added even application survives without it
 
+## No version change
+- /tools/mongo/removeMatchesByRosterID.sh
+- first arg is DB, second arg is rosterID. Run example `tools/mongo/removeMatchesByRosterID.sh registry 55ddcc66adf3822a855edf06`
+Script remove all matches, where homeClub or awayClub is equal rosterID.
