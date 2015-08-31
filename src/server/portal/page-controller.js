@@ -120,7 +120,8 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 				matchDate: data[i].baseData.matchDate,
 				fullTimeScoreHome: data[i].baseData.fullTimeScoreHome,
 				fullTimeScoreAway: data[i].baseData.fullTimeScoreAway,
-				webNo: data[i].delegatedPerson && data[i].delegatedPerson.webNumber
+				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
+				printTemplate: data[i].baseData && data[i].baseData.printTemplate
 			});
 		}
 
@@ -143,13 +144,13 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 				if (rosters[result[i].homeId]) {
 					result[i].homeName = rosters[result[i].homeId];
 				} else {
-					result[i].homeName = '---';
+					result[i].homeName = '-:-';
 				}
 
 				if (rosters[result[i].guestId]) {
 					result[i].guestName = rosters[result[i].guestId];
 				} else {
-					result[i].guestName = '---';
+					result[i].guestName = '-:-';
 				}
 			}
 			
@@ -225,7 +226,7 @@ PageController.prototype.competitionResults = function(req, res, next) {
 				if (rosters[i]) {
 					result[i].name = rosters[i];
 				} else {
-					result[i].name = '---';
+					result[i].name = '-:-';
 				}
 			}
 			
@@ -251,7 +252,7 @@ PageController.prototype.saveSchema = function(req, res, next) {
 	request({ url: config.webserverPublicUrl + '/udao/saveBySchema/' + req.params.schema, method: 'PUT', 
 			json: true,
 			headers: {
-				"content-type": "application/json",
+				'content-type': 'application/json',
 			},
 			body: req.body,
 			rejectUnauthorized: false
@@ -313,7 +314,7 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 		return;
 	}
 
-	this.uDaoService.getBySchema(schemaName, {perm: {"Registry - read" : true, 'RefereeReport - read - KM': true}}, mid, function(err, userError, data) {
+	this.uDaoService.getBySchema(schemaName, {perm: {'Registry - read' : true, 'RefereeReport - read - KM': true}}, mid, function(err, userError, data) {
 		if (err || userError) {
 			log.error('Failed to get refereeReport %s', mid);
 			next(err || userError);
@@ -517,7 +518,7 @@ PageController.prototype.renderPage = function(req, res, next) {
 				log.silly('Creating category block resolver');
 
 				elm.data.aid = aid;
-				if ((typeof elm.data.pageSize === "undefined") || elm.data.pageSize == '') {
+				if ((typeof elm.data.pageSize === 'undefined') || elm.data.pageSize == '') {
 					elm.data.pageSize = 20;
 				}
 				function findFirstOfType(obj, type) {
