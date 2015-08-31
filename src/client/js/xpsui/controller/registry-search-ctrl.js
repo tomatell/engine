@@ -325,12 +325,27 @@
 				return result;
 			}
 
+			function removeForcedFields(schemaFields, schema) {
+				if(schema.forcedCriteria) {
+					for (var j = 0; j < schemaFields.length; j++) {
+						schema.forcedCriteria.forEach(function(crit) {
+							if (schemaFields[j].path === crit.f) {
+								schemaFields.splice(j, 1);
+								j--;
+							}
+						});
+					}
+				}
+
+			}
+
 			schemaUtil.getCompiledSchema(schemaUri)
 			.success(function(data) {
 					$scope.schema = data;
 					$scope.schemaFields = flattenSchema(data, '');
+					removeForcedFields($scope.schemaFields, $scope.schema);
 					// FIXME check if schema is correct, there has to be at least one field
-					$scope.currSort.field  = $scope.schema.listFields[0].field;
+					$scope.currSort.field = $scope.schema.listFields[0].field;
 					$scope.addNewCrit();
 				}
 			)

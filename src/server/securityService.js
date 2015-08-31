@@ -179,12 +179,21 @@ var SecurityService = function(mongoDriver, schemaRegistry, options) {
 		Method merges schema forced criteria to specified qf
 		@method applySchemaForcedCrits
 	*/
-	this.applySchemaForcedCrits=function(schema,qf){
+	this.applySchemaForcedCrits = function(schema, qf) {
 
 		// query=QueryFilter.create().addCriterium(cfg.loginColumnName, QueryFilter.operation.EQUAL, req.loginName)
-		if ('forcedCriteria' in schema ){
-			schema.forcedCriteria.map(function(item){
-				qf.addCriterium(item.f,item.op,item.v);
+
+		if ('forcedCriteria' in schema ) {
+			schema.forcedCriteria.map(function(item) {
+
+				// removing crits which would override the forced crit
+				for (var i = 0; i < qf.crits.length; i++) {
+					if (qf.crits[i].f === item.f) {
+						qf.crits.splice(i, 1);
+						i--;
+					}
+				}
+				qf.addCriterium(item.f, item.op, item.v);
 			});
 		}
 		return qf;
