@@ -331,7 +331,6 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 				data.baseData.matchDate = d.substring(6, 8).concat('.', d.substring(4, 6), '.', d.substring(0, 4));
 			}
 
-			var e;
 			if (data && data.technicalData && data.technicalData.events) {
 				data.technicalData1 = {
 					events: []
@@ -340,9 +339,16 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 					events: []
 				};
 
+				if (data.listOfPlayersHome && data.listOfPlayersHome.players) {
+					data.listOfPlayersHome.players.sort(function(a, b) {return parseInt(a.dressNumber) - parseInt(b.dressNumber); });
+				}
+				if (data.listOfPlayersGuest && data.listOfPlayersGuest.players) {
+					data.listOfPlayersGuest.players.sort(function(a, b) {return parseInt(a.dressNumber) - parseInt(b.dressNumber); });
+				}
+
 				var hcounter = 0;
 				var acounter = 0;
-				
+
 				for (var e in data.technicalData.events) {
 					var evt = {
 						time: data.technicalData.events[e].time,
