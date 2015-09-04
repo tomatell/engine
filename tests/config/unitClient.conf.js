@@ -27,6 +27,9 @@ module.exports = function (config) {
 			'../build/client/lib/ace-builds/src-min-noconflict/ace.js',
 			'../build/client/lib/angular-ui-ace/ui-ace.js',
 			'../build/client/js/safeUrlEncoder.js',
+			'../build/client/lib/angular-qr/lib/qrcode.js',
+			'../build/client/lib/angular-qr/angular-qr.min.js',
+			
 
 			// Mock
 			'../build/client/lib/angular-mocks/angular-mocks.js',
