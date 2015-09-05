@@ -65,7 +65,7 @@
 				if (compName.length < 1) {
 					continue;
 				}
-				if (i === components.length - 1 ) {
+				if (i === components.length - 1) {
 					f[compName] = value;
 				} else {
 					if (f.hasOwnProperty(compName)) {

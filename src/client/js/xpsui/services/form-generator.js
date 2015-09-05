@@ -70,7 +70,7 @@
 				field.attr('xpsui-schema', schemaPath);
 			} else if (mode === this.MODE.EDIT) {
 				if (schemaFragment.type === 'array') {
-					if (schemaFragment.items && schemaFragment.items.render && schemaFragment.items.render.component ) {
+					if (schemaFragment.items && schemaFragment.items.render && schemaFragment.items.render.component) {
 						field = angular.element('<div xpsui-array-control-edit="' + schemaFragment.items.render.component + '"></div>');
 					} else {
 						field = angular.element('<div xpsui-array-control-edit></div>');
@@ -95,9 +95,9 @@
 					field = angular.element('<div xpsui-select-edit></div>');
 					field.attr('xpsui-schema', schemaPath);
 				} else if (schemaFragment.render && schemaFragment.render.component) {
-					if ( schemaFragment.render.component === 'psui-textarea' ) {
+					if (schemaFragment.render.component === 'psui-textarea') {
 						field = angular.element('<div xpsui-textarea-edit></div>');
-					} else if ( schemaFragment.render.component === 'psui-datepicker' ) {
+					} else if (schemaFragment.render.component === 'psui-datepicker') {
 						field = angular.element('<div xpsui-date-edit xpsui-calendar ></div>');
 					} else if (schemaFragment.render.component === 'psui-contenteditable') {
 						field = angular.element('<div xpsui-contenteditable></div>');

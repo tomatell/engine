@@ -221,7 +221,7 @@ var SchemaTools = function() {
 	var compileInternal = function(obj) {
 		var p, refSchema, compiledSchema, errMessage, res, props, propName;
 
-		if ( obj && typeof obj === 'object') {
+		if (obj && typeof obj === 'object') {
 			// obj is object or array
 			if (Array.isArray(obj)) {
 				// obj is array
