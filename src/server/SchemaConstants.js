@@ -23,7 +23,7 @@ module.exports = {
 	PROPERTIES_KEYWORD: 'properties', // properties keyword
 	OBJECT_LINK_REFDATA_KEYWORD: 'refData', // resolved reference data
 	CLIENT_ACTIONS: 'clientActions', // array of client actions
-	FRAGMENTED_UPDATES_ALLOWED: 'fragmentedUpdatesAllowed', // save can send only fragment
+	FRAGMENTED_UPDATE_ALLOWED: 'fragmentedUpdateAllowed', // save can send only fragment
 
 	//DATA types
 	TYPE_KEYWORD: 'type',

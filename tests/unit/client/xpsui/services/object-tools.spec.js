@@ -25,8 +25,10 @@ describe('xpsui:ObjectTools', function() {
 			};
 
 			objectTools.setObjectFragment(srcObj, 'x.y', {z: 'z'});
-
 			expect(srcObj).to.be.eql(valid);
+
+			objectTools.setObjectFragment(srcObj, 'x.q', null);
+			expect(srcObj).to.have.deep.property('x.q', null);
 
 			done();
 		}]);

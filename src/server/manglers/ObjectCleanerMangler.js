@@ -13,32 +13,31 @@
 	function ObjectCleanerMangler() {
 	}
 
-	ObjectCleanerMangler.prototype.mangle = function(ctx,objFragment, schemaFragment, objPath, callback) {
-		log.silly('ObjectCleanerMangler mangler start for %s', objPath);
+	ObjectCleanerMangler.prototype.mangle = function(ctx, objFragment, schemaFragment, objPath, callback) {
+		log.silly('ObjectCleanerMangler mangler start for %s', objPath || null);
 
-		if (objPath){
-			 var value=objectTools.evalPath(ctx.o,objPath);
-			if (value!==null){
-				if ('' ===value || (typeof value =='object' && (!Object.keys(value).length || value.oid ==='')) ) {
-					objectTools.setValue(ctx.o,objPath,null);
+		if (objPath) {
+			var value = objectTools.evalPath(ctx.o, objPath);
+			if (value !== null) {
+				if (value === '' || (typeof value === 'object' && (!Object.keys(value).length || value.oid === ''))) {
+					objectTools.setValue(ctx.o, objPath, null);
 				}
 			}
 		}
 
-		if (!objFragment|| 'id'===objPath || objFragment && schemaFragment && !schemaFragment[consts.SEQUENCE]) {
+		if (!objFragment || objPath === 'id' || objFragment && schemaFragment && !schemaFragment[consts.SEQUENCE]) {
 			callback(null, null);
 			return;
 		}
 
-		log.debug('ObjectCleanerMangler removing  %s',  objPath);
-		objectTools.remove(ctx.o,objPath);
+		log.debug('ObjectCleanerMangler removing  %s', objPath);
+		objectTools.remove(ctx.o, objPath);
 		callback();
-		log.debug('ObjectCleanerMangler mangling finished for %s',  objPath);
-
+		log.debug('ObjectCleanerMangler mangling finished for %s', objPath);
 	};
 
 
-	module.exports = function( ) {
+	module.exports = function() {
 		return new ObjectCleanerMangler();
 	};
 }());

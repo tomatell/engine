@@ -1,4 +1,4 @@
-var log = require('./logging.js').getLogger('UniversalDaoController.js');
+var log = require('./logging.js').getLogger('UniversalDaoService.js');
 var async = require('async');
 
 var universalDaoModule = require(process.cwd() + '/build/server/UniversalDao.js');
