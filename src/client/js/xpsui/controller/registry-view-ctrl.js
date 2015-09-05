@@ -7,9 +7,11 @@
 		'$routeParams',
 		'$http',
 		'$location',
+		'$parse',
 		'xpsui:SchemaUtil',
 		'xpsui:NotificationFactory',
-		function($scope, $routeParams, $http, $location, schemaUtilFactory, notificationFactory) {
+		'xpsui:ObjectTools',
+		function($scope, $routeParams, $http, $location, $parse, schemaUtilFactory, notificationFactory, objectTools) {
 			//$scope.currentSchema = 'uri://registries/' + $routeParams.schema;
 			$scope.currentSchema = $routeParams.schema;
 			$scope.currentId = $routeParams.id;
@@ -24,10 +26,25 @@
 				schema: {}
 			};
 
+			$scope.fragmentedUpdateAllowed = false;
+
 			var schemaUri = schemaUtilFactory.decodeUri($scope.currentSchema);
 
-			$scope.save = function() {
-				$http({url: '/udao/saveBySchema/' + schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri($scope.currentSchemaUri, 'view')), method: 'PUT', data: $scope.model.obj})
+			$scope.save = function(path) {
+				var d = $scope.model.obj;
+
+				if (path && $scope.fragmentedUpdateAllowed) {
+					var v = $parse(path)($scope);
+					if (angular.isUndefined(v) || v == null || Object.getOwnPropertyNames(v).length === 0) {
+						v = null;
+					}
+					d = objectTools.setObjectFragment(
+						{id: $scope.model.obj.id},
+						path.replace($scope.schemaFormOptions.modelPath + '.', ''),
+						v);
+				}
+
+				$http({url: '/udao/saveBySchema/' + schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri($scope.currentSchemaUri, 'view')), method: 'PUT', data: d})
 				.success(function() {
 					$http({
 						method: 'GET',
@@ -56,13 +73,14 @@
 				});
 			};
 
-			$scope.$on('xpsui:model_changed', function() {
-				$scope.save();
+			$scope.$on('xpsui:model_changed', function(evt, path) {
+				$scope.save(path);
 			});
 
 			schemaUtilFactory.getCompiledSchema(schemaUri, 'view')
 			.success(function(data) {
 				$scope.schemaFormOptions.schema = data;
+				$scope.fragmentedUpdateAllowed = data.fragmentedUpdateAllowed;
 
 				$http({method: 'GET', url: '/udao/getBySchema/' + schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri(schemaUri, 'view')) + '/' + $scope.currentId})
 				.success(function(data2) {

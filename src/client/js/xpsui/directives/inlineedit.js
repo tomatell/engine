@@ -60,7 +60,7 @@
 				var commitButton = angular.element('<button class="btn-secondary x-inlineedit-commit-button"><i class="fa fa-check"></i><span>Uložiť</span></button>');
 				var rollbackButton = angular.element('<button class="btn-secondary x-inlineedit-rollback-button"><i class="fa fa-remove"></i><span>Zrušiť</span></button>');
 				selfCtrl.setCommitButton(commitButton);
-				
+
 				buttonsElm.append(commitButton).append(rollbackButton);
 
 				elm.append(buttonsElm);
@@ -103,13 +103,13 @@
 					buttonsElm.addClass('x-hidden');
 					elm.addClass('x-inlineedit-view-mode');
 					elm.removeClass('x-inlineedit-edit-mode');
-				
+
 					elm.on('click', viewModeClickHandler);
 				}
 
 				function commit() {
 					enterViewMode();
-					scope.$emit('xpsui:model_changed');
+					scope.$emit('xpsui:model_changed', modelPath);
 
 					formControl.releaseFocus(elm);
 
