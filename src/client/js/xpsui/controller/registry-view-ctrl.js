@@ -11,12 +11,12 @@
 		'xpsui:SchemaUtil',
 		'xpsui:NotificationFactory',
 		'xpsui:ObjectTools',
-		function($scope, $routeParams, $http, $location, $parse, schemaUtilFactory, notificationFactory, objectTools) {
+		function($scope, $routeParams, $http, $location, $parse, schemaUtils, notificationFactory, objectTools) {
 			//$scope.currentSchema = 'uri://registries/' + $routeParams.schema;
 			$scope.currentSchema = $routeParams.schema;
 			$scope.currentId = $routeParams.id;
-			//$scope.currentSchemaUri = schemaUtilFactory.decodeUri('uri://registries/' + $routeParams.schema);
-			$scope.currentSchemaUri = schemaUtilFactory.decodeUri($routeParams.schema);
+			//$scope.currentSchemaUri = schemaUtils.decodeUri('uri://registries/' + $routeParams.schema);
+			$scope.currentSchemaUri = schemaUtils.decodeUri($routeParams.schema);
 
 			$scope.model = {};
 			$scope.model.obj = {};
@@ -28,7 +28,7 @@
 
 			$scope.fragmentedUpdateAllowed = false;
 
-			var schemaUri = schemaUtilFactory.decodeUri($scope.currentSchema);
+			var schemaUri = schemaUtils.decodeUri($scope.currentSchema);
 
 			$scope.save = function(path) {
 				var d = $scope.model.obj;
@@ -44,27 +44,29 @@
 						v);
 				}
 
-				$http({url: '/udao/saveBySchema/' + schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri($scope.currentSchemaUri, 'view')), method: 'PUT', data: d})
-				.success(function() {
+				$http({url: '/udao/saveBySchema/' + schemaUtils.encodeUri(schemaUtils.concatUri($scope.currentSchemaUri, 'view')), method: 'PUT', data: d})
+				.then(function() {
 					$http({
 						method: 'GET',
-						url: '/udao/getBySchema/' + schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri(schemaUri, 'view')) + '/' + $scope.currentId
-					}).success(function(data) {
-						schemaUtilFactory.generateObjectFromSchema($scope.schemaFormOptions.schema, $scope.model.obj);
-						$scope.model.obj = data;
-					}).error(function(err) {
-						notificationFactory.error(err);
+						url: '/udao/getBySchema/' + schemaUtils.encodeUri(schemaUtils.concatUri(schemaUri, 'view')) + '/' + $scope.currentId
+					}).then(function(resp) {
+						schemaUtils.generateObjectFromSchema($scope.schemaFormOptions.schema, $scope.model.obj);
+						$scope.model.obj = resp.data;
+					}, function(resp) {
+						// error
+						// TODO fix error handling
+						notificationFactory.error(resp.data);
 					});
 					notificationFactory.info({translationCode: 'registry.succesfully.saved', time: 3000});
-				})
-				.error(function(data, status) {
+				}, function(resp) {
+					// error
 					function warnByFieldFunc(fieldError) {
 						notificationFactory.warn({translationCode: fieldError.c, translationData: fieldError.d, time: 3000});
 					}
 
-					if (status === 400) {
-						for(var item in data.error) {
-							data.error[item].map(warnByFieldFunc);
+					if (resp.status === 400) {
+						for(var item in resp.data) {
+							resp.data[item].map(warnByFieldFunc);
 						}
 
 					} else {
@@ -77,19 +79,19 @@
 				$scope.save(path);
 			});
 
-			schemaUtilFactory.getCompiledSchema(schemaUri, 'view')
-			.success(function(data) {
-				$scope.schemaFormOptions.schema = data;
-				$scope.fragmentedUpdateAllowed = data.fragmentedUpdateAllowed;
+			schemaUtils.getCompiledSchema(schemaUri, 'view')
+			.then(function(resp) {
+				$scope.schemaFormOptions.schema = resp.data;
+				$scope.fragmentedUpdateAllowed = resp.data.fragmentedUpdateAllowed;
 
-				$http({method: 'GET', url: '/udao/getBySchema/' + schemaUtilFactory.encodeUri(schemaUtilFactory.concatUri(schemaUri, 'view')) + '/' + $scope.currentId})
-				.success(function(data2) {
-					schemaUtilFactory.generateObjectFromSchema($scope.schemaFormOptions.schema, $scope.model.obj);
-					$scope.model.obj = data2;
-				}).error(function(err) {
-					notificationFactory.error(err);
+				$http({method: 'GET', url: '/udao/getBySchema/' + schemaUtils.encodeUri(schemaUtils.concatUri(schemaUri, 'view')) + '/' + $scope.currentId})
+				.then(function(resp2) {
+					schemaUtils.generateObjectFromSchema($scope.schemaFormOptions.schema, $scope.model.obj);
+					$scope.model.obj = resp2.data;
+				}, function(resp2) {
+					notificationFactory.error(resp2.data);
 				});
-
+			// FIXME missing error part
 			});
 		}
 	]);

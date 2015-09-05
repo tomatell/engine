@@ -17,29 +17,27 @@
 		// 'psui-notification'
 	])
 	.config(['$httpProvider', function ($httpProvider) {
-		$httpProvider.interceptors.push(function ($q,$injector,$rootScope) {
+		$httpProvider.interceptors.push(function ($q, $injector, $rootScope) {
 			return {
 				'response': function (response) {
 					//Will only be called for HTTP up to 300
 					return response;
 				},
-				'responseError': function (rejection) {
+				'responseError': function(rejection) {
 					if (rejection.status === 500) {
-						$injector.get ('xpsui:NotificationFactory').warn({translationCode:'server.side.exception',translationData:rejection.data,time:5000} );
-					}else
-					if (rejection.status === 401) {
+						$injector.get('xpsui:NotificationFactory').warn({translationCode: 'server.side.exception', translationData: rejection.data, time: 5000});
+					} else if (rejection.status === 401) {
 						$rootScope.security.currentUser = undefined;
-						$rootScope.app.mainMenu=false;
-						$injector.get ('xpsui:NavigationService').navigate();
-						$injector.get ('$location').url('/login');
-						$injector.get ('xpsui:NotificationFactory').warn({translationCode:'security.user.session.expired',time:5000} );
-					}else
+						$rootScope.app.mainMenu = false;
+						$injector.get('xpsui:NavigationService').navigate();
+						$injector.get('$location').url('/login');
+						$injector.get('xpsui:NotificationFactory').warn({translationCode: 'security.user.session.expired', time: 5000});
+					} else if (rejection.status === 403) {
+						$injector.get('xpsui:NavigationService').navigate();
+						$injector.get('$location').url('/login');
+						$injector.get('xpsui:NotificationFactory').warn({translationCode: 'security.user.missing.permissions', translationData: rejection.data.missingPerm, time: 5000});
+					}
 
-					if (rejection.status === 403) {
-						$injector.get ('xpsui:NavigationService').navigate();
-						$injector.get ('$location').url('/login');
-						$injector.get('xpsui:NotificationFactory').warn({translationCode:'security.user.missing.permissions',translationData:rejection.data.missingPerm,time:5000});
-					} else
 					return $q.reject(rejection);
 				}
 			};
