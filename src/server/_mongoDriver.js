@@ -163,11 +163,15 @@ module.exports = function(MongoClient, ObjectID, QueryFilter) {
 
 			propIterator(null, obj);
 
-			if ( Object.keys(unset).length === 0 ) {
-				return {$set: set};
-			}else {
-				return {$set: set, $unset: unset};
+			var result = {};
+			if (Object.keys(set).length > 0) {
+				result.$set = set;
 			}
+			if (Object.keys(unset).length > 0) {
+				result.$unset = unset;
+			}
+
+			return result;
 
 		},
 		/**
