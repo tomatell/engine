@@ -593,7 +593,10 @@ PageController.prototype.renderPage = function(req, res, next) {
 				var blocksResolvers = [];
 
 				if (locals.article) {
+					var blockUUIDCounter = 1; // couter for generation of unique block id
+
 					for (var i in locals.article.data) {
+						locals.article.data[i].blockUUID = 'blockID'.concat(blockUUIDCounter++);
 						if (locals.article.data[i] && locals.article.data[i].meta.type === 'category' 
 								|| locals.article.data[i].meta.type === 'showcase'
 								|| locals.article.data[i].meta.type === 'overview'
