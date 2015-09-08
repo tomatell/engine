@@ -93,6 +93,70 @@ PageController.prototype.competitionsList = function(req, res, next) {
 
 };
 
+PageController.prototype.competitionMatchesAll = function(req, res, next) {
+	var cid = req.params.cid;
+
+	var qf = QueryFilter.create();
+
+	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
+	qf.addSort('baseData.matchDate', QueryFilter.sort.ASC);
+
+	this.refereeReportsDao.list(qf, function(err, data) {
+		if (err) {
+			log.error('Failed to get list of matches for competition %s', cid, err);
+			next(err);
+			return;
+		}
+
+		var result = [];
+
+		for (var i in data) {
+			result.push({
+				id: data[i].id,
+				homeId: data[i].baseData.homeClub.oid,
+				guestId: data[i].baseData.awayClub.oid,
+				matchDate: data[i].baseData.matchDate,
+				fullTimeScoreHome: data[i].baseData.fullTimeScoreHome,
+				fullTimeScoreAway: data[i].baseData.fullTimeScoreAway,
+				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
+				printTemplate: data[i].baseData && data[i].baseData.printTemplate
+			});
+		}
+
+		var rostersQf = QueryFilter.create();
+		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
+		pageController.rostersDao.list(rostersQf, function(err, data) {
+			if (err) {
+				log.error('Failed to get list of rosters for competition %s', cid, err);
+				next(err);
+				return;
+			}
+
+			var rosters = {};
+
+			for (var i in data) {
+				rosters[data[i].id] = data[i].baseData.prName;
+			}
+
+			for (i in result) {
+				if (rosters[result[i].homeId]) {
+					result[i].homeName = rosters[result[i].homeId];
+				} else {
+					result[i].homeName = '-:-';
+				}
+
+				if (rosters[result[i].guestId]) {
+					result[i].guestName = rosters[result[i].guestId];
+				} else {
+					result[i].guestName = '-:-';
+				}
+			}
+
+			res.json(result);
+		});
+	});
+};
+
 PageController.prototype.competitionMatches = function(req, res, next) {
 	var cid = req.params.cid;
 
@@ -764,6 +828,13 @@ module.exports = {
 	competitionMatches: function(req, res, next) {
 		if (pageController) {
 			pageController.competitionMatches(req, res, next);
+		} else {
+			throw new Error('page-controller module not initialized');
+		}
+	},
+	competitionMatchesAll: function(req, res, next) {
+		if (pageController) {
+			pageController.competitionMatchesAll(req, res, next);
 		} else {
 			throw new Error('page-controller module not initialized');
 		}

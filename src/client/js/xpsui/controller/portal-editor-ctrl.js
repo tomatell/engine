@@ -288,7 +288,7 @@
             type: 'pure-html',
             title: 'Titulok',
             desc: 'Nadpis článku, každý článok by mal mať aspoň jeden nadpis. Nadpis článku sa používa ak ako link v zozname článkov',
-            icon: 'img/block-headline.svg',
+            icon: 'img/block-headline.svg'
           },
           data: '<h1>...Titulok článku...</h1>',
           css: { cssClass: '' }
@@ -300,7 +300,7 @@
             type: 'pure-html',
             title: 'Abstrakt',
             desc: 'Krátke zhrnutie článku',
-            icon: 'img/block-abstract.svg',
+            icon: 'img/block-abstract.svg'
           },
           data: '...Abstrakt článku...'
         },
@@ -311,7 +311,7 @@
             type: 'pure-html',
             title: 'Obsah',
             desc: 'Obsah článku obsahujúci hlavnú časť textu',
-            icon: 'img/block-content.svg',
+            icon: 'img/block-content.svg'
           },
           data: '<p>...Obsah článku...</p>'
         },
@@ -322,9 +322,20 @@
               type: 'match-results',
               title: 'Výsledky',
               desc: 'Časť obsahujúa výsledky súťaží.',
-              icon: 'img/block-content.svg',
+              icon: 'img/block-content.svg'
             },
             data: '<h1>Výsledky súťaží</h1>'
+          },
+        matchResultsAll: {
+            meta: {
+              name: 'match-results-all',
+              element: '<section class="x-portal-competition-matches"><header>Rozlosovanie</header></section>',
+              type: 'match-results-all',
+              title: 'Rozlosovanie',
+              desc: 'Časť obsahujúa rozlosovanie súťaží.',
+              icon: 'img/block-content.svg'
+            },
+            data: ''
           },
 //          matchStandings: {
 //              meta: {

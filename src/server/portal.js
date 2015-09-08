@@ -64,6 +64,7 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 	app.get('/article/:aid?/:page?', pageController.renderPage);
 	app.get('/competition/list', pageController.competitionsList);
 	app.get('/competition/matches/:cid', pageController.competitionMatches);
+	app.get('/competition/matches-all/:cid', pageController.competitionMatchesAll);
 	app.get('/competition/results/:cid', pageController.competitionResults);
 	app.get('/competition/refereeReport', pageController.competitionRefereeReports);
 	app.get('/:page?', pageController.renderPage);
