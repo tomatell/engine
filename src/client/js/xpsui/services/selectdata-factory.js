@@ -187,7 +187,8 @@
 
 		ObjectLinkStore.DEFAULTS = {
 			searchCondition: 'starts',
-			orderBySort: 'asc'
+			orderBySort: 'asc',
+			inputType: 'string'
 		};
 
 		ObjectLinkStore.prototype.initFieldsSchema = function(callback){
@@ -271,7 +272,11 @@
 
 			//FIXME make sure that getSearchValue is always string and always non null
 			if (_searchVal && angular.isString(_searchVal) && _searchVal.length > 0) {
+				if(this.options.inputType === 'number') {
+					_searchVal = parseInt(_searchVal);
+				}
 				for (field in this.schema.fields) {
+
 					config.data.crits.push({
 						f: this.schema.fields[field],
 						v: _searchVal,
@@ -497,8 +502,8 @@
 
 				return new DataSet(store);
 			},
-			createObjectDataset: function(schemaFragment){
-				var store = new ObjectLinkStore();
+			createObjectDataset: function(schemaFragment, options){
+				var store = new ObjectLinkStore(options);
 
 				store.setSchema(schemaFragment.objectLink2)
 					.setForcedCriteria(schemaFragment.objectLink2ForcedCriteria)
