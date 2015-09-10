@@ -53,6 +53,7 @@ $icon-question: $fa-var-question !default;
 $icon-question-circle: $fa-var-question-circle !default;
 $icon-circle: $fa-var-circle !default;
 $icon-circle-o: $fa-var-circle-o !default;
+$icon-arrow-left: $fa-var-arrow-left !default;
 
 // icons
 // -------------------------
@@ -96,3 +97,4 @@ $icon-circle-o: $fa-var-circle-o !default;
 .icon-question-circle:before { content: $icon-question-circle }
 .icon-circle:before { content: $icon-circle }
 .icon-circle-o:before { content: $icon-circle-o }
+.icon-arrow-left:before { content: $icon-arrow-left }
