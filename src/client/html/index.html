@@ -65,6 +65,7 @@
 
 	<nav>
 		<ul>
+			<li><a href="membery://index"><i class="icon-arrow-left"></i></a></li>
 			<li ng-show="hasPermissions(['System User'])"><span class="text-block"
 				>{{security.currentUser.baseData.name}}&nbsp;{{security.currentUser.baseData.surName}}</span></li>
 				<li ng-show="hasPermissions(['System User'])"><div class="x-login-photo" ng-style="{'background-image': 'url(' + security.currentUser.photoInfo.photo + ')'}"></div>
