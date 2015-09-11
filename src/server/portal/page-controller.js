@@ -11,7 +11,7 @@ var swig = require('swig');
 var path = require('path');
 var request = require('request');
 var fs = require('fs');
-var safeUrlEncoder = require('../safeUrlEncoder.js');
+var objectTools = require('../ObjectTools.js');
 
 var articlesCollection = 'portalArticles';
 var menuCollection = 'portalMenu';
@@ -242,34 +242,50 @@ PageController.prototype.competitionResults = function(req, res, next) {
 		var result = {};
 
 		for (var i in data) {
+
+			var currentReport = data[i];
+			var reportState = objectTools.evalPath(currentReport, 'baseData.state');
+
 			var homeId = data[i].baseData.homeClub.oid;
 			var guestId = data[i].baseData.awayClub.oid;
-			var scoreHome = data[i].baseData.fullTimeScoreHome;
-			var scoreAway = data[i].baseData.fullTimeScoreAway;
 
 			if (typeof result[homeId] === 'undefined') {
-				result[homeId] = { points: 0, matches: 0};
+				result[homeId] = { points: 0, matches: 0, score: 0};
 			}
 			if (typeof result[guestId] === 'undefined') {
-				result[guestId] = { points: 0, matches: 0};
+				result[guestId] = { points: 0, matches: 0, score: 0};
 			}
 
-			if (scoreHome || scoreAway) {
-				if ((scoreHome + 0) > (scoreAway + 0)) {
-					result[homeId].points += 2;
-				} else if ((scoreHome + 0) < (scoreAway + 0)) {
-					result[guestId].points += 2;
-				} else {
-					result[homeId].points += 1;
-					result[guestId].points += 1;
-				}
-
-				result[homeId].matches += 1;
-				result[guestId].matches += 1;
+			if (['Schválený', 'Zatvorený'].indexOf(reportState) < 0) {
+				// Skip reports in another states
+				continue;
 			}
+
+			var scoreHome = parseInt(data[i].baseData.fullTimeScoreHome);
+			if (isNaN(scoreHome)) {
+				scoreHome = 0;
+			}
+
+			var scoreAway = parseInt(data[i].baseData.fullTimeScoreAway);
+			if (isNaN(scoreAway)) {
+				scoreAway = 0;
+			}
+
+			if ((scoreHome) > (scoreAway)) {
+				result[homeId].points += 2;
+			} else if ((scoreHome) < (scoreAway)) {
+				result[guestId].points += 2;
+			} else {
+				result[homeId].points += 1;
+				result[guestId].points += 1;
+			}
+
+			result[homeId].matches += 1;
+			result[guestId].matches += 1;
+
+			result[homeId].score += scoreHome - scoreAway;
+			result[guestId].score -= scoreHome - scoreAway;
 		}
-
-		console.log(result);
 
 		var rostersQf = QueryFilter.create();
 		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
@@ -301,9 +317,7 @@ PageController.prototype.competitionResults = function(req, res, next) {
 
 			res.json(finres);
 		});
-
 	});
-
 };
 
 PageController.prototype.saveSchema = function(req, res, next) {
