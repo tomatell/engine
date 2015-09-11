@@ -52,3 +52,8 @@ config.js needs to contain these e-mail addresses
 - /tools/mongo/removeMatchesByRosterID.sh
 - first arg is DB, second arg is rosterID. Run example `tools/mongo/removeMatchesByRosterID.sh registry 55ddcc66adf3822a855edf06`
 Script remove all matches, where homeClub or awayClub is equal rosterID.
+
+## No version change
+- /tools/mongo/allPlayers.sh
+- only one arg is DB. Run example `tools/mongo/allPlayers.sh registry`
+Script print all player in semicolon-separated values (;).
