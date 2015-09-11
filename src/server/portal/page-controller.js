@@ -162,10 +162,10 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 
 	var qf = QueryFilter.create();
 
-	qf.addCriterium('baseData.matchDate', QueryFilter.operation.LESS_EQUAL, require('../DateUtils.js').DateUtils.nowToReverse());
+	qf.addCriterium('baseData.matchDate', QueryFilter.operation.LESS_EQUAL, require('../DateUtils.js').DateUtils.dateToReverse(require('../DateUtils.js').DateUtils.dateAddDays(new Date(), 10)));
 	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
 	qf.addSort('baseData.matchDate', QueryFilter.sort.DESC);
-	qf.setLimit(12);
+	qf.setLimit(25);
 
 	this.refereeReportsDao.list(qf, function(err, data) {
 		if (err) {
@@ -182,10 +182,13 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 				homeId: data[i].baseData.homeClub.oid,
 				guestId: data[i].baseData.awayClub.oid,
 				matchDate: data[i].baseData.matchDate,
+				matchTime: data[i].baseData.matchBegin,
 				fullTimeScoreHome: data[i].baseData.fullTimeScoreHome,
 				fullTimeScoreAway: data[i].baseData.fullTimeScoreAway,
 				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
-				printTemplate: data[i].baseData && data[i].baseData.printTemplate
+				printTemplate: data[i].baseData && data[i].baseData.printTemplate,
+				started: data[i].technicalData && data[i].technicalData.events && data[i].technicalData.events.length > 0 ? true : false,
+				finished: ['Schválený', 'Zatvorený'].indexOf(data[i].baseData.state) > -1 ? true : false
 			});
 		}
 
@@ -217,7 +220,7 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 					result[i].guestName = '-:-';
 				}
 			}
-			
+
 			res.json(result);
 		});
 
