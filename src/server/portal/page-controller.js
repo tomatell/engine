@@ -84,10 +84,12 @@ PageController.prototype.competitionsList = function(req, res, next) {
 		for (var i in data) {
 			result.push({
 				id: data[i].id,
-				name: data[i].baseData.name
+				name: data[i].baseData.name,
+				lvl: data[i].baseData.competitionLevel || 0
 			});
 		}
 
+		result.sort(function(a, b) { return b.lvl - a.lvl; });
 		res.json(result);
 	});
 
