@@ -15,7 +15,7 @@
 
 				scope.$watch(attrs.psuiModel + '.id', function(nv) {
 					if (nv) {
-						attrs.$set('href', options.path + '?id=' + nv);
+						attrs.$set('href', options.path + '?private=true&id=' + nv);
 					}
 				});
 
