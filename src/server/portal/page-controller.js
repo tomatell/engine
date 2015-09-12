@@ -538,6 +538,11 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 				}
 			}
 
+			data.render = {
+				started: data.technicalData && data.technicalData.events && data.technicalData.events.length > 0 ? true : false,
+				finished: ['Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false
+
+			};
 			swig.renderFile(path.join(config.portalTemplatesPath, templateName), data, function(swigErr, output) {
 				if (swigErr) {
 					log.error('Failed to render %s', templateName, swigErr);
