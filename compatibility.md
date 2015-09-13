@@ -40,9 +40,11 @@ config.js needs to contain these e-mail addresses
 
 ## 6 - RefereeReport schema changes data upgrade script
 - assigns home and away clubs acording setup in rosters
+- migrate existing db's by running `tools/migrations/6.sh`
 
 ## 7 - Gender shortcut fix in rosters and people
 - unifies gender to F for females
+- migrate existing db's by running `tools/migrations/7.sh`
 
 ## 8 - Frontend configuration
 - /data/js/config.js file should be present
@@ -57,3 +59,11 @@ Script remove all matches, where homeClub or awayClub is equal rosterID.
 - /tools/mongo/allPlayers.sh
 - only one arg is DB. Run example `tools/mongo/allPlayers.sh registry`
 Script print all player in semicolon-separated values (;).
+
+## 9 - Change dataset in schema organizations, just in SVF instance.
+- script migrate data from "clubAdress" to "contactAdress"
+- migrate existing db's by running `tools/migrations/8.sh`
+
+## 10 - Migrate date in new/people scheme, just in SVF instance.
+- script migrate dates to new field dateOfRegistration
+- migrate existing db's by running `tools/migrations/9.sh`
