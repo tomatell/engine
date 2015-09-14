@@ -616,9 +616,10 @@ PageController.prototype.renderPage = function(req, res, next) {
 				if ((typeof elm.data.pageSize === 'undefined') || elm.data.pageSize == '') {
 					elm.data.pageSize = 20;
 				}
-				function findFirstOfType(obj, type) {
+
+				function findFirstWithName(obj, name) {
 					for (var j = 0; j < obj.length; ++j) {
-						if (obj[j].meta.name === type) {
+						if (obj[j].meta.name === name) {
 							return obj[j].data;
 						}
 					}
@@ -636,6 +637,7 @@ PageController.prototype.renderPage = function(req, res, next) {
 							if (page) {
 								currPage = page;
 							}
+
 							elm.data.prevPage = 0;
 							if (currPage > 0) {
 								elm.data.prevPage = currPage - 1;
@@ -646,20 +648,25 @@ PageController.prototype.renderPage = function(req, res, next) {
 							}
 							elm.data.articles = [];
 							var noOfPageElements =
-								(data.length <= elm.data.pageSize)? data.length :elm.data.pageSize;
-							for (var i=0; i < noOfPageElements; ++i) {
-								elm.data.articles.push({
-									id: data[i].id,
-									title: findFirstOfType(data[i].data, 'title'),
-									abstract: findFirstOfType(data[i].data, 'abstract'),
-									img: findFirstOfType(data[i].data, 'image'),
-									img1170: findFirstOfType(data[i].data, 'image1170'),
-									video: findFirstOfType(data[i].data, 'video'),
-									content: findFirstOfType(data[i].data, 'content')
-								});
+								(data.length <= elm.data.pageSize) ? data.length : elm.data.pageSize;
+							for (var i = 0; i < noOfPageElements; ++i) {
+								var articleData = {};
+								articleData.id = data[i].id;
+
+								if(elm.config) {
+									if(elm.config.thumbnailBlock) {
+										articleData.thumbnail = elm.config.thumbnailBlock;
+									}
+									if(elm.config.displayBlocks) {
+										for (var j = 0; j < elm.config.displayBlocks.length; j++) {
+											articleData[elm.config.displayBlocks[j]] = findFirstWithName(data[i].data, elm.config.displayBlocks[j]);
+										}
+									}
+								}
+
+								elm.data.articles.push(articleData);
 							}
 						}
-						
 						callback();
 					});
 				};
@@ -686,10 +693,8 @@ PageController.prototype.renderPage = function(req, res, next) {
 
 					for (var i in locals.article.data) {
 						locals.article.data[i].blockUUID = 'blockID'.concat(blockUUIDCounter++);
-						if (locals.article.data[i] && locals.article.data[i].meta.type === 'category' 
-								|| locals.article.data[i].meta.type === 'showcase'
-								|| locals.article.data[i].meta.type === 'overview'
-								|| locals.article.data[i].meta.type === 'showcasevideo') {
+
+						if (locals.article.data[i] && locals.article.data[i].meta.resolver === 'category') {
 							blocksResolvers.push(createCategoryResolver(locals.article.data[i], aid));
 						}
 					}

@@ -10,7 +10,7 @@
 			},
 			template: '<article ng-repeat="c in model" style="overflow: auto;">'
 				+ '			<div><a ng-click="navigate(c.id)" ng-bind-html="makeSafe(c.title)"></a></div>'
-				+ '			<img ng-show="c.img.img" ng-src="{{c.img.img}}" style="width: 164px !important; height: 123px !important;float: left;"></img>'
+				+ '			<img ng-show="c.thumbnail && c[c.thumbnail] && c[c.thumbnail].img" ng-src="{{c[c.thumbnail].img}}" style="width: 164px !important; height: 123px !important;float: left;"></img>'
 				+ '			<div ng-bind-html="makeSafe(c.abstract)" class="x-portal-widget-overview-inner"></div></article>'
 				+ '<div style=" text-align: right; clear: both;" class="x-portal-widget-overview-navigation">'
 				+ '	<a ng-click="prevPage()" style=" color: #CB2225; "><i class="fa fa-chevron-left x-portal-widget-gallery-prev-btn"></i></a>'
@@ -52,12 +52,12 @@
 					for (var i = iterateFrom; i < iterateTo; ++i) {
 						scope.model.push(scope.modelAll[i]);
 					}
-				}
+				};
 
-				function findFirstOfType(obj, type) {
-					for (var j = 0; j < obj.length; ++j) {
-						if (obj[j].meta.name === type) {
-							return obj[j].data;
+				function findFirstWithName(arr, name) {
+					for (var j = 0; j < arr.length; ++j) {
+						if (arr[j].meta.name === name) {
+							return arr[j].data;
 						}
 					}
 				}
@@ -84,19 +84,22 @@
 					if (data && data.length > 0) {
 						scope.modelAll = [];
 						for (var i = 0; i < data.length; ++i) {
-							scope.modelAll.push({
-								id: data[i].id,
-								title: findFirstOfType(data[i].data, 'title'),
-								abstract: findFirstOfType(data[i].data, 'abstract'),
-								img: findFirstOfType(data[i].data, 'image'),
-								img1170: findFirstOfType(data[i].data, 'image1170'),
-								video: findFirstOfType(data[i].data, 'video'),
-								content: findFirstOfType(data[i].data, 'content')
-							});
+							var articleData = {};
+							articleData.id = data[i].id;
+
+							if(scope.data.config) {
+								if(scope.data.config.thumbnailBlock) {
+									articleData.thumbnail = scope.data.config.thumbnailBlock;
+								}
+								if(scope.data.config.displayBlocks) {
+									for (var j = 0; j < scope.data.config.displayBlocks.length; j++) {
+										articleData[scope.data.config.displayBlocks[j]] = findFirstWithName(data[i].data, scope.data.config.displayBlocks[j]);
+									}
+								}
+							}
+							scope.modelAll.push(articleData);
 						}
 						scope.refreshPage();
-
-						console.log(scope.modelAll);
 					}
 				}).error(function(err) {
 					notificationFactory.error(err);
