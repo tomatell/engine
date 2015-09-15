@@ -70,3 +70,6 @@ Script print all player in semicolon-separated values (;).
 
 ## 11 - migrate state of generalRequests in SZH instance
 - migrate existing db's by running`tools/migrations/10.sh`
+
+## 12 - migrate idInfo.currnetId idInfo.currentId in SVF instance
+- migrate existing db's by running`tools/migrations/12.sh`
