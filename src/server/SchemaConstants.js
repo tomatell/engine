@@ -41,6 +41,7 @@ module.exports = {
 	TIMESTAMP: 'timestamp', // marks fields that will be updated with server era-time
 	COLLATE: 'collate', //marks fields that needs to be collated/ordered .
 	READ_ONLY: 'readOnly', // marks field as readonly field will not be editable in GUI
+	CALCULATION: 'calculation', // field is calculated
 
 	//Events
 	FIRE_EVENTS: 'fireEvents',

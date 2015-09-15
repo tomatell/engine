@@ -38,7 +38,8 @@
 				if (schema.calculation && form) {
 					log.debug("Registering calculation");
 					// Register calculation using the form controller
-					var unregister = form.registerCalculation(attrs.xpsuiModel, schema.calculation);
+					// FIXME do it only if there is one of models
+					var unregister = form.registerCalculation(attrs.xpsuiModel || attrs.ngModel, schema.calculation);
 					// Deregister calculation on $destroy
 					scope.$on('destroy', unregister);
 				}

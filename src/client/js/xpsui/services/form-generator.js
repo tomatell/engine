@@ -78,6 +78,7 @@
 					field.attr('xpsui-schema', schemaPath);
 				} else if(schemaFragment.objectLink2) {
 					field = angular.element('<div xpsui-objectlink2-edit></div>');
+					//FIXME this aatribute should be added to every control in form somehow
 					field.attr('xpsui-schema', schemaPath);
 				} else if(schemaFragment.uploadableImage
 					|| (schemaFragment.render && schemaFragment.render.component === 'psui-uploadable-image')) {
@@ -127,6 +128,7 @@
 				} else if (schemaFragment.objectLink2) {
 					field = angular.element('<div xpsui-objectlink2-view></div>');
 					field.attr('xpsui-schema', schemaPath);
+					field.attr('xpsui-form-control', 'x');
 				} else if (schemaFragment.uploadableImage
 					|| (schemaFragment.render && schemaFragment.render.component === 'psui-uploadable-image')) {
 

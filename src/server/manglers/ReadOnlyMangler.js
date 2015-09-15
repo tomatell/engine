@@ -16,7 +16,8 @@
 	ReadOnlyMangler.prototype.mangle = function(ctx,objFragment, schemaFragment, objPath, callback) {
 		log.silly('ReadOnlyMangler mangler start for %s', objPath);
 
-		if (!schemaFragment || !schemaFragment[consts.READ_ONLY]) {
+		// FIXME calculation should not meant it can be saced, but if should be realculated on server
+		if (!schemaFragment || !schemaFragment[consts.READ_ONLY] || schemaFragment[consts.CALCULATION]) {
 			callback(null, null);
 			return;
 		}

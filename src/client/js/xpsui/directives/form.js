@@ -50,6 +50,8 @@
 						function calculate() {
 							// Get model value
 							var modelValue = modelGetter($scope);
+							var formModel = formModelGetter($scope);
+
 							// Check 'onlyEmpty' flag - run calculation only if the this flag is not set or
 							// current model value is empty
 							// NOTE: Do not use !model because "false" can be allowed value
@@ -64,8 +66,8 @@
 						calculate();
 
 						// Register property watcher
-						return $scope.$watch(property.watcher(formModel), function(newValue, oldValue) {
-							if (newValue != oldValue) {
+						return $scope.$watch(property.watcher(formModelGetter, $scope), function(newValue, oldValue) {
+							if (newValue !== oldValue) {
 								calculate();
 							}
 						}, true); // NOTE: Always use TRUE for computedProperty.watcher

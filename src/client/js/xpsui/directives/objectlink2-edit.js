@@ -139,10 +139,10 @@
 						var dataset = dataFactory.createObjectDataset(schemaFragment, options);
 						selectbox.setDataset(dataset);
 
-						log.groupEnd();
 					}
 				);
 
+				log.groupEnd();
 			}
 		};
 	}]);
