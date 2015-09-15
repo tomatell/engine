@@ -67,3 +67,6 @@ Script print all player in semicolon-separated values (;).
 ## 10 - Migrate date in new/people scheme, just in SVF instance.
 - script migrate dates to new field dateOfRegistration
 - migrate existing db's by running `tools/migrations/9.sh`
+
+## 11 - migrate state of generalRequests in SZH instance
+- migrate existing db's by running`tools/migrations/10.sh`
