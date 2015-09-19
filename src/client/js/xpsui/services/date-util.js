@@ -28,9 +28,9 @@
 					(year > 0 && year < 10000)
 				) {
 					var d = new Date();
-					d.setDate(day);
-					d.setMonth(month -1);
 					d.setYear(year);
+					d.setMonth(month -1);
+					d.setDate(day);
 					return d;
 				}
 			}	
