@@ -123,9 +123,9 @@
 					if(string){
 						return string;
 					}
-					// invalid
-					return undefined;
 				}
+				
+				return '';
 			},
 			
 			formatterToBackend: function(value) {
