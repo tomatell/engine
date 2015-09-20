@@ -3,7 +3,9 @@
 
 	angular.module('xpsui:services')
 	/**
-	 * @class xpsui:SchemaTools
+	 * Set of tools and utilities for schema based operations.
+	 *
+	 * @class service:xpsui:SchemaTools
 	 * @module client
 	 * @submodule services
 	 */
@@ -14,8 +16,8 @@
 		/**
 		 * Get compiled schema from server
 		 *
-		 * @param {string} schema - identifier/uri of schema
-		 *
+		 * @method getSchema
+		 * @param {string} schema identifier/uri of schema
 		 * @return {promise} if resolved, it returns schema object
 		 */
 		SchemaTools.prototype.getSchema = function(schema) {
@@ -40,10 +42,12 @@
 		/**
 		 * Get object from server
 		 *
-		 * @param {string} schema unencoded
-		 * @param {string} id of object
+		 * @method getBySchema
+		 * @param {string} schema unencoded schema
+		 * @param {string} id identifier of object
+		 * @param [array] fields array of strings defining fields to retireve
 		 *
-		 * @return {promise} if resolved, it returns id of object
+		 * @return {promise} if resolved, it returns retrieved object
 		 */
 		SchemaTools.prototype.getBySchema = function(schema, id, fields) {
 			//FIXME unit tests
@@ -75,10 +79,11 @@
 		/**
 		 * Save object to server
 		 *
-		 * @param {string} schema unencoded
-		 * @param {object} obj - object to save
+		 * @method saveBySchema
+		 * @param {string} schema unencoded schema uri
+		 * @param {object} obj object to save
 		 *
-		 * @return {promise}
+		 * @return {promise} if resolved, returns saved object
 		 */
 		SchemaTools.prototype.saveBySchema = function(schema, obj) {
 			//FIXME unit tests
@@ -102,6 +107,11 @@
 		};
 		/**
 		 * Encodes uri by safe encoder
+		 *
+		 * @method encodeUri
+		 * @param {string} uri to encode
+		 *
+		 * @return {string} encoded uri
 		 */
 		SchemaTools.prototype.encodeUri = function(uri) {
 			return urlEncoder.encode(uri);
@@ -109,6 +119,11 @@
 
 		/**
 		 * Decode uri by safe decoder
+		 *
+		 * @method decodeUri
+		 * @param {string} uri to decode
+		 *
+		 * @return {string} decoded uri
 		 */
 		SchemaTools.prototype.decodeUri = function(uri) {
 			return urlEncoder.decode(uri);
@@ -117,3 +132,4 @@
 		return new SchemaTools();
 	}]);
 }(window.angular));
+// CODEREVIEW 20150920 f08a9164b6874a79ca27ce0170e4f2e40b16be6b starekp

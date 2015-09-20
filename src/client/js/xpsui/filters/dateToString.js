@@ -1,7 +1,13 @@
 (function(angular) {
-
 	'use strict';
 
+	/**
+	 * Converts internal representation of string into human readable form.
+	 *
+	 * @module client
+	 * @submodule xpsui:filters
+	 * @class filter:dateToString
+	 */
 	angular.module('xpsui:filters')
 	.filter('dateToString', function() {
 		return function(value) {
@@ -20,5 +26,5 @@
 			return '';
 		};
 	});
-
 }(window.angular));
+// CODEREVIEW 20150920 f08a9164b6874a79ca27ce0170e4f2e40b16be6b starekp
