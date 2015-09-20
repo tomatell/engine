@@ -25,7 +25,7 @@
 				};
 
 			},
-			require: ['xpsuiFormControl', '^xpsuiForm', '?ngModel'],
+			require: ['xpsuiFormControl', '?^xpsuiForm', '?ngModel'],
 			link: function(scope, elm, attrs, ctrls) {
 				var formControl = ctrls[0];
 				var form = ctrls[1];
