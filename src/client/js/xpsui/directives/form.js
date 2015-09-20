@@ -3,8 +3,8 @@
 
 	angular.module('xpsui:directives')
 	.directive('xpsuiForm', [
-		'$compile', '$parse', 'xpsui:logging', 'xpsui:FormGenerator', 'xpsui:Calculator', '$translate',
-		function($compile, $parse, log, formGenerator, calculator, $translate) {
+		'$compile', '$parse', 'xpsui:logging', 'xpsui:FormGenerator', 'xpsui:Calculator', '$translate', '$timeout',
+		function($compile, $parse, log, formGenerator, calculator, $translate, $timeout) {
 			return {
 				restrict: 'A',
 				require: '^form',
@@ -29,6 +29,24 @@
 						return false;
 					};
 
+					var unregistrations = [];
+
+					var canCalculate = false;
+
+					unregistrations.push($scope.$on('xpsui:data-unstable', function() {
+						canCalculate = false;
+					}));
+
+					unregistrations.push($scope.$on('xpsui:data-stable', function() {
+						$timeout(function() {canCalculate = true; }, 500);
+					}));
+
+					$scope.$on('$destroy', function() {
+						unregistrations.map(function(i) {
+							i();
+						});
+					});
+
 					/**
 					 * Registers a calculation for the `model` based on the `scheam`
 					 *
@@ -48,6 +66,10 @@
 						var formModel = formModelGetter($scope);
 
 						function calculate() {
+							if (!canCalculate) {
+								return;
+							}
+
 							// Get model value
 							var modelValue = modelGetter($scope);
 							var formModel = formModelGetter($scope);
@@ -63,7 +85,7 @@
 							}
 						}
 
-						calculate();
+						//calculate();
 
 						// Register property watcher
 						return $scope.$watch(property.watcher(formModelGetter, $scope), function(newValue, oldValue) {
