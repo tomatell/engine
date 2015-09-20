@@ -14,6 +14,7 @@
 		 */
 		var PsuiError = function(code) {
 			this.code = code;
+			this.meta = null;
 		};
 
 		/**
@@ -25,7 +26,10 @@
 		Errors.prototype.codes = {
 			SERVER_SIDE_UNRECOVERABLE_ERROR: 'SERVER_SIDE_UNRECOVERABLE_ERROR',
 			UNKNOWN_STATE: 'UNKNOWN_STATE',
-			GENERIC_ERROR: 'GENERIC_ERROR'};
+			ILLEGAL_STATE: 'ILLEGAL_STATE',
+			INTERNAL_ERROR: 'INTERNAL_ERROR',
+			GENERIC_ERROR: 'GENERIC_ERROR',
+			UNKNOWN_ERROR: 'UNKNOWN_ERROR'};
 
 		/**
 		 * Evalueated http error and returns associated error object
@@ -38,9 +42,20 @@
 		/**
 		 * Returns error object defined by code
 		 */
-		Errors.prototype.ByCode = function(code) {
+		Errors.prototype.byCode = function(code) {
 			// FIXME chceck if code exists and is registered
 			return new PsuiError(code);
+		};
+
+		/**
+		 * Return UNKNOWN error with wrapped error in meta property.
+		 *
+		 * Should be used to wrap unhandle errors from underalaying system
+		 */
+		Errors.prototype.unhandled = function(err) {
+			var e = new PsuiError(this.codes.UNKNOWN_ERROR);
+			this.meta = err;
+			return e;
 		};
 
 		return new Errors();

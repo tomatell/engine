@@ -12,13 +12,42 @@
 		};
 
 		/**
-		 * get object from server
+		 * Get compiled schema from server
+		 *
+		 * @param {string} schema - identifier/uri of schema
+		 *
+		 * @return {promise} if resolved, it returns schema object
+		 */
+		SchemaTools.prototype.getSchema = function(schema) {
+			// FIXME unit tests
+			var p = $q.defer();
+
+			var url = '/schema/compiled/'.concat(this.encodeUri(schema));
+
+			$http({
+				url: url,
+				method: 'GET'
+			}).then(function(r) {
+				//success
+				p.resolve(r.data);
+			}, function(r) {
+				//failure
+				p.reject(errors.resolveHttpError(r));
+			});
+			return p.promise;
+		};
+
+		/**
+		 * Get object from server
+		 *
 		 * @param {string} schema unencoded
-		 * @param {id} id of object
+		 * @param {string} id of object
+		 *
+		 * @return {promise} if resolved, it returns id of object
 		 */
 		SchemaTools.prototype.getBySchema = function(schema, id, fields) {
 			//FIXME unit tests
-			//FIXME all chain has to be finished to use fields
+			//FIXME all chain (server) has to be finished to use fields
 			var p = $q.defer();
 
 			var url = '/udao/getBySchema/'.concat(
@@ -34,13 +63,8 @@
 				method: 'GET'
 			}).then(function(r) {
 				// success
-				if (r.status === 200) {
-					p.resolve(r.data);
-				} else {
-					p.reject(errors.byCode(errors.codes.UNKNOWN_STATE));
-				}
-			},
-			function(r) {
+				p.resolve(r.data);
+			}, function(r) {
 				// failure
 				p.reject(errors.resolveHttpError(r));
 			});
@@ -48,6 +72,34 @@
 			return p.promise;
 		};
 
+		/**
+		 * Save object to server
+		 *
+		 * @param {string} schema unencoded
+		 * @param {object} obj - object to save
+		 *
+		 * @return {promise}
+		 */
+		SchemaTools.prototype.saveBySchema = function(schema, obj) {
+			//FIXME unit tests
+			var p = $q.defer();
+
+			var url = '/udao/saveBySchema/'.concat(this.encodeUri(schema));
+
+			$http({
+				url: url,
+				method:	'PUT',
+				data: obj
+			}).then(function(r) {
+				// success
+				p.resolve(r.data);
+			}, function(r) {
+				// failure
+				p.reject(errors.resolveHttpError(r));
+			});
+
+			return p.promise;
+		};
 		/**
 		 * Encodes uri by safe encoder
 		 */
