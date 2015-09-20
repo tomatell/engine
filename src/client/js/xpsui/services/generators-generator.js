@@ -5,15 +5,16 @@
 	.factory('xpsui:GeneratorsGenerator', [ '$http', 'xpsui:safeUrlEncoder',
 		'xpsui:SchemaUtil','$q','xpsui:ObjectTools', 
 		function($http, urlEncoder,schemaUtilFactory,$q,objectTools) {
-		var service = {};
+			var service = {};
 
 		/** Counts porter(-berger) table
 		 * @teams - array of objects that will be used to define match
 		 * @terms - array of object that will be used to define round, its size limits result
+		 * @baseDataCP - object of baseData competitionParts
 		 * @returns - object in form
 				[{ round:<index>,term:<round_term>,matches:[{home:teams[x1],visitors:teams[y1],board:<board_index>},...] },...]
 		 */
-		function bergerTable(teams,terms) {
+		function bergerTable(teams,terms,baseDataCP) {
 
 			var floatTable = [];
 			var n, i, increment=1, atype=1, minmove=0, flipcolors=0;
@@ -34,7 +35,12 @@
 			var test_r = 0;
 			var outRounds=[];
 
-			var textPrefix = 'A-';
+			if (baseDataCP.matchIDNullBeforeSecondHalf=='TRUE') {
+				var textPrefix = 'A-';
+			} else {
+				var textPrefix = '';
+			}
+			
 			var match_id = 0;
 
 			for (var r=1; r<= max_round; r++) {	// r is the round number.
@@ -42,7 +48,7 @@
 				var outRound={round:r,term:terms[r-1],matches:[]};
 				outRounds.push(outRound);
 
-				if(r == nr+1) {
+				if(r == nr+1 && baseDataCP.matchIDNullBeforeSecondHalf=='TRUE') {
 					match_id=0;
 					textPrefix = 'B-';
 				}
@@ -72,52 +78,84 @@
 				if (atype == '1')
 					increment=2;
 
-				while (1) {	 //Must get out of this loop with break
-					
-					match_id++;
-
-					var matchPrefix=textPrefix+match_id;
-
-					if (i === 0)	 //At ghost board, color determined by round number
-						colorFlag = ((r-test_r)%2) ? 1 : 0;
-					else			//On other boards, board number determines it
-						colorFlag = (i % 2) ? 0 : 1;
-
-					colorFlag ^= flipcolors; //Will reverse color assignment if checked
-
-					var pHome = teams[floatTable[colorFlag?nr-i:i]-1];
-					var pVisitors = teams[floatTable[colorFlag?i:nr-i]-1];
-
-					var match={home:pHome.team ,visitors:pVisitors.team ,boar:i ,matchNumber:matchPrefix, homeClub:teams[floatTable[colorFlag?nr-i:i]-1].club ,visitorClub:teams[floatTable[colorFlag?i:nr-i]-1].club};
-
-					if (i===0) {
-						match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix, homeClub:match.visitorClub, visitorClub:match.homeClub};
-					}
-
-					if (pHome.complement) {
-						outRound.notPlaying=pVisitors;
-					} else if (pVisitors.complement) {
-						outRound.notPlaying=pHome;
-					} else {
-						outRound.matches.push(match);
-					}
-
-					if (minmove && (i===0) && (r % 2)===0)
-						i = 1;
-					else
-						i+= increment;
-					if (i >= n2)
-						if (increment == 1)	//Board number option
-							break;
-						else	{	//Come back to display the boards we missed
-							increment = -2;
-							i = ((i > n2) ? i - 3 : --i) ;
-						}
-					if ((i < 1) && (increment == -2)) //Finished with NOT board number option, exit loop
-						break;
+				if (baseDataCP.typeOfCompetition=='BERGER_SAME_PAIR_TWICE') {
+					var repeat=2;
+				} else {
+					var repeat = 1;
 				}
-			}
 
+				// for (var nasobok=1;nasobok<=repeat; nasobok++) {
+								
+					while (1) {	 //Must get out of this loop with break
+
+						if (i === 0)	 //At ghost board, color determined by round number
+							colorFlag = ((r-test_r)%2) ? 1 : 0;
+						else			//On other boards, board number determines it
+							colorFlag = (i % 2) ? 0 : 1;
+
+						colorFlag ^= flipcolors; //Will reverse color assignment if checked
+
+						var pHome = teams[floatTable[colorFlag?nr-i:i]-1];
+						var pVisitors = teams[floatTable[colorFlag?i:nr-i]-1];
+
+						for (var x = 0 ; x < repeat ; x++) {
+						
+							if (x===0) {
+								match_id++;
+								if (match_id<10) {
+									match_id = '0'+match_id;
+								}
+								if (baseDataCP.prefix) {
+									var matchPrefix=baseDataCP.prefix+textPrefix+match_id;
+								}
+							} else if (x===1) {
+								if (baseDataCP.prefix) {
+									var matchPrefix=baseDataCP.prefix+textPrefix+match_id+'/2';
+								}
+							} else {
+								if (baseDataCP.prefix) {
+									var matchPrefix=baseDataCP.prefix+textPrefix+match_id;
+								}
+							}
+
+							var match={home:pHome.team ,visitors:pVisitors.team ,boar:i ,matchNumber:matchPrefix, homeClub:teams[floatTable[colorFlag?nr-i:i]-1].club ,visitorClub:teams[floatTable[colorFlag?i:nr-i]-1].club};
+
+							if (i===0) {
+								match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix, homeClub:match.visitorClub, visitorClub:match.homeClub};
+							}
+
+							if (pHome.complement) {
+								outRound.notPlaying=pVisitors;
+								if (baseDataCP.matchIDForNotPlayingTeam=='FALSE' && x===0) {
+									match_id--;
+								}
+							} else if (pVisitors.complement) {
+								outRound.notPlaying=pHome;
+								if (baseDataCP.matchIDForNotPlayingTeam=='FALSE' && x===0) {
+									match_id--;
+								}
+							} else {
+								outRound.matches.push(match);
+							}
+						}
+
+						if (minmove && (i===0) && (r % 2)===0)
+							i = 1;
+						else
+							i+= increment;
+						if (i >= n2)
+							if (increment == 1)	//Board number option
+								break;
+							else	{	//Come back to display the boards we missed
+								increment = -2;
+								i = ((i > n2) ? i - 3 : --i) ;
+							}
+						if ((i < 1) && (increment == -2)) //Finished with NOT board number option, exit loop
+							break;
+					}
+				// }
+			}
+		
 			// console.log(outRounds);
 			// console.log(JSON.stringify(outRounds));
 			return outRounds;
@@ -148,12 +186,12 @@
 					toSave.baseData.state='Otvorený';
 
 					if (entity.baseData.prefix) {
-						toSave.baseData.matchNumber=entity.baseData.prefix+match.matchNumber;
+						toSave.baseData.matchNumber=match.matchNumber;
 					};
 
 					toSave.baseData.printTemplate=entity.baseData.printTemplate;	
 					
-					all.push( $http({url: '/udao/saveBySchema/'+saveSchema, method: 'PUT',data: toSave}));
+					all.push($http({url: '/udao/saveBySchema/'+saveSchema, method: 'PUT',data: toSave}));
 				});
 			});
 			$q.all(all).then(function() {
@@ -176,6 +214,7 @@
 				}
 			}).success(function(terms) {
 				var teams=entity.listOfTeam.team;
+				var baseDataCP=entity.baseData; //baseDataCP is baseData of competitionParts
 
 				var n = teams.length;
 				
@@ -213,7 +252,7 @@
 							teams[i].club = rosters[i].data.baseData.club;
 						}
 
-						entity.generated=bergerTable(teams,terms);
+						entity.generated=bergerTable(teams,terms,baseDataCP);
 
 						callback();
 					});
