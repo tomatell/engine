@@ -96,11 +96,11 @@
 						return;
 					}
 
+					// we are watching collection because it will be loaded later after element creation
 					scope.$watchCollection( attrs.xpsuiSchema, function() {
 						log.info('xpsuiForm generate');
 						var schema = scope.$eval(attrs.xpsuiSchema);
 						var mode = attrs.xpsuiForm;
-
 
 						// ACTIONS
 						if ( "viewedit"===mode && schema.clientActions ) {
