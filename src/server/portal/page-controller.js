@@ -101,61 +101,56 @@ PageController.prototype.competitionMatchesAll = function(req, res, next) {
 	var qf = QueryFilter.create();
 
 	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-	qf.addSort('baseData.matchDate', QueryFilter.sort.ASC);
+	qf.addSort('baseData.matchRound', QueryFilter.sort.ASC);
 
-	this.refereeReportsDao.list(qf, function(err, data) {
+	var schemaName = 'uri://registries/refereeReports#views/refereeReports-km/view';
+
+	var self = this;
+	this.refereeReportsDao.list(qf, function(err, data1) {
 		if (err) {
-			log.error('Failed to get list of matches for competition %s', cid, err);
-			next(err);
+			res.sendStatus(500);
 			return;
 		}
 
-		var result = [];
+		var result = {};
+		if (data1) {
+			async.map(data1, function(d, cb) {
+				self.uDaoService.getBySchema(schemaName, {perm: {'Registry - read' : true, 'RefereeReport - read - KM': true}}, d.id, function(err, userError, data) {
 
-		for (var i in data) {
-			result.push({
-				id: data[i].id,
-				homeId: data[i].baseData.homeClub.oid,
-				guestId: data[i].baseData.awayClub.oid,
-				matchDate: data[i].baseData.matchDate,
-				fullTimeScoreHome: data[i].baseData.fullTimeScoreHome,
-				fullTimeScoreAway: data[i].baseData.fullTimeScoreAway,
-				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
-				printTemplate: data[i].baseData && data[i].baseData.printTemplate
+					if (data) {
+						var r = {
+							id: data.id,
+							round: safeExtract(data, 'baseData.matchRound.refData.name', null),
+							homeId: data.baseData.homeClub.oid,
+							guestId: data.baseData.awayClub.oid,
+							homeName: safeExtract(data, 'baseData.homeClub.refData.name', ''),
+							guestName: safeExtract(data, 'baseData.awayClub.refData.name', ''),
+							matchDate: data.baseData.matchDate,
+							matchTime: data.baseData.matchBegin,
+							additionalScore: data.baseData.countOfBalls,
+							fullTimeScoreHome: data.baseData.fullTimeScoreHome,
+							fullTimeScoreAway: data.baseData.fullTimeScoreAway,
+							matchNumber: data.baseData && data.baseData.matchNumber,
+							printTemplate: data.baseData && data.baseData.printTemplate,
+							started: data.technicalData && data.technicalData.events && data.technicalData.events.length > 0 ? true : false,
+							finished: ['Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false
+						};
+
+						if (r.round) {
+							if (!result.hasOwnProperty(r.round)) {
+								result[r.round] = [];
+							}
+
+							result[r.round].push(r);
+						}
+					}
+
+					cb();
+				});
+			}, function(err) {
+				res.json(result);
 			});
 		}
-
-		var rostersQf = QueryFilter.create();
-		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-		pageController.rostersDao.list(rostersQf, function(err, data) {
-			if (err) {
-				log.error('Failed to get list of rosters for competition %s', cid, err);
-				next(err);
-				return;
-			}
-
-			var rosters = {};
-
-			for (var i in data) {
-				rosters[data[i].id] = data[i].baseData.prName;
-			}
-
-			for (i in result) {
-				if (rosters[result[i].homeId]) {
-					result[i].homeName = rosters[result[i].homeId];
-				} else {
-					result[i].homeName = '-:-';
-				}
-
-				if (rosters[result[i].guestId]) {
-					result[i].guestName = rosters[result[i].guestId];
-				} else {
-					result[i].guestName = '-:-';
-				}
-			}
-
-			res.json(result);
-		});
 	});
 };
 
@@ -185,6 +180,7 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 				guestId: data[i].baseData.awayClub.oid,
 				matchDate: data[i].baseData.matchDate,
 				matchTime: data[i].baseData.matchBegin,
+				additionalScore: data[i].baseData.countOfBalls,
 				fullTimeScoreHome: data[i].baseData.fullTimeScoreHome,
 				fullTimeScoreAway: data[i].baseData.fullTimeScoreAway,
 				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
@@ -195,7 +191,7 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 		}
 
 		var rostersQf = QueryFilter.create();
-		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
+		//rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
 		pageController.rostersDao.list(rostersQf, function(err, data) {
 			if (err) {
 				log.error('Failed to get list of rosters for competition %s', cid, err);
@@ -235,6 +231,10 @@ PageController.prototype.competitionResults = function(req, res, next) {
 
 	var qf = QueryFilter.create();
 
+	// FIXME make this config public in configuration
+	var fieldsPairing = {
+		'ROSTER_NAME': 'baseData.prName'
+	}
 	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
 
 	this.refereeReportsDao.list(qf, function(err, data) {
@@ -255,10 +255,10 @@ PageController.prototype.competitionResults = function(req, res, next) {
 			var guestId = data[i].baseData.awayClub.oid;
 
 			if (typeof result[homeId] === 'undefined') {
-				result[homeId] = { points: 0, matches: 0, score: 0};
+				result[homeId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0};
 			}
 			if (typeof result[guestId] === 'undefined') {
-				result[guestId] = { points: 0, matches: 0, score: 0};
+				result[guestId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0};
 			}
 
 			if (['Schválený', 'Zatvorený'].indexOf(reportState) < 0) {
@@ -277,23 +277,37 @@ PageController.prototype.competitionResults = function(req, res, next) {
 			}
 
 			if ((scoreHome) > (scoreAway)) {
-				result[homeId].points += 2;
+				++result[homeId].wins;
 			} else if ((scoreHome) < (scoreAway)) {
+				++result[guestId].wins;
+			}
+
+			if ((scoreHome === 3) && ([0, 1].indexOf(scoreAway) > -1)) {
+				result[homeId].points += 3;
+				result[guestId].points += 0;
+			} else if ((scoreHome === 3) && (scoreAway === 2)) {
+				result[homeId].points += 2;
+				result[guestId].points += 1;
+			} else if ((scoreHome === 2) && (scoreAway === 3)) {
+				result[homeId].points += 1;
 				result[guestId].points += 2;
 			} else {
-				result[homeId].points += 1;
-				result[guestId].points += 1;
+				result[homeId].points += 0;
+				result[guestId].points += 3;
 			}
+
+			result[homeId].setsWon += scoreHome;
+			result[homeId].setsLost += scoreAway;
+			result[guestId].setsWon += scoreAway;
+			result[guestId].setsLost += scoreHome;
 
 			result[homeId].matches += 1;
 			result[guestId].matches += 1;
 
-			result[homeId].score += scoreHome - scoreAway;
-			result[guestId].score -= scoreHome - scoreAway;
 		}
 
 		var rostersQf = QueryFilter.create();
-		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
+		//rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
 		pageController.rostersDao.list(rostersQf, function(err, data) {
 			if (err) {
 				log.error('Failed to get list of rosters for competition %s', cid, err);
@@ -314,7 +328,7 @@ PageController.prototype.competitionResults = function(req, res, next) {
 					result[i].name = '-:-';
 				}
 			}
-			
+
 			var finres = [];
 			for (var i in result) {
 				finres.push(result[i]);
