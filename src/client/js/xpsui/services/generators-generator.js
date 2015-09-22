@@ -124,6 +124,18 @@
 								match={home:match.visitors,visitors:match.home,board:i, matchNumber:matchPrefix, homeClub:match.visitorClub, visitorClub:match.homeClub};
 							}
 
+							if (baseDataCP.matchIDForNotPlayingTeam=='FALSE' && match.home.refData.name=='volno' || match.visitors.refData.name=='volno') {
+								if (baseDataCP.matchIDForNotPlayingTeam=='FALSE') {
+									if (x===0 && baseDataCP.typeOfCompetition=='BERGER_SAME_PAIR_TWICE') {
+										// do nothing
+									} else if (x===1) {
+										match_id--;
+									} else {
+										match_id--;
+									}
+								}
+							}
+
 							if (pHome.complement) {
 								outRound.notPlaying=pVisitors;
 								if (baseDataCP.matchIDForNotPlayingTeam=='FALSE' && x===0) {
