@@ -46,8 +46,7 @@
 	}])
 	.config(['reCAPTCHAProvider',function (reCAPTCHAProvider) {
 				// required: please use your own key :)
-				reCAPTCHAProvider.setPublicKey('6LfOUQITAAAAAOgMxsnYmhkSY0lZw0tej0C4N2XS-not-used-but-required');
-
+				reCAPTCHAProvider.setPublicKey('6LfFZQ0TAAAAAMRlrjaZ5Wruzi83rnzBHpaCYjEp'); // membery.io reCAPTCHA public key
 				// optional: gets passed into the Recaptcha.create call
 				reCAPTCHAProvider.setOptions({
 					theme: 'clean'
