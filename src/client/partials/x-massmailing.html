@@ -60,16 +60,16 @@
 							autocomplete="off">
 					</div>
 					<div class="x-fieldset-col-2 pull-right">
-						<button ng-click="removeCrit($index)" class="btn-clear"><i class="icon-remove"></i> {{'generic.search.remove' | translate}}</button>
+						<button ng-click="removeCrit($index)" class="btn-clear"><i class="fa fa-remove"></i> {{'generic.search.remove' | translate}}</button>
 					</div>
 				</div>
 
 				<div class="x-fieldset-row clearfix">
 					<div class="pull-left">
-						<button ng-click="addCrit()" class="btn-secondary"><i class="icon-add"></i> {{'generic.search.add' | translate}}</button>
+						<button ng-click="addCrit()" class="btn-secondary"><i class="fa fa-plus"></i> {{'generic.search.add' | translate}}</button>
 					</div>
 					<div class="pull-right">
-						<button ng-click="search()" class="btn-primary"><i class="icon-search"></i> {{'generic.search.search' | translate}}</button>
+						<button ng-click="search()" class="btn-primary"><i class="fa fa-search"></i> {{'generic.search.search' | translate}}</button>
 					</div>
 				</div>
 			</div>
@@ -102,7 +102,7 @@
 			</div>
 			<div class="x-fieldset">
 				<div class="pull-right">
-					<button ng-disabled="recipientCount()<1" xpsui-confirmed-click="sendMail()" xpsui-confirm-click="{{'massmailing.send.confirm' | translate}}" class="btn-primary"><i class="glyphicon-search"></i>{{'massmailing.send' | translate}} ({{recipientCount()}}x)</button>
+					<button ng-disabled="recipientCount()<1" xpsui-confirmed-click="sendMail()" xpsui-confirm-click="{{'massmailing.send.confirm' | translate}}" class="btn-primary"><i class="fa fa-search"></i>{{'massmailing.send' | translate}} ({{recipientCount()}}x)</button>
 				</div>
 			</div>
 

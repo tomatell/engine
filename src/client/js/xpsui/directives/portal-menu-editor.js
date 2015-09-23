@@ -41,14 +41,14 @@
 				elm.addClass('portal-menu-editor');
 
 				var header = angular.element('<div class="portal-menu-header"></div>');
-				var openIcon = angular.element('<i class="icon-minus" style="padding-right:10px;"></i>');
+				var openIcon = angular.element('<i class="fa fa-minus" style="padding-right:10px;"></i>');
 				var children = angular.element('<div style="padding-left: 20px;"><div ng-repeat="c in index.subElements"><div xpsui-portal-menu-editor="c" portal-menu-index="$index"></div></div></div>');
 				var actionButtons = angular.element('<span style="padding-left: 10px;" class="x-hidden"></span>');
-				var editButton = angular.element('<i class="action-button icon-pencil"></i>');
-				var addButton = angular.element('<i class="action-button icon-add"></i>');
-				var removeButton = angular.element('<i class="action-button icon-minus" ng-click="removeParent()"></i>');
-				var downButton = angular.element('<i class="action-button icon-chevron-down" ng-click="downFn()"></i>');
-				var upButton = angular.element('<i class="action-button icon-chevron-up" ng-click="upFn()"></i>');
+				var editButton = angular.element('<i class="action-button fa fa-pencil"></i>');
+				var addButton = angular.element('<i class="action-button fa fa-plus"></i>');
+				var removeButton = angular.element('<i class="action-button fa fa-minus" ng-click="removeParent()"></i>');
+				var downButton = angular.element('<i class="action-button fa fa-chevron-down" ng-click="downFn()"></i>');
+				var upButton = angular.element('<i class="action-button fa fa-chevron-up" ng-click="upFn()"></i>');
 
 				var editPanel = angular.element('<table class="x-hidden portal-menu-editor-edit-panel">' +
 					'<tr><td>Meno:</td><td><input ng-model="index.name"</td></tr>' +
@@ -116,8 +116,8 @@
 
 				header.on('click', function(evt) {
 					if (scope.index && scope.index.subElements && scope.index.subElements.length > 0) {
-						openIcon.toggleClass('icon-add');
-						openIcon.toggleClass('icon-minus');
+						openIcon.toggleClass('fa fa-plus');
+						openIcon.toggleClass('fa fa-minus');
 
 						children.toggleClass('x-hidden');
 					}
@@ -138,9 +138,9 @@
 				header.append(actionButtons);
 
 				if (scope.index.name != 'ROOT' && scope.index && scope.index.subElements && scope.index.subElements.length < 1) {
-					openIcon.removeClass('icon-minus');
-					openIcon.removeClass('icon-add');
-					openIcon.addClass('icon-circle-o');
+					openIcon.removeClass('fa fa-minus');
+					openIcon.removeClass('fa fa-plus');
+					openIcon.addClass('fa fa-circle-o');
 					console.log('name: ' + scope.index.subElements);
 				}
 
@@ -158,9 +158,9 @@
 						tags: [],
 						subElements: []
 					});
-					openIcon.addClass('glyphicon-minus-sign');
-					openIcon.removeClass('glyphicon-record');
-					openIcon.removeClass('glyphicon-plus-sign');
+					openIcon.addClass('fa fa-minus');
+					openIcon.removeClass('fa fa-circle-o');
+					openIcon.removeClass('fa fa-plus');
 					children.removeClass('x-hidden');
 				};
 

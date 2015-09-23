@@ -24,13 +24,13 @@
 
 		.x-action-previous{
 			&:after{
-				@include icon-font($icon-chevron-left);
+				@include icon-font(fa fa-chevron-left);
 			}
 		}
 		.x-action-next{
 			
 			&:after{
-				@include icon-font($icon-chevron-right);
+				@include icon-font(fa fa-chevron-right);
 			}
 		}
 		.x-action-header{

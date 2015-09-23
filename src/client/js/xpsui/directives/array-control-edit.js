@@ -19,12 +19,12 @@
 		+ '  xpsui-by-schema-field-edit xpsui-schema="xpsuiSchema.items[key]"'
 		+ '  xpsui-model="$parent.item[key]">x</div>'
 		+ '  <button ng-click="removeByIndex($index);" class="btn-clear">'
-		+ '   <i class="icon-minus"></i> {{\'generic.search.remove\' | translate}}'
+		+ '   <i class="fa fa-minus"></i> {{\'generic.search.remove\' | translate}}'
 		+ '  </button>'
 		+ '</div>'
 		+ '<div class="xpsui-array-control-noItems" ng-show="!ngModel || ngModel.length==0">{{"generic.noItems.label" | translate}}</div>'
 		+ '<div class="pull-right">'
-		+ ' <button ng-click="appendNew();" class="btn-clear"><i class="icon-add"></i> {{"generic.search.add" | translate}}</button>'
+		+ ' <button ng-click="appendNew();" class="btn-clear"><i class="fa fa-plus"></i> {{"generic.search.add" | translate}}</button>'
 		+ '</div>'
 		+ ' </fieldset>';
 

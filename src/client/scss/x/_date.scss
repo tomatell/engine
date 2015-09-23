@@ -7,11 +7,11 @@
 
 	.x-dropdown-action{
 		&:after{
-			@include icon-font($icon-calendar-empty);
+			@include icon-font(fa fa-calendar-o);
 		}
 		&:hover{
 			&:after{
-				content: $icon-calendar;
+				content: fa fa-calendar;
 			}
 		}
 	}
@@ -19,7 +19,7 @@
 	&.x-open{
 		.x-dropdown-action{
 			&:after{
-				content: $icon-calendar;
+				content: fa fa-calendar;
 			}
 		}
 	}

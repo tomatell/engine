@@ -113,7 +113,7 @@
 				text-align: center;
 
 				&:before{
-					@include icon-font($icon-remove !important);
+					@include icon-font(fa fa-remove !important);
 					font-size: em(18px);
 					line-height: $fixed-header-height;
 				}
