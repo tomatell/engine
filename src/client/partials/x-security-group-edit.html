@@ -78,7 +78,7 @@
 										<header>{{'security.group.edit.added.permissions' | translate}}</header>
 										<section>
 											<div ng-repeat="perm in group.permissions" class="psui-list-item" ng-click="removePermission(perm)">
-												<i class="icon-minus"></i> <span>{{perm}}</span>
+												<i class="fa fa-minus"></i> <span>{{perm}}</span>
 											</div>
 										</section>
 									</div>
@@ -86,7 +86,7 @@
 										<header>{{'security.group.edit.available.permissions' | translate}}</header>
 										<section>
 											<div ng-repeat="perm in permissions" class="psui-list-item" ng-click="addPermission(perm)">
-												<i class="icon-add"></i> <span>{{perm}}</span>
+												<i class="fa fa-plus"></i> <span>{{perm}}</span>
 											</div>
 										</section>
 									</div>
@@ -98,7 +98,7 @@
 					<fieldset>
 						<div class="pull-right">
 							<button ng-click="updateGroupPermissions()" class="btn-primary">
-								<i class="icon-check"></i> {{'security.group.edit.save' | translate}}
+								<i class="fa fa-check"></i> {{'security.group.edit.save' | translate}}
 							</button>
 						</div>
 					</fieldset>

@@ -66,7 +66,7 @@
 		top: 0px;
 
 		&:before{
-			@include icon-font($icon-remove !important);
+			@include icon-font($fa-var-remove !important);
 			font-size: em($font-size-bigger);
 			line-height: $fixed-header-height;
 		}

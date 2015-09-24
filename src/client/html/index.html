@@ -65,15 +65,15 @@
 
 	<nav>
 		<ul>
-			<li ng-show="isMobile"><a href="membery://index"><i class="icon-arrow-left"></i></a></li>
+			<li ng-show="isMobile"><a href="membery://index"><i class="fa fa-arrow-left"></i></a></li>
 			<li ng-show="hasPermissions(['System User'])"><span class="text-block"
 				>{{security.currentUser.baseData.name}}&nbsp;{{security.currentUser.baseData.surName}}</span></li>
 				<li ng-show="hasPermissions(['System User'])"><div class="x-login-photo" ng-style="{'background-image': 'url(' + security.currentUser.photoInfo.photo + ')'}"></div>
 			</li>
-			<li ng-show="!hasPermissions(['System User'])"><a href="#/help" target="_blank"><i class="icon-question-circle"></i></a></li>
-			<li ng-show="hasPermissions(['System User'])"><a href="#/help"><i class="icon-question-circle"></i></a></li>
+			<li ng-show="!hasPermissions(['System User'])"><a href="#/help" target="_blank"><i class="fa fa-question-circle"></i></a></li>
+			<li ng-show="hasPermissions(['System User'])"><a href="#/help"><i class="fa fa-question-circle"></i></a></li>
 			<li ng-show="hasPermissions(['System User'])" class="" ng-controller="xpsui:SecurityLogoutCtrl"><a
-				href="#" ng-click="logout();"><i class="icon-power-off"></i></a
+				href="#" ng-click="logout();"><i class="fa fa-power-off"></i></a
 			></li>
 		</ul>
 	</nav>

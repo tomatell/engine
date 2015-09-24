@@ -1,18 +1,18 @@
 <h1>{{'portal.edit.title' | translate}}</h1>
 <fieldset class="form-group" style="background-color: black; padding: 10px;" ng-show="mode !== 'edit'">
 <div class="btn-group pull-right">
-	<button class="btn btn-primary btn-ok" ng-show="showButtons" ng-click="edit();"><i class="icon-pencil"></i>{{'portal.edit.edit' | translate}}</button>
-	<button class="btn btn-primary btn-ok" ng-show="showButtons" ng-click="addNew();"><i class="icon-add-circle"></i>{{'portal.edit.new' | translate}}</button>
+	<button class="btn btn-primary btn-ok" ng-click="edit();"><i class="fa fa-pencil"></i>{{'portal.edit.edit' | translate}}</button>
+	<button class="btn btn-primary btn-ok" ng-click="addNew();"><i class="fa fa-add-circle"></i>{{'portal.edit.new' | translate}}</button>
 </div>
 </fieldset>
 <div ng-show="mode === 'edit'">
 <fieldset class="form-group" style="background-color: black; padding: 10px;">
 <div class="btn-group">
-	<button class="btn btn-primary btn-ok" ng-click="showBlockSelector();"><i class="icon-add-circle"></i>{{'portal.edit.add.block' | translate}}</button>
+	<button class="btn btn-primary btn-ok" ng-click="showBlockSelector();"><i class="fa fa-add-circle"></i>{{'portal.edit.add.block' | translate}}</button>
 
 	<div class="pull-right">
-		<button class="btn btn-secondary btn-cancel" ng-click="cancel();"><i class="icon-remove"></i>{{'portal.edit.cancel' | translate}}</button>
-		<button class="btn btn-primary btn-ok" ng-click="save();"><i class="icon-check"></i>{{'portal.edit.save' | translate}}</button>
+		<button class="btn btn-secondary btn-cancel" ng-click="cancel();"><i class="fa fa-remove"></i>{{'portal.edit.cancel' | translate}}</button>
+		<button class="btn btn-primary btn-ok" ng-click="save();"><i class="fa fa-check"></i>{{'portal.edit.save' | translate}}</button>
 	</div>
 </div>
 </fieldset>

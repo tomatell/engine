@@ -10,7 +10,7 @@
 		padding: 0px $dropdown-offset;
 
 		&:after{
-			@include icon-font($icon-remove);
+			@include icon-font($fa-var-remove);
 		}
 		&.x-show{
 			display: block;

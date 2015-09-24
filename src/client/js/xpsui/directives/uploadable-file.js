@@ -36,7 +36,7 @@
 				var fileButton = angular.element('<input type="file" style="display: none;"></input>');
 				var chooseFileButton = angular.element(
 						'<button class="btn-primary">'
-						+ '<icon class="icon-open"></icon> ' + $translate.instant('generic.file.choose')
+						+ '<icon class="fa fa-eye"></icon> ' + $translate.instant('generic.file.choose')
 						+ '</button>');
 				var imgLink = '';
 				// elm.addClass('xpsui-uploadable-file');

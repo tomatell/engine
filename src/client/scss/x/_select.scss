@@ -11,11 +11,11 @@
 
 	.x-dropdown-action{
 		&:after{
-			@include icon-font($icon-chevron-down);
+			@include icon-font($fa-var-chevron-down);
 		}
 		&:hover{
 			&:after{
-				content: $icon-chevron-down;
+				content: $fa-var-chevron-down;
 			}
 		}
 	}
@@ -23,7 +23,7 @@
 	&.x-open{
 		.x-dropdown-action{
 			&:after{
-				content: $icon-chevron-up;
+				content: $fa-var-chevron-up;
 			}
 		}
 	}
@@ -38,7 +38,7 @@
 
 	&.x-loading .x-selectbox header:after {
 		@include spin();
-		content: $icon-refresh;
+		content: $fa-var-refresh;
 	}
 
 	.x-selectbox{
@@ -47,7 +47,7 @@
 		
 		header{
 			&:after{
-				@include icon-font($icon-search);
+				@include icon-font($fa-var-search);
 				position: absolute;
 				right: 0px;
 				top: 0px;

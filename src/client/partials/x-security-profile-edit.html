@@ -33,7 +33,7 @@
 
 						<div class="x-fieldset-col-2">
 							<button ng-click="removeCrit($index)" class="btn-clear">
-								<i class="icon-remove"></i>
+								<i class="fa fa-remove"></i>
 								{{'security.profile.edit.cancel' |translate}}
 							</button>
 						</div>
@@ -42,13 +42,13 @@
 					<div class="x-fieldset-row">
 						<div class="pull-left">
 							<button ng-click="addCrit()" class="btn-secondary">
-								<i class="icon-add"></i>
+								<i class="fa fa-plus"></i>
 								{{'security.profile.edit.add' |translate}}
 							</button>
 						</div>
 						<div class="pull-right">
 							<button ng-click="search()" class="btn-primary">
-								<i class="icon-search"></i>
+								<i class="fa fa-search"></i>
 								{{'security.profile.edit.search' |translate}}
 							</button>
 						</div>
@@ -76,7 +76,7 @@
 
 									<td>
 										<span ng-click='selectProfile(obj)' class="item-clickable">
-											<i class="icon-pencil"></i> <span>{{'security.profile.edit.edit' |translate}}</span>
+											<i class="fa fa-pencil"></i> <span>{{'security.profile.edit.edit' |translate}}</span>
 										</span>
 									</td>
 								</tr>
@@ -124,7 +124,7 @@
 									<header>{{'security.profile.edit.added.groups' |translate}}</header>
 									<section >
 										<div ng-repeat="group in profile.groups" ng-click="removeGroup(group)">
-											<i class="icon-minus"></i> <span>{{group.baseData.name}}</span>
+											<i class="fa fa-minus"></i> <span>{{group.baseData.name}}</span>
 										</div>
 									</section>
 								</div>
@@ -132,7 +132,7 @@
 									<header>{{'security.profile.edit.available.groups' |translate}}</header>
 									<section>
 										<div ng-repeat="group in groups" ng-click="addGroup(group)">
-											<i class="icon-add"></i> <span>{{group.baseData.name}}</span>
+											<i class="fa fa-plus"></i> <span>{{group.baseData.name}}</span>
 										</div>
 									</section>
 								</div>
@@ -156,7 +156,7 @@
 									<header>{{'security.profile.edit.added.permissions' |translate}}</header>
 									<section >
 										<div ng-repeat="perm in profile.permissions" ng-click="removePermission(perm)">
-											<i class="icon-minus"></i> <span>{{perm}}</span>
+											<i class="fa fa-minus"></i> <span>{{perm}}</span>
 										</div>
 									</section>
 								</div>
@@ -164,7 +164,7 @@
 									<header>{{'security.profile.edit.available.permissions' |translate}}</header>
 									<section>
 										<div ng-repeat="perm in permissions" ng-click="addPermission(perm)">
-											<i class="icon-add"></i> <span>{{perm}}</span>
+											<i class="fa fa-plus"></i> <span>{{perm}}</span>
 										</div>
 									</section>
 								</div>
@@ -213,14 +213,14 @@
 
 						<div class="x-fieldset-col-2">
 							<button ng-click="removeProfileCrit($index)" class="btn-clear">
-								<i class="icon-remove"></i> {{'security.profile.edit.cancel' |translate}}
+								<i class="fa fa-remove"></i> {{'security.profile.edit.cancel' |translate}}
 							</button>
 						</div>
 					</div>
 					<div class="x-fieldset-row">
 						<div class="x-fieldset-col-4">
 							<button ng-click="addProfileCrit()" class="btn-secondary">
-								<i class="icon-add"></i> {{'security.profile.edit.add' |translate}}
+								<i class="fa fa-plus"></i> {{'security.profile.edit.add' |translate}}
 							</button>
 						</div>
 					</div>
@@ -236,7 +236,7 @@
 						</div>
 						<div class="x-fieldset-col-4 pull-right">
 							<button ng-click="updateProfileSecurity()" class="btn btn-primary">
-								<i class="glyphicon-ok"></i>{{'security.profile.edit.save' |translate}}
+								<i class="fa fa-check"></i>{{'security.profile.edit.save' |translate}}
 							</button>
 						</div>
 					</div>

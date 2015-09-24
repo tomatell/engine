@@ -23,7 +23,7 @@
 
 					var btn = angular.element('<button type="button" class="btn"></button>');
 
-					var icon = angular.element('<i class="icon-search"></i>');
+					var icon = angular.element('<i class="fa fa-search"></i>');
 					var iconSpinner = angular.element('<i class="fa fa-spinner fa-spin"></i>');
 
 					btn.append(icon);
