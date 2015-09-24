@@ -12,7 +12,7 @@
 		cursor: pointer;
 		font-size: em($validation-mark-icon-size);
 		&:before{
-			@include icon-font($icon-error);
+			@include icon-font($fa-var-exclamation-circle);
 		}
 	}
 

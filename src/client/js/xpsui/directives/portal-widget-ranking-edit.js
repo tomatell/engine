@@ -16,14 +16,14 @@
 				elm.empty();
 				elm.addClass('x-portal-widget-edit');
 
-				var titleBar = angular.element('<div class="xpsui-portal-widget-title-bar">{{data.meta.type}}:{{data.meta.name}}<div class="pull-right"><i class="action-button icon-add" ng-click="add();"></i><i class="action-button icon-chevron-up" ng-click="moveUp();"></i><i class="action-button icon-chevron-down" ng-click="moveDown();"></i><i class="action-button icon-trash" ng-click="remove();"></i></div></div>');
+				var titleBar = angular.element('<div class="xpsui-portal-widget-title-bar">{{data.meta.type}}:{{data.meta.name}}<div class="pull-right"><i class="action-button fa fa-plus" ng-click="add();"></i><i class="action-button fa fa-chevron-up" ng-click="moveUp();"></i><i class="action-button fa fa-chevron-down" ng-click="moveDown();"></i><i class="action-button fa fa-trash" ng-click="remove();"></i></div></div>');
 
 				var content = angular.element('<div style="padding-left: 1px;">' +
 						'<div ng-repeat="file in data.data.results" class="psui-wrapper" style="padding: 10px; position: relative;">' +
 							'<div style="position: absolute; right: 5px; top: 10px;">' +
-								'<i class="action-button icon-chevron-left" ng-click="photoLeft($index);"></i>'+
-								'<i class="action-button icon-trash" ng-click="photoRemove($index);"></i>'+
-								'<i class="action-button icon-chevron-right" ng-click="photoRight($index);"></i>'+
+								'<i class="action-button fa fa-chevron-left" ng-click="photoLeft($index);"></i>'+
+								'<i class="action-button fa fa-trash" ng-click="photoRemove($index);"></i>'+
+								'<i class="action-button fa fa-chevron-right" ng-click="photoRight($index);"></i>'+
 							'</div>' +
 							'<div>' +
 							'Meno: <input ng-model="data.data.results[$index].name"/>' +

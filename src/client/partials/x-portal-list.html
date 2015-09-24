@@ -25,16 +25,16 @@
 					</div>
 				</div>
 				<div class="flex-form-col-right">
-					<button ng-click="removeCrit($index)" type="button" class="btn-clear"><i class="icon-remove"></i> Zrušiť</button>
+					<button ng-click="removeCrit($index)" type="button" class="btn-clear"><i class="fa fa-remove"></i> Zrušiť</button>
 				</div>
 			</div>
 			<div class="flex-form-row" style="">
 				<div class="flex-form-col-middle">
-					<button ng-click="addNewCrit()" type="button" class="btn-secondary"><i class="icon-add"></i> Pridať</button>	
+					<button ng-click="addNewCrit()" type="button" class="btn-secondary"><i class="fa fa-plus"></i> Pridať</button>	
 				</div>
 				<div class="flex-form-col-content-end">
 					<button ng-click="search()" type="button" class="btn-primary">
-						<i ng-show="!isSearching" class="icon-search"></i><i ng-show="isSearching" class="fa fa-spinner fa-spin ng-hide"></i> 
+						<i ng-show="!isSearching" class="fa fa-search"></i><i ng-show="isSearching" class="fa fa-spinner fa-spin ng-hide"></i> 
 						Hľadať
 					</button>	
 				</div>
@@ -47,23 +47,23 @@
 		<div class="search-header flex-form-headers">
 			<div class="flex-form-header" ng-click="changeSort('article.meta.title');" style="flex: 10 0 200px; ">
 				Názov
-				<i ng-show="'article.meta.title' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="icon-chevron-up"></i>
-				<i ng-show="'article.meta.title' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="icon-chevron-down ng-hide"></i>
+				<i ng-show="'article.meta.title' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="fa fa-chevron-up"></i>
+				<i ng-show="'article.meta.title' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="fa fa-chevron-down ng-hide"></i>
 			</div>
 			<div class="flex-form-header" ng-click="changeSort('article.meta.lastModTimestamp');" style="flex: 6 0 100px; ">
 				D. posl. zmeny
-				<i ng-show="'article.meta.lastModTimestamp' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="icon-chevron-up"></i>
-				<i ng-show="'article.meta.lastModTimestamp' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="icon-chevron-down ng-hide"></i>
+				<i ng-show="'article.meta.lastModTimestamp' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="fa fa-chevron-up"></i>
+				<i ng-show="'article.meta.lastModTimestamp' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="fa fa-chevron-down ng-hide"></i>
 			</div>
 			<div class="flex-form-header" ng-click="changeSort('article.meta.tags');" style="flex: 10 0 200px; ">
 				Tagy
-				<i ng-show="'article.meta.tags' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="icon-chevron-up"></i>
-				<i ng-show="'article.meta.tags' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="icon-chevron-down ng-hide"></i>
+				<i ng-show="'article.meta.tags' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="fa fa-chevron-up"></i>
+				<i ng-show="'article.meta.tags' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="fa fa-chevron-down ng-hide"></i>
 			</div>
 			<div class="flex-form-header" ng-click="changeSort('article.meta.template');" style="flex: 4 0 100px; ">
 				Template
-				<i ng-show="'article.meta.template' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="icon-chevron-up"></i>
-				<i ng-show="'article.meta.template' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="icon-chevron-down ng-hide"></i>
+				<i ng-show="'article.meta.template' == currSort.field &amp;&amp; currSort.order == sort.ASC" class="fa fa-chevron-up"></i>
+				<i ng-show="'article.meta.template' == currSort.field &amp;&amp; currSort.order == sort.DESC" class="fa fa-chevron-down ng-hide"></i>
 			</div>
 			<div class="flex-form-header" style="flex: 4 0 100px; ">
 				Akcie

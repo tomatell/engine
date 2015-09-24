@@ -34,10 +34,10 @@
 
 					<div class="x-fieldset-row">
 						<div class="pull-left">
-							<button ng-click="addCrit()" class="btn-secondary"><i class="icon-add"></i> {{'security.user.edit.add' |translate}}</button>
+							<button ng-click="addCrit()" class="btn-secondary"><i class="fa fa-plus"></i> {{'security.user.edit.add' |translate}}</button>
 						</div>
 						<div class="pull-right">
-							<button ng-click="search()" class="btn-primary"><i class="icon-search"></i> {{'security.user.edit.search' |translate}}</button>
+							<button ng-click="search()" class="btn-primary"><i class="fa fa-search"></i> {{'security.user.edit.search' |translate}}</button>
 						</div>
 					</div>
 				<!-- </div> -->
@@ -63,7 +63,7 @@
 
 									<td>
 										<a ng-click='selectUser(obj)' class="item-clickable">
-											<i class="icon-pencil"></i> <span>{{'security.user.edit.edit' |translate}}</span>
+											<i class="fa fa-pencil"></i> <span>{{'security.user.edit.edit' |translate}}</span>
 										</a>
 									</td>
 								</tr>
@@ -124,7 +124,7 @@
 								<header>{{'security.user.edit.added.profiles' |translate}}</header>
 								<section>
 									<div ng-repeat="profile in user.profiles" ng-click="removeProfile(profile)">
-										<i class="icon-minus"></i> <span>{{profile.baseData.name}}</span>
+										<i class="fa fa-minus"></i> <span>{{profile.baseData.name}}</span>
 									</div>
 								</section>
 							</div>
@@ -132,7 +132,7 @@
 								<header>{{'security.user.edit.available.profiles' |translate}}</header>
 								<section>
 									<div ng-repeat="profile in profiles" ng-click="addProfile(profile)">
-										<i class="icon-add"></i> <span>{{profile.baseData.name}}</span>
+										<i class="fa fa-plus"></i> <span>{{profile.baseData.name}}</span>
 									</div>
 								</section>
 							</div>
@@ -146,7 +146,7 @@
 						<div class="pull-right">
 							<button ng-click="resetPassword() " class="btn-secondary">{{'security.user.edit.reset.password' | translate}}</button>
 							<button ng-click="updateUserSecurity()" class="btn-primary">
-								<i class="icon-check"></i> {{'security.user.edit.save' |translate}}
+								<i class="fa fa-check"></i> {{'security.user.edit.save' |translate}}
 							</button>
 						</div>
 					</div>

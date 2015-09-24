@@ -90,10 +90,10 @@
 				var buttonsHolder = angular.element('<div class="xpsui-buttons-holder"></div>');
 				modalContentEl.append(buttonsHolder);
 
-				var buttonRotate = $compile(angular.element('<button type="button" class="btn-secondary xpsui-icon-rotate"><icon class="icon-rotate"></icon> <span>{{\'psui.imageresizor.rotate\' | translate}}</span></button>'))(scope);
+				var buttonRotate = $compile(angular.element('<button type="button" class="btn-secondary xpsui-icon-rotate"><icon class="fa fa-repeat"></icon> <span>{{\'psui.imageresizor.rotate\' | translate}}</span></button>'))(scope);
 				buttonsHolder.append(buttonRotate);
 				
-				var buttonOk = $compile(angular.element('<button type="button" class="btn-secondary xpsui-icon-ok"><icon class="icon-check"></icon> <span>{{\'psui.imageresizor.ok\' | translate}}</span></button>'))(scope);
+				var buttonOk = $compile(angular.element('<button type="button" class="btn-secondary xpsui-icon-ok"><icon class="fa fa-check"></icon> <span>{{\'psui.imageresizor.ok\' | translate}}</span></button>'))(scope);
 				buttonsHolder.append(buttonOk);
 				
 				var buttonClose = angular.element('<div class="x-modalview-close"></div>');

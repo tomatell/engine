@@ -13,15 +13,15 @@
 				xpsui-by-schema-field-edit xpsui-schema="{{crit.field.path ? 'schema.' + objectPathToSchemaPath(crit.field.path) : null}}" 
 				xpsui-model="crit.val" ng-keypress="filterKeyPressed($event)"></div>
 		<div class="flex-form-col-right">
-			<button ng-click="removeCrit($index)" type="button" class="btn-clear"><i class="icon-remove"></i> {{'generic.search.remove' | translate}}</button>
+			<button ng-click="removeCrit($index)" type="button" class="btn-clear"><i class="fa fa-remove"></i> {{'generic.search.remove' | translate}}</button>
 		</div>
 	</div>
 	<div class="flex-form-row" style="">
 		<div class="flex-form-col-middle">
-			<button ng-click="addNewCrit()" type="button" class="btn-secondary"><i class="icon-add"></i> {{'generic.search.add' | translate}}</button>	
+			<button ng-click="addNewCrit()" type="button" class="btn-secondary"><i class="fa fa-plus"></i> {{'generic.search.add' | translate}}</button>	
 		</div>
 		<div class="flex-form-col-content-end">
-			<button ng-click="search()" type="button" class="btn-primary"><i ng-show="!isSearching" class="icon-search"></i><i ng-show="isSearching" class="fa fa-spinner fa-spin"></i> {{'generic.search.search' | translate}}</button>	
+			<button ng-click="search()" type="button" class="btn-primary"><i ng-show="!isSearching" class="fa fa-search"></i><i ng-show="isSearching" class="fa fa-spinner fa-spin"></i> {{'generic.search.search' | translate}}</button>	
 		</div>
 	</div>
 	</fieldset>
@@ -32,8 +32,8 @@
 		<div ng-repeat="f in schema.listFields" class="flex-form-header" ng-click="changeSort(f.field);"
 				ng-style="{'flex': fieldWeigth(f), '-webkit-flex': fieldWeigth(f) }">
 			{{f.transCode || f.title | translate}}
-			<i ng-show="f.field == currSort.field && currSort.order == sort.ASC" class="icon-chevron-up" class="flex-form-header-icon"></i>
-			<i ng-show="f.field == currSort.field && currSort.order == sort.DESC" class="icon-chevron-down" class="flex-form-header-icon"></i>
+			<i ng-show="f.field == currSort.field && currSort.order == sort.ASC" class="fa fa-chevron-up" class="flex-form-header-icon"></i>
+			<i ng-show="f.field == currSort.field && currSort.order == sort.DESC" class="fa fa-chevron-down" class="flex-form-header-icon"></i>
 		</div>
 		<div class="flex-form-header-inactive">{{'generic.search.action' | translate}}</div>
 	</div>

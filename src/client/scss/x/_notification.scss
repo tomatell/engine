@@ -26,7 +26,7 @@
 		cursor: pointer;
 
 		&:before{
-			@include icon-font($icon-remove !important);
+			@include icon-font($fa-var-remove !important);
 			// line-height: $fixed-header-height;
 		}
 		

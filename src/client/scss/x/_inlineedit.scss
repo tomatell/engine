@@ -70,7 +70,7 @@
 	cursor: pointer;
 }
 .x-inlineedit:AFTER {
-	@include icon-font($icon-pencil);
+	@include icon-font($fa-var-pencil);
 	position: absolute;
 	right: 0;
 	top: 0px;
@@ -79,7 +79,7 @@
 }
 
 .x-inlineedit-active:AFTER {
-	@include icon-font($icon-pencil);
+	@include icon-font($fa-var-pencil);
 
 	padding: $inlineedit-view-active-icon-padding;
 	// padding-top: 8px;

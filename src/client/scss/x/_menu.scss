@@ -27,7 +27,8 @@
 		text-align: center;
 
 		&:before{
-			@include icon-font($icon-align-justify);
+			@include icon-font($fa-var-align-justify);
+			font: fa-align-justify;
 			font-size: em(18px);
 			line-height: $fixed-header-height;
 		}
