@@ -56,7 +56,7 @@
 					 SecurityService.getCurrentUser().success(function(data){
 						$rootScope.security.currentUser=data;
 						if (!navigationService.back()) {
-							$location.path(config.get('after_login_url') || '/dashboard');
+							$location.path(config.get( 'after_login_url') || '/dashboard' );
 						}
 					});
 				});
