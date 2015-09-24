@@ -1629,7 +1629,7 @@
 		});
 
 $translateProvider.translations('ja', {
-			"login.title": "ログイン画面",
+			"login.title": "ログイン",
 			"login.loginName": "ログイン名",
 			"login.password": "パスワード",
 			"login.forgottenPassword": "パスワードを忘れた場合",
