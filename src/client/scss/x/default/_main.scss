@@ -70,7 +70,7 @@ button.btn-primary, a.btn-primary, a.btn-primary:HOVER, a.btn-primary:VISITED {
 	color: $color-main-reverse;
 	background-color: $color-main;
 	border-color: $color-main-darker;
-	height: 70px;
+	//height: 70px;
 }
 
 button.btn-primary:hover, button.btn-primary:active,
@@ -161,3 +161,9 @@ table.portal-edit-block-selector-block {
 		overflow: scroll;
 	}
 }
+.footer {
+  position: absolute;
+  height: 40px;
+  bottom: 0;
+}
+
