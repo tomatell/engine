@@ -265,7 +265,7 @@
 			
 			//FIXME make sure this.criteria is always array never null
 			if (this.crits && angular.isArray(this.crits)) {
-				config.data.crits.concat(this.crits);
+				config.data.crits = config.data.crits.concat(this.crits);
 			}
 
 			var _searchVal = dataset.getSearchValue();
