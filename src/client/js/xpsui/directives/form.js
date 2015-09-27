@@ -3,8 +3,15 @@
 
 	angular.module('xpsui:directives')
 	.directive('xpsuiForm', [
-		'$compile', '$parse', 'xpsui:logging', 'xpsui:FormGenerator', 'xpsui:Calculator', '$translate', '$timeout',
-		function($compile, $parse, log, formGenerator, calculator, $translate, $timeout) {
+		'$compile',
+		'$parse',
+		'xpsui:logging',
+		'xpsui:FormGenerator',
+		'xpsui:Calculator',
+		'$translate',
+		'$timeout',
+		'xpsui:calculator2',
+		function($compile, $parse, log, formGenerator, calculator, $translate, $timeout, calculator2) {
 			return {
 				restrict: 'A',
 				require: '^form',
@@ -46,6 +53,51 @@
 							i();
 						});
 					});
+
+					this.registerCalculation2 = function(def, callback) {
+						if (!angular.isArray(def.watch)) {
+							// FIXME errorify
+							throw 'no watches';
+						}
+
+						var watches = def.watch;
+
+						// prefix watchers my root model path
+						if ($attrs.xpsuiModel) {
+							watches = def.watch.map(function(val) {
+								return $attrs.xpsuiModel.concat('.', val);
+							});
+						}
+
+						var calc = calculator2.createCalculator(def);
+
+						function calculate() {
+							calc.execute(
+								calculator2.createCtx($scope, $parse($attrs.xpsuiModel)($scope)
+							)).then(function(result) {
+								callback(null, result);
+							}, function(err) {
+								callback(err, def.empty || null);
+								// FIXME do something with error
+							});
+						}
+
+						calculate();
+
+						return $scope.$watchGroup(watches, function(nv, ov) {
+							var changed = false;
+
+							for (var i in nv) {
+								if (nv[i] !== ov[i]) {
+									changed = true;
+								}
+							}
+
+							if (changed) {
+								calculate();
+							}
+						});
+					};
 
 					/**
 					 * Registers a calculation for the `model` based on the `scheam`
