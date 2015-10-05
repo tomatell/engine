@@ -31,6 +31,7 @@
 			var schemaUri = schemaUtils.decodeUri($scope.currentSchema);
 
 			$scope.save = function(path) {
+				$scope.$broadcast('xpsui:data-unstable');
 				var d = $scope.model.obj;
 
 				if (path && $scope.fragmentedUpdateAllowed) {
@@ -52,6 +53,8 @@
 					}).then(function(resp) {
 						schemaUtils.generateObjectFromSchema($scope.schemaFormOptions.schema, $scope.model.obj);
 						$scope.model.obj = resp.data;
+
+						$scope.$broadcast('xpsui:data-stable');
 					}, function(resp) {
 						// error
 						// TODO fix error handling
@@ -88,6 +91,7 @@
 				.then(function(resp2) {
 					schemaUtils.generateObjectFromSchema($scope.schemaFormOptions.schema, $scope.model.obj);
 					$scope.model.obj = resp2.data;
+					$scope.$broadcast('xpsui:data-stable');
 				}, function(resp2) {
 					notificationFactory.error(resp2.data);
 				});

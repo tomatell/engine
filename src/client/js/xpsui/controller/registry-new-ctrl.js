@@ -52,6 +52,7 @@
 				if (filler) {
 					schemaUtilFactory.fillObj($scope, filler);
 				}
+				$scope.$broadcast('xpsui:data-stable');
 			}).error(function(err) {
 				notificationFactory.error(err);
 			});

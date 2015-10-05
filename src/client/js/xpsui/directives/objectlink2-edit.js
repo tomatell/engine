@@ -116,9 +116,31 @@
 				selectbox.setInput(selfControl.getInput());
 				selectbox.setDropdown(dropdown);
 
-				// store
-				var dataset = dataFactory.createObjectDataset(schemaFragment);
-				selectbox.setDataset(dataset);
+				schemaUtil.getFieldsSchemaFragment(
+					schemaFragment.objectLink2.schema,
+					schemaFragment.objectLink2.fields,
+					function(fields) {
+						if (fields === null) {
+							return log.error('Could not load objLink field definitions');
+						}
+
+						var firstField = fields[Object.keys(fields)[0]];
+						var options = {};
+
+						if(firstField.type === 'number') {
+							options.searchCondition = 'eq';
+							options.inputType = 'number';
+						}else if(firstField.type === 'string') {
+							options.searchCondition = 'starts';
+							options.inputType = 'string';
+						}
+
+						// store
+						var dataset = dataFactory.createObjectDataset(schemaFragment, options);
+						selectbox.setDataset(dataset);
+
+					}
+				);
 
 				log.groupEnd();
 			}

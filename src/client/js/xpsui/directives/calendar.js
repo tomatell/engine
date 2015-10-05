@@ -78,7 +78,7 @@
 		};
 		
 		component.prototype.setValue = function(value){
-			if(angular.isUndefined(value)){
+			if(!value){
 				return this;
 			}
 			
