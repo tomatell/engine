@@ -226,8 +226,9 @@
 
 				this.getRootElement().append(this.$selectboxElement);
 
-				this.doLoad();
 			}
+			this.doReset();
+			this.doLoad();
 		};
 
 		Selectbox.prototype._handleScrollEvent = function(){
@@ -270,7 +271,7 @@
 		Selectbox.prototype.onReset = function(){
 			this.selected = null;
 			this._startPaging = false;
-			if( this.$itemsElement.length ){
+			if(this.$itemsElement && this.$itemsElement.length) {
 				this.$itemsElement.empty();
 			}
 		};

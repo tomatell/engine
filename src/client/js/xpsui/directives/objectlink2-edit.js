@@ -13,7 +13,7 @@
 	function(log, $parse, dropdownFactory, objectlink2Factory, dataFactory, schemaUtil, removeButtonFactory) {
 		return {
 			restrict: 'A',
-			require: ['ngModel', '?^xpsuiFormControl', 'xpsuiObjectlink2Edit'],
+			require: ['ngModel', '?^xpsuiFormControl', 'xpsuiObjectlink2Edit', '?^xpsuiForm'],
 			controller: function() {
 				this.setup = function() {
 					this.$input = angular.element('<div tabindex="0"></div>');
@@ -32,9 +32,11 @@
 
 				var ngModel = ctrls[0],
 					selfControl = ctrls[2],
+					form = ctrls[3],
 					input = selfControl.getInput(),
 					parseSchemaFragment = $parse(attrs.xpsuiSchema),
-					schemaFragment = parseSchemaFragment(scope)
+					schemaFragment = parseSchemaFragment(scope),
+					selectbox = null
 				;
 
 				var removeButton = removeButtonFactory.create(elm, {
@@ -51,16 +53,6 @@
 				elm.addClass('x-control');
 				elm.addClass('x-select-edit x-objectlink2-edit');
 
-				ngModel.$render = function() {
-					if(!angular.equals({}, ngModel.$viewValue)) {
-						// get data from schema or model and render it
-						render(dataFactory.getObjectLinkData(
-							schemaFragment.objectLink2, ngModel.$modelValue
-						));
-					} else {
-						input.empty();
-					}
-				};
 
 				function render(data) {
 					input.empty();
@@ -99,7 +91,7 @@
 				;
 
 				// selectobx
-				var selectbox = objectlink2Factory.create(elm, {
+				selectbox = objectlink2Factory.create(elm, {
 					onSelected: function(value) {
 
 						scope.$apply(function() {
@@ -139,8 +131,33 @@
 						var dataset = dataFactory.createObjectDataset(schemaFragment, options);
 						selectbox.setDataset(dataset);
 
+						// FIXME really strange place for stuff like this. getFieldsChemaFragment should
+						// be promised and reworked
+						if (form && schemaFragment.objectLink2.calculatedCriteria) {
+							var unregister2 = form.registerCalculation2(schemaFragment.objectLink2.calculatedCriteria, function(err, val) {
+								// FIXME do something with error
+								//schemaFragment.crits = val;
+								if (err) {
+									console.log(err);
+								} else {
+									selectbox.dataset.store.setForcedCriteria(val);
+								}
+							});
+							scope.$on('destroy', unregister2);
+						}
 					}
 				);
+
+				ngModel.$render = function() {
+					if(!angular.equals({}, ngModel.$viewValue)) {
+						// get data from schema or model and render it
+						render(dataFactory.getObjectLinkData(
+							schemaFragment.objectLink2, ngModel.$modelValue
+						));
+					} else {
+						input.empty();
+					}
+				};
 
 				log.groupEnd();
 			}
