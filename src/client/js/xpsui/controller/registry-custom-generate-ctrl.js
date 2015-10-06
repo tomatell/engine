@@ -8,23 +8,23 @@
 			$scope.model = {};
 			// $scope.currentSchemaUri = schemaUtilFactory.decodeUri($routeParams.schema);
 
-			$scope.save=function(){
-				generator.save($scope.model,$routeParams.generateBy,function(err,progess){
-					if(err){
+			$scope.save=function() {
+				generator.save($scope.model,$routeParams.generateBy,function(err,progess) {
+					if(err) {
 						notificationFactory.error({translationCode:'registry.unsuccesfully.saved', time:3000});
 					} else
 					notificationFactory.info({translationCode:'registry.succesfully.saved', time:3000});
 				});
 			};
 
-			function toXlsHtml(tableHtml){
+			function toXlsHtml(tableHtml) {
 				var retVal='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta http-equiv=Content-Type content="text/html; charset=utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>';
-					retVal+=tableHtml;
-					retVal+='</body></html>';
+				retVal+=tableHtml;
+				retVal+='</body></html>';
 				return retVal;
 			}
 
-			$scope.exportTable=function(id){
+			$scope.exportTable=function(id) {
 				var element=document.getElementById(id);
 
 				var data=toXlsHtml(element.innerHTML);
@@ -45,20 +45,21 @@
 				var clubIds = [];
 				for (var pos=0; pos<$scope.model.listOfTeam.team.length; pos++) {
 					(function (position) {
-						var rosterId = $scope.model.listOfTeam.team[position].team.oid;
-						$http({
-							method : 'GET',
-							url : '/udao/getBySchema/uri~3A~2F~2Fregistries~2Frosters~23views~2Frosters~2Fview/' + rosterId,
-							data : {
-							}
-						}).success(function(roster) {
-							fillForClub(position, roster.baseData.club.oid);
-						}).error(function(err) {
-							callback(err);
-						});
+						if ($scope.model.listOfTeam.team[$scope.model.listOfTeam.team.length-1].complement===false) {
+							var rosterId = $scope.model.listOfTeam.team[position].team.oid;
+							$http({
+								method : 'GET',
+								url : '/udao/getBySchema/uri~3A~2F~2Fregistries~2Frosters~23views~2Frosters~2Fview/' + rosterId,
+								data : {
+								}
+							}).success(function(roster) {
+								fillForClub(position, roster.baseData.club.oid);
+							}).error(function(err) {
+								callback(err);
+							});
+						}
 					}(pos));
 				}
-
 			}
 
 			function fillForClub(position, clubOid) {
@@ -76,10 +77,10 @@
 
 			// /registry/generated/:schemaFrom/:idFrom/:generateBy/:template
 			$http({ method : 'GET',url: '/udao/getBySchema/'+$routeParams.schemaFrom+'/'+ $routeParams.idFrom})
-			.success(function(data, status, headers, config){
+			.success(function(data, status, headers, config) {
 				$scope.model = data;
-				generator.generate(data,$routeParams.generateBy,function(err,progess){
-					if(err){
+				generator.generate(data,$routeParams.generateBy,function(err,progess) {
+					if(err) {
 						notificationFactory.error({translationCode:'registry.unsuccesfully.generated', time:3000});
 					} else
 					notificationFactory.info({translationCode:'registry.succesfully.generated', time:3000});
