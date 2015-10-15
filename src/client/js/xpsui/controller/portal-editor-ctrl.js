@@ -332,7 +332,18 @@
               element: '<section class="x-portal-competition-matches"><header>Rozlosovanie</header></section>',
               type: 'match-results-all',
               title: 'Rozlosovanie',
-              desc: 'Časť obsahujúa rozlosovanie súťaží.',
+              desc: 'Časť obsahujúca rozlosovanie súťaží.',
+              icon: 'img/block-content.svg'
+            },
+            data: ''
+          },
+        playerStats: {
+            meta: {
+              name: 'players-stats',
+              element: '<section class="x-portal-competition-matches"><header>Štatistiky hráčov</header></section>',
+              type: 'players-stats',
+              title: 'Štatistiky hráčov',
+              desc: 'Časť obsahujúca rozlosovanie súťaží.',
               icon: 'img/block-content.svg'
             },
             data: ''

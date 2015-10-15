@@ -12,6 +12,8 @@ var path = require('path');
 var request = require('request');
 var fs = require('fs');
 var objectTools = require('../ObjectTools.js');
+var cache = require('../Cache.js').defaultCache;
+var Q = require('q');
 
 var articlesCollection = 'portalArticles';
 var menuCollection = 'portalMenu';
@@ -57,6 +59,7 @@ function PageController(mongoDriver) {
 	this.competitionDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitions'});
 	this.refereeReportsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'refereeReports'});
 	this.rostersDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'rosters'});
+	this.peopleDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'people'});
 
 	// Load and register schemas
 	var schemasListPaths = JSON.parse(
@@ -230,20 +233,138 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 
 };
 
-PageController.prototype.competitionResults = function(req, res, next) {
+/**
+ * Returns bare list of refereeReports for provided competition
+ */
+var getBareRefereeReportsForCompetition = function(competitionId) {
+	return function() {
+		var d = Q.defer();
+
+		var qf = QueryFilter.create();
+		qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, competitionId);
+
+		pageController.refereeReportsDao.list(qf, function(err, reports) {
+			if (err) {
+				log.error('Failed to get list of refereeReports for competition %s', competitionId, err);
+				d.reject(err);
+				return;
+			}
+
+			d.resolve(reports);
+		});
+
+		return d.promise;
+	};
+};
+
+/**
+ * Gets object where keys are ids of teams and adds property name to
+ * particular value based on id of team
+ */
+var resolveTeamNames = function(competitionId) {
+	return function(data) {
+		var d = Q.defer();
+
+		var rostersQf = QueryFilter.create();
+		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, competitionId);
+
+		pageController.rostersDao.list(rostersQf, function(err, rosters) {
+			if (err) {
+				log.error('Failed to get list of rosters for competition %s', competitionId, err);
+				d.reject(err);
+				return;
+			}
+
+			for (var i in rosters) {
+				if (rosters[i].baseData && rosters[i].baseData.prName && data[rosters[i].id]) {
+					data[rosters[i].id].name = rosters[i].baseData.prName;
+				}
+			}
+
+			d.resolve(data);
+		});
+
+		return d.promise;
+	};
+};
+
+/**
+ * Gets object where keys are ids of players and adds property 'name' to
+ * particular value based on id of player
+ */
+var resolvePlayerNames = function() {
+	return function(data) {
+		var d = Q.defer();
+
+		var promises = Object.getOwnPropertyNames(data).map(function(v) {
+			var d = Q.defer();
+
+			pageController.peopleDao.get(v, function(err, person) {
+				if (err) {
+					log.error('Failed to get person with id %s', v, err);
+					d.reject(err);
+					return;
+				}
+
+				var name = '';
+				if (person.baseData) {
+					name = ''.concat(safeExtract(person, 'baseData.name.v', ''),
+						' ',
+						safeExtract(person, 'baseData.surName.v', ''));
+				}
+
+				d.resolve({k: v, v: name});
+			});
+
+			return d.promise;
+		});
+
+		Q.all(promises)
+		.then(function(names) {
+			names.map(function(x) {
+				data[x.k].name = x.v;
+			});
+			d.resolve(data);
+		})
+		.catch(function(errs) {
+			log.error(errs);
+			d.reject('Failed to get players names');
+		});
+
+		return d.promise;
+	};
+};
+
+/**
+ * It gets input object and returns array of it's values.
+ */
+var convertToArray = function(data) {
+	if (data) {
+		return Object.keys(data).map(function(key) {return data[key]; });
+	} else {
+		return [];
+	}
+};
+
+PageController.prototype.competitionResults = function(req, res) {
 	var cid = req.params.cid;
 
-	var qf = QueryFilter.create();
-
-	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-
-	this.refereeReportsDao.list(qf, function(err, data) {
-		if (err) {
-			log.error('Failed to get list of matches for competition %s', cid, err);
-			next(err);
-			return;
+	var etagCacheKey = cache.keyPrefix.concat('competitionResults:etag:', cid);
+	cache.get(etagCacheKey)
+	.then(function(cachedEtag) {
+		if (cachedEtag) {
+			if (cachedEtag === req.get('if-none-match')) {
+				// etag is same as cached etag
+				res.set('etag', cachedEtag);
+				res.sendStatus(304);
+				throw 'CACHED';
+			}
 		}
 
+		return;
+	})
+	.then(getBareRefereeReportsForCompetition(cid))
+	.then(function(data) {
 		var result = {};
 
 		for (var i in data) {
@@ -292,36 +413,304 @@ PageController.prototype.competitionResults = function(req, res, next) {
 			result[guestId].score -= scoreHome - scoreAway;
 		}
 
-		var rostersQf = QueryFilter.create();
-		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-		pageController.rostersDao.list(rostersQf, function(err, data) {
-			if (err) {
-				log.error('Failed to get list of rosters for competition %s', cid, err);
-				next(err);
-				return;
-			}
+		return result;
+	})
+	.then(resolveTeamNames(cid))
+	.then(convertToArray)
+	.then(function(data) {
+		var etagVal = 'W/'.concat(cache.keyPrefix, 'competitionResults:', cid, ':', (new Date()).getTime());
+		res.set('etag', etagVal);
 
-			var rosters = {};
+		return cache.store(etagCacheKey, etagVal, 60)
+		.then(function() {
+			return cache.registerForEviction(cache.keyPrefix.concat('evict:refereeReport'), etagCacheKey);
+		})
+		.then(function() {
+			// continue with data
+			return data;
+		});
+	})
+	.then(function(data) {
+		res.json(data);
+	})
+	.catch(function(err) {
+		if (err !== 'CACHED') {
+			res.status(500).send(err);
+		}
+	});
+};
 
-			for (var i in data) {
-				rosters[data[i].id] = data[i].baseData.prName;
-			}
-
-			for (i in result) {
-				if (rosters[i]) {
-					result[i].name = rosters[i];
+/**
+ *	returns sorter by property pseudoname and order
+ */
+var sortByProperty = function(sortProp, order) {
+	var lorder = order === 'asc' ? 1 : -1;
+	return function(data) {
+		switch (sortProp) {
+		case 'goals':
+			return data.sort(function(a, b) {
+				if (a.g > b.g) {
+					return 1 * lorder;
+				} else if (a.g < b.g) {
+					return -1 * lorder;
 				} else {
-					result[i].name = '-:-';
+					return (b.seven - a.seven) * lorder;
+				}
+
+			});
+		case 'matches':
+			return data.sort(function(a, b) {
+				return (a.m - b.m) * lorder;
+			});
+		case 'seven':
+			return data.sort(function(a, b) {
+				return (a.seven - b.seven) * lorder;
+			});
+		case 'yellow':
+			return data.sort(function(a, b) {
+				return (a.yellow - b.yellow) * lorder;
+			});
+		case 'two':
+			return data.sort(function(a, b) {
+				return (a.two - b.two) * lorder;
+			});
+		case 'disc':
+			return data.sort(function(a, b) {
+				return (a.disc - b.disc) * lorder;
+			});
+		case 'penalties':
+			return data.sort(function(a, b) {
+				return (a.penalties - b.penalties) * lorder;
+			});
+		default:
+			// let it be as is
+			return data;
+		}
+	};
+};
+
+PageController.prototype.playersStats = function(req, res, next) {
+	var cid = req.params.cid;
+	var sortProp = req.params.sortProp;
+	var sortOrder = req.params.sortOrder;
+	var howMany = req.params.howMany;
+
+	var etagCacheKey = 'W/'.concat(cache.keyPrefix, 'playersStats:etag:', cid, ':', sortProp, ':', sortOrder, ':', howMany);
+	cache.get(etagCacheKey)
+	.then(function(cachedEtag) {
+		if (cachedEtag) {
+			if (cachedEtag === req.get('if-none-match')) {
+				// etag is same as cached etag
+				res.set('etag', cachedEtag);
+				res.sendStatus(304);
+				throw 'CACHED';
+			}
+		}
+
+		return;
+	})
+	.then(getBareRefereeReportsForCompetition(cid))
+	.then(function(data) {
+		var result = {};
+		var p;
+
+		// iterate over refereeReports for comeptition
+		for (var i in data) {
+
+			var currentReport = data[i];
+			
+			// hashtable of players where key is jersey number, val is oid
+			// jersey number is prefixed by h for home and g for guest
+			var players = {};
+			var homePlayers = safeExtract(currentReport, 'listOfPlayersHome.players', []);
+			var guestPlayers = safeExtract(currentReport, 'listOfPlayersGuest.players', []);
+			for (p in homePlayers) {
+				if (homePlayers[p].player && homePlayers[p].player.oid
+					&& homePlayers[p].dressNumber && homePlayers[p]. dressNumber.length > 0) {
+					players['h'.concat(homePlayers[p].dressNumber)] = {
+						oid: homePlayers[p].player.oid,
+						g: 0, // goals
+						m: 1, // matches
+						seven: 0, // 7m throws
+						sevenFail: 0, // 7m unsuccessfull
+						yellow: 0, // yellow cards
+						penalties: 0, // penalty points
+						two: 0, // 2m penalties
+						disc: 0 // direct discvalifications
+					};
 				}
 			}
-			
-			var finres = [];
-			for (var i in result) {
-				finres.push(result[i]);
+
+			for (p in guestPlayers) {
+				if (guestPlayers[p].player && guestPlayers[p].player.oid
+					&& guestPlayers[p].dressNumber && guestPlayers[p].dressNumber.length > 0) {
+					players['g'.concat(guestPlayers[p].dressNumber)] = {
+						oid: guestPlayers[p].player.oid,
+						g: 0, // goals
+						m: 1,
+						seven: 0,
+						sevenFail: 0,
+						yellow: 0,
+						penalties: 0,
+						two: 0,
+						disc: 0
+					};
+				}
 			}
 
-			res.json(finres);
+			var events = safeExtract(currentReport, 'technicalData.events', []);
+			for (var j in events) {
+				var e = events[j];
+				
+				switch (e.action) {
+				case 'G': // goal
+					if (e.home) {
+						if (players.hasOwnProperty('h'.concat(e.home))) {
+							++players['h'.concat(e.home)].g;
+						}
+					} else if (e.away) {
+						if (players.hasOwnProperty('g'.concat(e.away))) {
+							++players['g'.concat(e.away)].g;
+						}
+					}
+					break;
+				case '7': // 7m throw
+					if (e.home) {
+						if (players.hasOwnProperty('h'.concat(e.home))) {
+							++players['h'.concat(e.home)].seven;
+							++players['h'.concat(e.home)].g;
+						}
+					} else if (e.away) {
+						if (players.hasOwnProperty('g'.concat(e.away))) {
+							++players['g'.concat(e.away)].seven;
+							++players['g'.concat(e.away)].g;
+						}
+					}
+					break;
+				case '0': // 7m throw
+					if (e.home) {
+						if (players.hasOwnProperty('h'.concat(e.home))) {
+							++players['h'.concat(e.home)].sevenFail;
+						}
+					} else if (e.away) {
+						if (players.hasOwnProperty('g'.concat(e.away))) {
+							++players['g'.concat(e.away)].sevenFail;
+						}
+					}
+					break;
+				case 'N': // Yellow card
+					if (e.home) {
+						if (players.hasOwnProperty('h'.concat(e.home))) {
+							++players['h'.concat(e.home)].yellow;
+							++players['h'.concat(e.home)].penalties;
+						}
+					} else if (e.away) {
+						if (players.hasOwnProperty('g'.concat(e.away))) {
+							++players['g'.concat(e.away)].yellow;
+							++players['g'.concat(e.away)].penalties;
+						}
+					}
+					break;
+				case '2': // 2m penalty
+					if (e.home) {
+						if (players.hasOwnProperty('h'.concat(e.home))) {
+							++players['h'.concat(e.home)].two;
+							players['h'.concat(e.home)].penalties += 2;
+						}
+					} else if (e.away) {
+						if (players.hasOwnProperty('g'.concat(e.away))) {
+							++players['g'.concat(e.away)].two;
+							players['g'.concat(e.away)].penalties += 2;
+						}
+					}
+					break;
+				case 'D': // 2m penalty
+					if (e.home) {
+						if (players.hasOwnProperty('h'.concat(e.home))) {
+							++players['h'.concat(e.home)].disc;
+							players['h'.concat(e.home)].penalties += 10;
+						}
+					} else if (e.away) {
+						if (players.hasOwnProperty('g'.concat(e.away))) {
+							++players['g'.concat(e.away)].disc;
+							players['g'.concat(e.away)].penalties += 10;
+						}
+					}
+					break;
+				}
+			}
+
+			// now we have player filled by events
+			for (p in players) {
+				if (players.hasOwnProperty(p)) {
+					if (result.hasOwnProperty(players[p].oid)) {
+						var rPlayer = result[players[p].oid];
+
+						rPlayer.g += players[p].g;
+						rPlayer.m += players[p].m;
+						rPlayer.seven += players[p].seven;
+						rPlayer.yellow += players[p].yellow;
+						rPlayer.two += players[p].two;
+						rPlayer.disc += players[p].disc;
+						rPlayer.penalties += players[p].penalties;
+					} else {
+						result[players[p].oid] = players[p];
+					}
+				}
+			}
+		}
+
+		return result;
+	})
+	.then(resolvePlayerNames())
+	.then(convertToArray)
+	.then(sortByProperty(sortProp, sortOrder))
+	.then(function(data) {
+		// number them
+		var i, increment;
+
+		if (sortOrder === 'desc') {
+			i = 0;
+			increment = 1;
+		} else {
+			i = data.length + 1;
+			increment = -1;
+		}
+		return data.map(function(v) {
+			v.num = i += increment;
+
+			return v;
 		});
+	})
+	.then(function(data) {
+		// slice to 10 if not all requested
+		if (howMany && howMany !== 'all') {
+			var parsedCount = parseInt(howMany);
+			return data.slice(0, parsedCount);
+		}
+
+		return data;
+	})
+	.then(function(data) {
+		var etagVal = 'W/'.concat(cache.keyPrefix, 'playersStats', cid, ':', (new Date()).getTime());
+		res.set('etag', etagVal);
+
+		return cache.store(etagCacheKey, etagVal, 60)
+		.then(function() {
+			return cache.registerForEviction(cache.keyPrefix.concat('evict:refereeReport'), etagCacheKey);
+		})
+		.then(function() {
+			// continue with data
+			return data;
+		});
+	})
+	.then(function(data) {
+		res.json(data);
+	})
+	.catch(function(err) {
+		if (err !== 'CACHED') {
+			res.status(500).send(err);
+		}
 	});
 };
 
@@ -572,6 +961,18 @@ PageController.prototype.renderPage = function(req, res, next) {
 		page = parseInt(req.params.page);
 	}
 
+	// check cache
+	var etagCacheKey = cache.keyPrefix.concat('portalArticle:etag:', aid || '/', ':', page);
+	var cachedEtag = null;
+	cache.get(etagCacheKey);
+	if (cachedEtag) {
+		if (cachedEtag === req.get('if-none-match')) {
+			// etag is same as cached etag
+			res.sendStatus(304);
+			return;
+		}
+	}
+
 	this.getArticle(aid, function(err, data) {
 		if (err) {
 			log.error('Failed to get article %s', aid);
@@ -659,7 +1060,7 @@ PageController.prototype.renderPage = function(req, res, next) {
 								});
 							}
 						}
-						
+
 						callback();
 					});
 				};
@@ -708,6 +1109,10 @@ PageController.prototype.renderPage = function(req, res, next) {
 							next(err);
 							return;
 						}
+
+						var etag = ''.concat(aid || '', ':', page, (new Date()).getTime());
+						res.set('etag', etag);
+						cache.store(etagCacheKey, etag, 60);
 						res.send(output);
 					});
 				});
@@ -729,6 +1134,27 @@ PageController.prototype.renderNotFound = function(req, res, next) {
 		res.send(output);
 		res.status(404);
 	});
+};
+
+PageController.prototype.getMenuPromise = function() {
+	var d = Q.defer();
+
+	this.menuDao.list({}, function(err, data) {
+		if (err) {
+			log.verbose('Error while getting menu entries', err);
+			d.reject(err);
+			return;
+		}
+
+		// return only first found menu
+		if (data && data.length > 0) {
+			d.resolve(data[0]);
+		} else {
+			d.resolve(null);
+		}
+	});
+
+	return d;
 };
 
 PageController.prototype.getMenu = function(callback) {
@@ -867,6 +1293,13 @@ module.exports = {
 	competitionResults: function(req, res, next) {
 		if (pageController) {
 			pageController.competitionResults(req, res, next);
+		} else {
+			throw new Error('page-controller module not initialized');
+		}
+	},
+	competitionPlayersStats: function(req, res, next) {
+		if (pageController) {
+			pageController.playersStats(req, res, next);
 		} else {
 			throw new Error('page-controller module not initialized');
 		}

@@ -67,6 +67,7 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 	app.get('/competition/matches-all/:cid', pageController.competitionMatchesAll);
 	app.get('/competition/results/:cid', pageController.competitionResults);
 	app.get('/competition/refereeReport', pageController.competitionRefereeReports);
+	app.get('/competition/stats/players/:cid/:sortProp/:sortOrder/:howMany?', pageController.competitionPlayersStats);
 	app.get('/favicon.ico', express.static(path.join(process.cwd(), 'data', 'portal', 'client', 'img')));
 	app.get('/:page?', pageController.renderPage);
 
