@@ -1,3 +1,5 @@
+'use strict';
+
 var fs = require('fs');
 var path = require('path');
 var extend = require('extend');
@@ -15,26 +17,26 @@ var config = {
 	mongoDbURI: (
 				process.env.REGISTRIES_MONGODB_URL || process.env.OPENSHIFT_MONGODB_DB_URL ||
 				'mongodb://' + (process.env.OPENSHIFT_MONGODB_DB_HOST || 'localhost') + ':' + (process.env.OPENSHIFT_MONGODB_DB_PORT || '27017')
-			) + '/registry' + (process.env.NODE_ENV == 'test' ? '_test' : ''),
+			) + '/registry' + (process.env.NODE_ENV === 'test' ? '_test' : ''),
 	mongoDbURI_test: 'mongodb://localhost:27017/integration_test_' + new Date().getTime(),
-	paths : {
+	paths: {
 		photos: process.env.REGISTRIES_PATH_PHOTOS || process.cwd() + '/data/photos',
 		uploads: process.env.REGISTRIES_PATH_UPLOADS || process.cwd() + '/data/uploads',
 		schemas: process.env.REGISTRIES_PATH_SCHEMAS || process.cwd() + '/data/schemas',
 		dataset: process.env.REGISTRIES_PATH_DATASET || process.cwd() + '/data/',
 		portalClient: process.cwd() + '/data/portal/client'
 	},
-	mails:{
+	mails: {
 		eventProcessingErrorSender: 'websupport@unionsoft.sk',
 		eventProcessingError: 'websupport@unionsoft.sk',
-		massmailSenderAddress:'websupport@unionsoft.sk',
+		massmailSenderAddress: 'websupport@unionsoft.sk',
 		requestNotifSender: 'websupport@unionsoft.sk',
-		requestSolverAddress:'websupport@unionsoft.sk'
+		requestSolverAddress: 'websupport@unionsoft.sk'
 	},
-	schemaRegistry:{
-		schemas : [ 'permissions.json', 'login.json', 'systemCredentials.json', 'people.json',
-			        'group.json', 'groupMaster.json', 'member.json', 'organization.json',
-					'club.json', 'coach.json', 'player.json', 'referee.json', 'stadium.json', 'person.json']
+	schemaRegistry: {
+		schemas: [ 'permissions.json', 'login.json', 'systemCredentials.json', 'people.json',
+			'group.json', 'groupMaster.json', 'member.json', 'organization.json',
+			'club.json', 'coach.json', 'player.json', 'referee.json', 'stadium.json', 'person.json']
 	},
 	logging: (function() {
 			switch (process.env.NODE_ENV) {
@@ -46,7 +48,7 @@ var config = {
 								prettyPrint: true,
 								timestamp: false,
 								silent: true
-							},
+							}
 						},
 						addLabel: true
 					};
@@ -74,10 +76,15 @@ var config = {
 					};
 			}
 		}()),
-	collation : {
+	collation: {
 		numberOfChars: 32,
 		language: 'sk'
-	}
+	},
+	defaultRedis: {
+		port: 6379,
+		host: 'localhost'
+	},
+	cacheKeyPrefix: 'registry:'
 };
 
 // merge default configuration with local configuration if exists

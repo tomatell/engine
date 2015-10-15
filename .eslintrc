@@ -1,4 +1,5 @@
 {
+	"extends": "eslint:recommended",
     "rules": {
         "indent": [
             2,
@@ -22,7 +23,7 @@
 			{ "allowSingleLine": true }
 		],
 		"no-mixed-spaces-and-tabs": 2,
-		"space-after-function-name": [2, "never"],
+		"space-before-function-paren": [2, "never"],
 		"no-spaced-func": 2,
 		"space-before-blocks": [2, "always"],
 		"space-in-parens": [2, "never"]
