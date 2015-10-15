@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
 	'use strict';
 
-	grunt.loadNpmTasks('gruntify-eslint');
+	grunt.loadNpmTasks('grunt-eslint');
 };

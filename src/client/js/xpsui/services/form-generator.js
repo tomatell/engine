@@ -47,7 +47,6 @@
 				}
 
 				if (schemaFragment.unique) {
-					console.log('');
 					// FIXME why do i need this definition? whay i cannot simply use whole object options in xpsui-schema
 					field.attr('xpsui-unique', schemaPath + '.unique');
 					field.attr('xpsui-validity-mark', '');
