@@ -14,7 +14,8 @@ module.exports = {
 
 		css: {
 			files: [
-				{expand: true, cwd: 'src/client/css', src: ['**'], dest: 'build/client/css/'}
+				{expand: true, cwd: 'src/client/css', src: ['**'], dest: 'build/client/css/'},
+				{expand: true, cwd: 'src/client/styles', src: ['**'], dest: 'build/client/lib/cookieconsent2/build/'}
 			]
 		},
 		js: {

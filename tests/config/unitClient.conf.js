@@ -29,6 +29,7 @@ module.exports = function (config) {
 			'../build/client/js/safeUrlEncoder.js',
 			'../build/client/lib/angular-qr/lib/qrcode.js',
 			'../build/client/lib/angular-qr/angular-qr.min.js',
+			'../build/client/lib/cookieconsent2/build/cookieconsent.min.js',
 			
 
 			// Mock

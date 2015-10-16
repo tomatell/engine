@@ -42,3 +42,6 @@ Search form now recognizes definition fo relative width of column in search resu
 ```
 
 Supported values are: narrow, normal, wide.
+
+### Cookie Choice
+Cookie choice is implemented to comply EU's PERC (The Privacy and Electronic Communications Regulations) .
