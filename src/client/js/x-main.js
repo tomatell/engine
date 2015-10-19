@@ -137,6 +137,11 @@
 			} else {
 				$rootScope.isMobile = false;
 			}
+			if( $window.navigator.userAgent.indexOf("iPhone") > -1 | $window.navigator.userAgent.indexOf("iPad") > -1 ) {
+				$rootScope.isIos = true;
+			} else {
+				$rootScope.isIos = false;
+			}
 		} else {
 			$rootScope.isMobile = false;
 		}
