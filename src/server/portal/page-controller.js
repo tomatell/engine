@@ -60,6 +60,7 @@ function PageController(mongoDriver) {
 	this.refereeReportsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'refereeReports'});
 	this.rostersDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'rosters'});
 	this.peopleDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'people'});
+	this.organizationsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'organizations'});
 
 	// Load and register schemas
 	var schemasListPaths = JSON.parse(
@@ -104,61 +105,56 @@ PageController.prototype.competitionMatchesAll = function(req, res, next) {
 	var qf = QueryFilter.create();
 
 	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-	qf.addSort('baseData.matchDate', QueryFilter.sort.ASC);
+	qf.addSort('baseData.matchRound', QueryFilter.sort.ASC);
 
-	this.refereeReportsDao.list(qf, function(err, data) {
+	var schemaName = 'uri://registries/refereeReports#views/refereeReports-km/view';
+
+	var self = this;
+	this.refereeReportsDao.list(qf, function(err, data1) {
 		if (err) {
-			log.error('Failed to get list of matches for competition %s', cid, err);
-			next(err);
+			res.sendStatus(500);
 			return;
 		}
 
-		var result = [];
+		var result = {};
+		if (data1) {
+			async.map(data1, function(d, cb) {
+				self.uDaoService.getBySchema(schemaName, {perm: {'Registry - read': true, 'RefereeReport - read - KM': true}}, d.id, function(err, userError, data) {
 
-		for (var i in data) {
-			result.push({
-				id: data[i].id,
-				homeId: data[i].baseData.homeClub.oid,
-				guestId: data[i].baseData.awayClub.oid,
-				matchDate: data[i].baseData.matchDate,
-				fullTimeScoreHome: data[i].baseData.fullTimeScoreHome,
-				fullTimeScoreAway: data[i].baseData.fullTimeScoreAway,
-				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
-				printTemplate: data[i].baseData && data[i].baseData.printTemplate
+					if (data) {
+						var r = {
+							id: data.id,
+							round: safeExtract(data, 'baseData.matchRound.refData.name', null),
+							homeId: data.baseData.homeClub.oid,
+							guestId: data.baseData.awayClub.oid,
+							homeName: safeExtract(data, 'baseData.homeClub.refData.name', ''),
+							guestName: safeExtract(data, 'baseData.awayClub.refData.name', ''),
+							matchDate: data.baseData.matchDate,
+							matchTime: data.baseData.matchBegin,
+							additionalScore: data.baseData.countOfBalls,
+							fullTimeScoreHome: data.baseData.fullTimeScoreHome,
+							fullTimeScoreAway: data.baseData.fullTimeScoreAway,
+							matchNumber: data.baseData && data.baseData.matchNumber,
+							printTemplate: data.baseData && data.baseData.printTemplate,
+							started: data.technicalData && data.technicalData.events && data.technicalData.events.length > 0 ? true : false,
+							finished: ['Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false
+						};
+
+						if (r.round) {
+							if (!result.hasOwnProperty(r.round)) {
+								result[r.round] = [];
+							}
+
+							result[r.round].push(r);
+						}
+					}
+
+					cb();
+				});
+			}, function(err) {
+				res.json(result);
 			});
 		}
-
-		var rostersQf = QueryFilter.create();
-		rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-		pageController.rostersDao.list(rostersQf, function(err, data) {
-			if (err) {
-				log.error('Failed to get list of rosters for competition %s', cid, err);
-				next(err);
-				return;
-			}
-
-			var rosters = {};
-
-			for (var i in data) {
-				rosters[data[i].id] = data[i].baseData.prName;
-			}
-
-			for (i in result) {
-				if (rosters[result[i].homeId]) {
-					result[i].homeName = rosters[result[i].homeId];
-				} else {
-					result[i].homeName = '-:-';
-				}
-
-				if (rosters[result[i].guestId]) {
-					result[i].guestName = rosters[result[i].guestId];
-				} else {
-					result[i].guestName = '-:-';
-				}
-			}
-
-			res.json(result);
-		});
 	});
 };
 
@@ -336,6 +332,61 @@ var resolvePlayerNames = function() {
 };
 
 /**
+ * Gets object where keys are ids of players and adds property 'club' to
+ * particular value based on id of player
+ */
+var resolvePlayersClubNames = function() {
+	return function(data) {
+		var d = Q.defer();
+
+		var promises = Object.getOwnPropertyNames(data).map(function(v) {
+			var d = Q.defer();
+
+			pageController.peopleDao.get(v, function(err, person) {
+				if (err) {
+					log.error('Failed to get person with id %s', v, err);
+					d.reject(err);
+					return;
+				}
+
+				var clubOid = safeExtract(person, 'player.club.oid', null);
+
+				if (clubOid) {
+					pageController.organizationsDao.get(clubOid, function(err, club) {
+						if (err) {
+							log.error('Failed to get club with id %s', v, err);
+							d.reject(err);
+							return;
+						}
+
+						d.resolve({k: v, v: safeExtract(club, 'club.name.v', '-h')});
+					});
+				} else {
+					// no club
+					d.resolve({k: v, v: '-'});
+				}
+			});
+
+			return d.promise;
+		});
+
+		Q.all(promises)
+		.then(function(names) {
+			names.map(function(x) {
+				data[x.k].club = x.v;
+			});
+			d.resolve(data);
+		})
+		.catch(function(errs) {
+			log.error(errs);
+			d.reject('Failed to get players\' clubs');
+		});
+
+		return d.promise;
+	};
+};
+
+/**
  * It gets input object and returns array of it's values.
  */
 var convertToArray = function(data) {
@@ -440,75 +491,118 @@ PageController.prototype.competitionResults = function(req, res) {
 	});
 };
 
-/**
- *	returns sorter by property pseudoname and order
- */
-var sortByProperty = function(sortProp, order) {
-	var lorder = order === 'asc' ? 1 : -1;
-	return function(data) {
-		switch (sortProp) {
-		case 'goals':
-			return data.sort(function(a, b) {
-				if (a.g > b.g) {
-					return 1 * lorder;
-				} else if (a.g < b.g) {
-					return -1 * lorder;
-				} else {
-					return (b.seven - a.seven) * lorder;
-				}
+var evaluateCacheState = function(etagCacheKey, contentType, req, res) {
+	return function(cachedEtag) {
+		if (cachedEtag) {
+			if (cachedEtag === req.get('if-none-match')) {
+				// etag is same as cached etag
+				res.set('Etag', cachedEtag);
+				res.status(304).send();
+				throw 'CACHED';
+			}
 
+			// we cannot send 304 response, but content can be still stored in cache
+			return cache.get(etagCacheKey.concat(':val:',cachedEtag)).then(function(cachedVal) {
+				if (cachedVal) {
+					// we found cached value
+
+					res.set('Etag', cachedEtag);
+					res.set('Content-type', contentType);
+					res.status(200).send(cachedVal);
+
+					throw 'CACHED';
+				}
 			});
-		case 'matches':
-			return data.sort(function(a, b) {
-				return (a.m - b.m) * lorder;
-			});
-		case 'seven':
-			return data.sort(function(a, b) {
-				return (a.seven - b.seven) * lorder;
-			});
-		case 'yellow':
-			return data.sort(function(a, b) {
-				return (a.yellow - b.yellow) * lorder;
-			});
-		case 'two':
-			return data.sort(function(a, b) {
-				return (a.two - b.two) * lorder;
-			});
-		case 'disc':
-			return data.sort(function(a, b) {
-				return (a.disc - b.disc) * lorder;
-			});
-		case 'penalties':
-			return data.sort(function(a, b) {
-				return (a.penalties - b.penalties) * lorder;
-			});
-		default:
-			// let it be as is
-			return data;
 		}
+
+		return;
 	};
 };
 
-PageController.prototype.playersStats = function(req, res, next) {
+
+var cacheResponse = function(etagCacheKey, evictionKey, expiration, res) {
+	return function(data) {
+		var etagVal = 'W/'.concat((new Date()).getTime());
+		res.set('Etag', etagVal);
+
+		return cache.store(etagCacheKey, etagVal, expiration)
+		.then(function() {
+			return cache.registerForEviction(cache.keyPrefix.concat(evictionKey), etagCacheKey)
+				.then(function() {
+					return cache.store(etagCacheKey.concat(':val:', etagVal), JSON.stringify(data), expiration); 
+				});
+
+		})
+		.then(function() {
+			// continue with data
+			return data;
+		});
+	};
+};
+
+PageController.prototype.playersStats = function(req, res) {
 	var cid = req.params.cid;
 	var sortProp = req.params.sortProp;
 	var sortOrder = req.params.sortOrder;
 	var howMany = req.params.howMany;
+	
+	/**
+	 *	returns sorter by property pseudoname and order
+	 */
+	var sortByProperty = function(sortProp, order) {
+		var lorder = order === 'asc' ? 1 : -1;
+		return function(data) {
+			switch (sortProp) {
+			case 'goals':
+				return data.sort(function(a, b) {
+					if (a.g > b.g) {
+						return 1 * lorder;
+					} else if (a.g < b.g) {
+						return -1 * lorder;
+					} else {
+						return (b.seven - a.seven) * lorder;
+					}
 
-	var etagCacheKey = 'W/'.concat(cache.keyPrefix, 'playersStats:etag:', cid, ':', sortProp, ':', sortOrder, ':', howMany);
-	cache.get(etagCacheKey)
-	.then(function(cachedEtag) {
-		if (cachedEtag) {
-			if (cachedEtag === req.get('if-none-match')) {
-				// etag is same as cached etag
-				res.set('etag', cachedEtag);
-				res.sendStatus(304);
-				throw 'CACHED';
+				});
+			case 'matches':
+				return data.sort(function(a, b) {
+					return (a.m - b.m) * lorder;
+				});
+			case 'seven':
+				return data.sort(function(a, b) {
+					return (a.seven - b.seven) * lorder;
+				});
+			case 'yellow':
+				return data.sort(function(a, b) {
+					return (a.yellow - b.yellow) * lorder;
+				});
+			case 'two':
+				return data.sort(function(a, b) {
+					return (a.two - b.two) * lorder;
+				});
+			case 'disc':
+				return data.sort(function(a, b) {
+					return (a.disc - b.disc) * lorder;
+				});
+			case 'penalties':
+				return data.sort(function(a, b) {
+					return (a.penalties - b.penalties) * lorder;
+				});
+			default:
+				// let it be as is
+				return data;
 			}
-		}
+		};
+	};
 
-		return;
-	})
+	var etagCacheKey = 'W/'.concat(
+			cache.keyPrefix,
+			'playersStats:etag:', cid, ':',
+			sortProp, ':', sortOrder, ':', howMany
+		);
+
+	cache.get(etagCacheKey)
+	.then(evaluateCacheState(etagCacheKey, 'application/json', req, res))
 	.then(getBareRefereeReportsForCompetition(cid))
 	.then(function(data) {
 		var result = {};
@@ -663,10 +757,10 @@ PageController.prototype.playersStats = function(req, res, next) {
 		return result;
 	})
 	.then(resolvePlayerNames())
+	.then(resolvePlayersClubNames())
 	.then(convertToArray)
 	.then(sortByProperty(sortProp, sortOrder))
-	.then(function(data) {
-		// number them
+	.then(function(data) { // number them
 		var i, increment;
 
 		if (sortOrder === 'desc') {
@@ -682,8 +776,7 @@ PageController.prototype.playersStats = function(req, res, next) {
 			return v;
 		});
 	})
-	.then(function(data) {
-		// slice to 10 if not all requested
+	.then(function(data) { // slice to 10 if not all requested
 		if (howMany && howMany !== 'all') {
 			var parsedCount = parseInt(howMany);
 			return data.slice(0, parsedCount);
@@ -691,29 +784,271 @@ PageController.prototype.playersStats = function(req, res, next) {
 
 		return data;
 	})
-	.then(function(data) {
-		var etagVal = 'W/'.concat(cache.keyPrefix, 'playersStats', cid, ':', (new Date()).getTime());
-		res.set('etag', etagVal);
-
-		return cache.store(etagCacheKey, etagVal, 60)
-		.then(function() {
-			return cache.registerForEviction(cache.keyPrefix.concat('evict:refereeReport'), etagCacheKey);
-		})
-		.then(function() {
-			// continue with data
-			return data;
-		});
-	})
+	.then(cacheResponse(etagCacheKey, 'evict:refereeReport', 300, res))
 	.then(function(data) {
 		res.json(data);
 	})
 	.catch(function(err) {
 		if (err !== 'CACHED') {
+			log.error(err);
 			res.status(500).send(err);
 		}
 	});
 };
 
+PageController.prototype.teamsStats = function(req, res) {
+	var cid = req.params.cid;
+	var sortProp = req.params.sortProp;
+	var sortOrder = req.params.sortOrder;
+	
+	/**
+	 *	returns sorter by property pseudoname and order
+	 */
+	var sortByProperty = function(sortProp, order) {
+		var lorder = order === 'asc' ? 1 : -1;
+		return function(data) {
+			switch (sortProp) {
+			case 'points':
+				return data.sort(function(a, b) {
+					if (a.points > b.points) {
+						return 1 * lorder;
+					} else if (a.points < b.points) {
+						return -1 * lorder;
+					} else {
+						return (a.score - b.score) * lorder;
+					}
+
+				});
+			case 'score':
+				return data.sort(function(a, b) {
+					return (a.score - b.score) * lorder;
+				});
+			case 'matches':
+				return data.sort(function(a, b) {
+					return (a.matches - b.matches) * lorder;
+				});
+			case 'seven':
+				return data.sort(function(a, b) {
+					return (a.seven - b.seven) * lorder;
+				});
+			case 'yellow':
+				return data.sort(function(a, b) {
+					return (a.yellow - b.yellow) * lorder;
+				});
+			case 'two':
+				return data.sort(function(a, b) {
+					return (a.two - b.two) * lorder;
+				});
+			case 'disc':
+				return data.sort(function(a, b) {
+					return (a.disc - b.disc) * lorder;
+				});
+			case 'penalties':
+				return data.sort(function(a, b) {
+					return (a.penalties - b.penalties) * lorder;
+				});
+			case 'plusScore':
+				return data.sort(function(a, b) {
+					return (a.plusScore - b.plusScore) * lorder;
+				});
+			case 'minusScore':
+				return data.sort(function(a, b) {
+					return (a.minusScore - b.minusScore) * lorder;
+				});
+			case 'wins':
+				return data.sort(function(a, b) {
+					return (a.wins - b.wins) * lorder;
+				});
+			case 'looses':
+				return data.sort(function(a, b) {
+					return (a.looses - b.looses) * lorder;
+				});
+			case 'draws':
+				return data.sort(function(a, b) {
+					return (a.draws - b.draws) * lorder;
+				});
+			default:
+				// let it be as is
+				return data;
+			}
+		};
+	};
+
+	var etagCacheKey = 'W/'.concat(
+			cache.keyPrefix,
+			'teamsStats:etag:', cid, ':',
+			sortProp, ':', sortOrder
+		);
+
+	cache.get(etagCacheKey)
+	.then(evaluateCacheState(etagCacheKey, 'application/json', req, res))
+	.then(getBareRefereeReportsForCompetition(cid))
+	.then(function(data) {
+		var result = {};
+
+		// iterate over refereeReports for comeptition
+		for (var i in data) {
+
+			var currentReport = data[i];
+			
+			// hashtable of players where key is jersey number, val is oid
+			// jersey number is prefixed by h for home and g for guest
+
+			var homeId = safeExtract(currentReport, 'baseData.homeClub.oid', null);
+			var guestId = safeExtract(currentReport, 'baseData.awayClub.oid', null);
+			var reportState = safeExtract(currentReport, 'baseData.state', null);
+
+			if (typeof result[homeId] === 'undefined') {
+				result[homeId] = {
+					points: 0,
+					matches: 0,
+					score: 0,
+					seven: 0, // 7m throws
+					yellow: 0, // yellow cards
+					two: 0, // 2min penalties
+					disc: 0, // disqalifications
+					penalties: 0, // penalty points
+					plusScore: 0,
+					minusScore: 0,
+					wins: 0,
+					looses: 0,
+					draws: 0
+				};
+			}
+			if (typeof result[guestId] === 'undefined') {
+				result[guestId] = {
+					points: 0,
+					matches: 0,
+					score: 0,
+					seven: 0, // 7m throws
+					yellow: 0, // yellow cards
+					two: 0, // 2min penalties
+					disc: 0, // disqalifications
+					penalties: 0, // penalty points
+					plusScore: 0,
+					minusScore: 0,
+					wins: 0,
+					looses: 0,
+					draws: 0
+				};
+			}
+
+			if (['Schválený', 'Zatvorený'].indexOf(reportState) < 0) {
+				// Skip reports in another states
+				continue;
+			}
+
+			var scoreHome = parseInt(data[i].baseData.fullTimeScoreHome);
+			if (isNaN(scoreHome)) {
+				scoreHome = 0;
+			}
+
+			var scoreAway = parseInt(data[i].baseData.fullTimeScoreAway);
+			if (isNaN(scoreAway)) {
+				scoreAway = 0;
+			}
+
+			if ((scoreHome) > (scoreAway)) {
+				result[homeId].points += 2;
+				result[homeId].wins += 1;
+				result[guestId].looses += 1;
+			} else if ((scoreHome) < (scoreAway)) {
+				result[guestId].points += 2;
+				result[guestId].wins += 1;
+				result[homeId].looses += 1;
+			} else {
+				result[homeId].points += 1;
+				result[guestId].points += 1;
+				result[guestId].draws += 1;
+				result[homeId].draws += 1;
+			}
+
+			result[homeId].matches += 1;
+			result[guestId].matches += 1;
+
+			result[homeId].score += scoreHome - scoreAway;
+			result[guestId].score -= scoreHome - scoreAway;
+
+			result[homeId].plusScore += scoreHome;
+			result[homeId].minusScore += scoreAway;
+			result[guestId].minusScore += scoreHome;
+			result[guestId].plusScore += scoreAway;
+
+			var events = safeExtract(currentReport, 'technicalData.events', []);
+			for (var j in events) {
+				var e = events[j];
+				
+				switch (e.action) {
+				case '7': // 7m throw
+					if (e.home) {
+						result[homeId].seven += 1;
+					} else if (e.away) {
+						result[guestId].seven += 1;
+					}
+					break;
+				case 'N': // Yellow card
+					if (e.home) {
+						result[homeId].yellow += 1;
+						result[homeId].penalties += 1;
+					} else if (e.away) {
+						result[guestId].yellow += 1;
+						result[guestId].penalties += 1;
+					}
+					break;
+				case '2': // 2m penalty
+					if (e.home) {
+						result[homeId].two += 1;
+						result[homeId].penalties += 2;
+					} else if (e.away) {
+						result[guestId].two += 1;
+						result[guestId].penalties += 2;
+					}
+					break;
+				case 'D': // 2m penalty
+					if (e.home) {
+						result[homeId].disc += 1;
+						result[homeId].penalties += 10;
+					} else if (e.away) {
+						result[guestId].disc += 1;
+						result[guestId].penalties += 10;
+					}
+					break;
+				}
+			}
+		}
+
+		return result;
+	})
+	.then(resolveTeamNames(cid))
+	.then(convertToArray)
+	.then(sortByProperty(sortProp, sortOrder))
+	.then(function(data) { // number them
+		var i, increment;
+
+		if (sortOrder === 'desc') {
+			i = 0;
+			increment = 1;
+		} else {
+			i = data.length + 1;
+			increment = -1;
+		}
+		return data.map(function(v) {
+			v.num = i += increment;
+
+			return v;
+		});
+	})
+	.then(cacheResponse(etagCacheKey, 'evict:refereeReport', 300, res))
+	.then(function(data) {
+		res.json(data);
+	})
+	.catch(function(err) {
+		if (err !== 'CACHED') {
+			log.error(err);
+			res.status(500).send(err);
+		}
+	});
+};
 PageController.prototype.saveSchema = function(req, res, next) {
 	var schema = '';
 
@@ -1300,6 +1635,13 @@ module.exports = {
 	competitionPlayersStats: function(req, res, next) {
 		if (pageController) {
 			pageController.playersStats(req, res, next);
+		} else {
+			throw new Error('page-controller module not initialized');
+		}
+	},
+	competitionTeamsStats: function(req, res, next) {
+		if (pageController) {
+			pageController.teamsStats(req, res, next);
 		} else {
 			throw new Error('page-controller module not initialized');
 		}
