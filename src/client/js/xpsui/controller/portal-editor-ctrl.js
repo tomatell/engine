@@ -348,6 +348,17 @@
             },
             data: ''
           },
+        teamsStats: {
+            meta: {
+              name: 'teams-stats',
+              element: '<section class="x-portal-competition-matches"><header>Štatistiky družstiev</header></section>',
+              type: 'teams-stats',
+              title: 'Štatistiky družstiev',
+              desc: 'Časť obsahujúca štatistiky družstiev.',
+              icon: 'img/block-content.svg'
+            },
+            data: ''
+          },
 //          matchStandings: {
 //              meta: {
 //                name: 'match-standings',
