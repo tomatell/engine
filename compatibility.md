@@ -81,3 +81,8 @@ Script print all player in semicolon-separated values (;).
 ## 14 - Configurable portal widgets
 - dataset needs to implement configurable widgets
 - run 14.sh for db migration
+
+## No version change
+- /tools/mongo/removeMatchesByCompetitionID.sh
+- first arg is DB, second arg is competitonID. Run example `tools/mongo/removeMatchesByCompetitionID.sh registry 55ddcc66adf3822a855edf06`
+Script remove all matches, where competition is equal competitonID.
