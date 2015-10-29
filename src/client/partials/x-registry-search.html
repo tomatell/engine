@@ -2,20 +2,24 @@
 <form novalidate class="flex-form">
 	<fieldset class="flex-form-fieldset-search-box">
 	<span class="x-fieldset-title">{{'generic.search.searching' | translate}} ({{schema.transCode || schema.title | translate}})</span>
-	<div class="flex-form-row" ng-repeat="crit in searchCrits">
+	<div class="flex-form-search-box-headers" ng-repeat="crit in searchCrits">
 		<div class="flex-form-col-left">
 			<select ng-options="d.name group by [d.group] for d in schemaFields" ng-model="crit.field" ng-change=""></select>
 		</div>
 		<div class="flex-form-col-left">
 			<select ng-options="o.text for o in allOps" ng-model="crit.op"></select>
 		</div>
-		<div class="flex-form-col-middle" 
-				xpsui-by-schema-field-edit xpsui-schema="{{crit.field.path ? 'schema.' + objectPathToSchemaPath(crit.field.path) : null}}" 
-				xpsui-model="crit.val" ng-keypress="filterKeyPressed($event)"></div>
+		<div class="flex-form-col-middle">
+		<div xpsui-by-schema-field-edit xpsui-schema="{{crit.field.path ? 'schema.' + objectPathToSchemaPath(crit.field.path) : null}}" 
+				xpsui-model="crit.val" ng-keypress="filterKeyPressed($event)">
+		</div>
 		<div class="flex-form-col-right">
 			<button ng-click="removeCrit($index)" type="button" class="btn-clear"><i class="icon-remove"></i> {{'generic.search.remove' | translate}}</button>
 		</div>
+		</div>
 	</div>
+		
+	
 	<div class="flex-form-row" style="">
 		<div class="flex-form-col-middle">
 			<button ng-click="addNewCrit()" type="button" class="btn-secondary"><i class="icon-add"></i> {{'generic.search.add' | translate}}</button>	
