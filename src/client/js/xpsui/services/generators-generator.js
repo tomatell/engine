@@ -17,7 +17,7 @@
 			function bergerTable(teams,terms,baseDataCP) {
 
 				var floatTable = [];
-				var n, i, increment=1, atype=1, minmove=0, flipcolors=0;
+				var n, i, increment=1, atype=1, minmove=0, flipcolors=1;
 
 				if (teams.length%2===1) {
 					teams.push({complement:true});
@@ -32,7 +32,7 @@
 
 				var max_round = terms.length;
 
-				var test_r = 0;
+				var test_r = 1;
 				var outRounds=[];
 
 				if (baseDataCP.matchIDNullBeforeSecondHalf=='TRUE') {
@@ -69,9 +69,9 @@
 						}
 						floatTable[0] = temp;
 					}
-					if (r == n) {
+					if (r % (n - 1) === 1) {
 						flipcolors ^= 1; // Swap colors for 2nd half
-						test_r = 1; 
+						test_r ^= 1;
 					}
 
 					i=0; // i is the board number about to be displayed, changed at bottom of loop
