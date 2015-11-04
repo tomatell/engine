@@ -57,6 +57,23 @@
 				return;
 			}
 
+			if ($routeParams.template == 'createTransferOfficer.html') {
+				$http({ method : 'GET',
+					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2FtransferRequestsOfficer~23views~2FtransferOfficerSolver~2Fview'
+						+ '/' + $routeParams.id})
+				.success(function(data, status, headers, config) {
+					var copyFields = [
+									{ 'path': 'model.obj.baseData', 'value': data.transferData }
+					];
+					var uri = '/registry/new/uri~3A~2F~2Fregistries~2FtransfersOfficer~23views~2FtransfersOfficer';
+					navigationService.navigateToPath(uri, copyFields);
+					$location.path(uri);
+				}).error(function(err) {
+					notificationFactory.error(err);
+				});
+				return;
+			}
+
 			if ($routeParams.template == 'personalAccountActivation.html') {
 				$http({ method : 'GET',
 					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2Fpeople~23views~2Ffullperson~2Fview'
