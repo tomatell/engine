@@ -216,7 +216,7 @@
 					} else {
 						// dirty workarround for chrome
 						//take apart data URL
-						var parts = canvasResult[0].toDataURL().match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
+						var parts = canvasResult[0].toDataURL('image/jpeg').match(/data:([^;]*)(;base64)?,([0-9A-Za-z+/]+)/);
 
 						//assume base64 encoding
 						var binStr = atob(parts[3]);
