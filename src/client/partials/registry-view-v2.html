@@ -1,0 +1,6 @@
+<div>
+	<form novalidate name="newForm">
+		<xpsui-action ng-repeat="action in model.actions" options="action" scope-prefix="$parent" model-prefix="model.obj" class="pull-right"></xpsui-action>
+		<div xpsui-form="viewedit" xpsui-model="model.obj" xpsui-schema="schemaFormOptions.schema"></div>
+	</form>
+</div>

@@ -83,6 +83,9 @@
 		$routeProvider.when('/registry/view/:schema/:id', {templateUrl: '/partials/x-registry-view.html', controller: 'xpsui:RegistryViewCtrl'});
 		$routeProvider.when('/registry/search/:schema', {templateUrl : 'partials/x-registry-search.html', controller : 'xpsui:RegistrySearchCtrl'});
 
+		$routeProvider.when('/2/registry/search/:schema', {templateUrl : 'partials/registry-search-v2.html', controller : 'xpsui:RegistrySearchV2Ctrl'});
+		$routeProvider.when('/2/registry/view/:schema/:id', {templateUrl: '/partials/registry-view-v2.html', controller: 'xpsui:RegistryViewV2Ctrl'});
+
 		$routeProvider.when('/registry/custom/:template/:schema/:id', {templateUrl: function(params) {
 			return '/dataset/get/partials/' + params.template;
 		}, controller: 'xpsui:RegistryCustomTemplateCtrl',permissions:['Registry - read']});

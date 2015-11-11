@@ -15,8 +15,8 @@
 	 * invoke method.
 	 */
 	.factory('xpsui:StandardActions', [
-		'$q', 'xpsui:Errors', '$location', 'xpsui:SchemaTools', '$interpolate',
-		function(q, errors, $location, schemaTools, $interpolate) {
+		'$q', 'xpsui:Errors', '$location', 'xpsui:SchemaTools', '$interpolate', '$http', 'xpsui:NotificationFactory',
+		function(q, errors, $location, schemaTools, $interpolate, $http, notifications) {
 			var StandardActions = function() {
 			};
 
@@ -105,14 +105,138 @@
 					q.when(ctx.scope[funcName]()).then(
 						function(r) {
 							p.resolve(r);
-						}, function(r) {
+						},
+						function(r) {
 							p.reject(r);
-						}
-					);
+						});
 					return p.promise;
 				} else {
 					return q.reject(errors.byCode(errors.INTERNAL_ERROR, {mgs: 'Function does not exist'}));
 				}
+			};
+
+			/**
+			 * THIS IS NASTY QUICK HACK
+			 */
+			StandardActions.prototype.svfHack = function(ctx) {
+				var p = q.defer();
+
+				function get(obj, path, def) {
+					var p = (path || '').split('.');
+
+					var objFragment, pathFragment;
+
+					objFragment = obj;
+
+					while (p.length > 0) {
+						pathFragment = p.shift();
+
+						if (angular.isObject(objFragment)) {
+							objFragment = objFragment[pathFragment];
+						} else {
+							return def;
+						}
+					}
+
+					//TODO in case objFragment is false it returns default which is wrong
+					return objFragment || def;
+				}
+
+				function set(obj, path, value) {
+					if (!value) {
+						return;
+					}
+
+					var p = (path || '').split('.');
+
+					var objFragment, pathFragment;
+
+					objFragment = obj;
+
+					while (p.length > 0) {
+						pathFragment = p.shift();
+
+						if (!angular.isObject(objFragment[pathFragment])) {
+							objFragment[pathFragment] = {};
+						}
+
+						if (p.length === 0) {
+							objFragment[pathFragment] = value;
+							return;
+						} else {
+							objFragment = objFragment[pathFragment];
+						}
+					}
+				}
+
+				var o = {};
+				var lp;
+
+				lp = 'baseData.id'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.name'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.surName'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.titleAfter'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.birthDate'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.birthDate'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.gender'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'baseData.nationality'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'player.isPlayer'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'player.stateOfPlayer'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'player.registrationCanceled'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'player.validFrom'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'player.validTo'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.isOfficer'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.stateOfOfficer'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.association'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.club'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.note'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.dateOfRegistration'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'officer.expiration'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.isCoach'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.stateOfCoach'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.proffesionalCompetence'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.dateOfRegistration'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.coachLicense'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.coachLicenseLevel'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.coachLicenseType'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'coach.licenseSeminar'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'medic.isMedic'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'medic.medicLicense'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'medic.stateOfMedic'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'medic.dateOfRegistration'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'medic.validFrom'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'medic.validTo'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'statistic.isStatistic'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'statistic.statisticLicense'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'statistic.stateOfStatistic'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'statistic.dateOfRegistration'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'statistic.validFrom'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'statistic.validTo'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'scorer.isScorer'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'scorer.scorerLicense'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'scorer.stateOfScorer'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'scorer.club'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'scorer.dateOfRegistration'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'scorer.validFrom'; set(o, lp, get(ctx.model, lp, null));
+				lp = 'photoInfo.photo'; set(o, lp, get(ctx.model, lp, null));
+				set(o, 'id', get(ctx.model, 'peopleObjLink.people.oid', null));
+
+				if (!o.id) {
+					notifications.warn({text: 'Nepodarilo sa upraviť záznam, nie je nastavená osoba', timeout: 3000});
+					return q.reject();
+				}
+				$http({url: '/udao/saveBySchema/uri~3A~2F~2Fregistries~2Fpeople~23views~2Ffullperson~2Fview', method: 'PUT', data: o}).then(
+					function(data) {
+						notifications.info({text: 'Záznam osoby upravený', timeout: 3000});
+						return p.resolve(data);
+					},
+					function(err) {
+						notifications.warn({text: 'Nepodarilo sa upraviť záznam, vykonajte manuálnu úpravu', timeout: 3000});
+						return p.reject(err);
+					}
+				);
+
+				return p.promise;
 			};
 
 			return new StandardActions();

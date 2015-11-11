@@ -9,7 +9,7 @@
 		function(sAct, $compile, $translate) {
 			return {
 				restrict: 'E',
-				link: function(scope, elm, attrs, ctrls) {
+				link: function(scope, elm, attrs) {
 					var options = scope.$eval(attrs.options) || {};
 
 					var scopePrefix = attrs.scopePrefix || null;
@@ -23,8 +23,12 @@
 
 					var btn = angular.element('<button type="button" class="btn"></button>');
 
-					var icon = angular.element('<i class="icon-search"></i>');
+					var icon = angular.element('<i></i>');
 					var iconSpinner = angular.element('<i class="fa fa-spinner fa-spin"></i>');
+
+					if (options.iconClasses) {
+						icon.addClass(options.iconClasses);
+					}
 
 					btn.append(icon);
 					btn.append(iconSpinner);
@@ -32,10 +36,9 @@
 					// set title, classes and other stuff
 					btn.append($translate.instant(options.title));
 
-					(options.classes || []).map(function(i) {
-						btn.addClass(i);
-					});
-
+					if (options.classes) {
+						btn.addClass(options.classes);
+					}
 
 					$compile(btn)(scope);
 					elm.append(btn);
@@ -74,7 +77,7 @@
 							iconSpinner.removeClass('ng-hide');
 							btn.attr('disabled', 'disabled');
 
-							sAct.invoke(options.func, ctx).finally(function(r) {
+							sAct.invoke(options.func, ctx).finally(function() {
 								stopExecution();
 							});
 						}
