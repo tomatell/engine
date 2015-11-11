@@ -8,7 +8,7 @@
 			$scope.model = {};
 			$scope.currentSchemaUri = schemaUtilFactory.decodeUri($routeParams.schema);
 
-			if ($routeParams.template == 'playerLicenseCard.html' || $routeParams.template == 'playerHostingCard.html' || $routeParams.template == 'officerCard.html') {
+			if ($routeParams.template == 'playerLicenseCard.html' || $routeParams.template == 'playerHostingCard.html' || $routeParams.template == 'officerCard.html' || $routeParams.template == 'officerHostingCard.html') {
 				$scope.model = {};
 				$scope.currentSchemaUri = schemaUtilFactory.decodeUri($routeParams.schema);
 
