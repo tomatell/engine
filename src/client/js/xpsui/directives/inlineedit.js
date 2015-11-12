@@ -186,7 +186,7 @@
 					elm.attr('tabindex', '0');
 				
 					elm.on('focus', function(e) {
-						if (formControl.acquireFocus(elm) && mode !== formGenerator.MODE.EDIT) {
+						if (formControl.acquireFocus(elm) && e.srcElement.className != 'linkIcon') {
 							enterEditMode();
 						}
 					});

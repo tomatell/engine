@@ -36,7 +36,8 @@
 									);
 								var schemaUri = schemaFragment.objectLink2.schema;
 								schemaUri = schemaUri.substring(0, schemaUri.length - '/view'.length);
-								view.append('<a href="#/registry/view/' + xpsuiuriescape(schemaUri) + '/' + data.oid + '" ><i class="icon-external-link fa-1"></i></a>&nbsp;&nbsp;');
+								var linkPath = '#/registry/view/' + xpsuiuriescape(schemaUri) + '/' + data.oid;
++								view.append('<a href="' + linkPath + '"><div class="linkIcon" width="32px" height="64px"><i class="icon-external-link fa-1 blackiconcolor"></i>&nbsp;&nbsp;</div></a>');
 								objectlink2Factory.renderElement(
 									view, 
 									fields, 
