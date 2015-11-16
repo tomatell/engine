@@ -10,7 +10,8 @@
 		'xpsui:controllers',
 		'pascalprecht.translate',
 		'ui.ace',
-		'reCAPTCHA'
+		'reCAPTCHA',
+		'ja.qr'
 
 		// 'x-security',
 		// 'personal-page',
@@ -129,7 +130,16 @@
 	 * Main function, initializes all required data and scopes. For configuration of $providers
 	 * use .config
 	 */
-	.run(["$rootScope", '$location', 'xpsui:SecurityService', '$cookies','xpsui:NotificationFactory', function($rootScope, $location, SecurityService,$cookies,notificationFactory) {
+	.run(["$rootScope", '$location', 'xpsui:SecurityService', '$cookies','xpsui:NotificationFactory', '$window', function($rootScope, $location, SecurityService,$cookies,notificationFactory, $window) {
+		if($window.navigator && $window.navigator.userAgent) {
+			if($window.navigator.userAgent.indexOf("Crosswalk") > -1 ) {
+				$rootScope.isMobile = true;
+			} else {
+				$rootScope.isMobile = false;
+			}
+		} else {
+			$rootScope.isMobile = false;
+		}
 		$rootScope.security = $rootScope.security || {};
 		// by default, current user is undefined, as there is noone logged in
 		$rootScope.hasPermissions=SecurityService.hasPermissions;
