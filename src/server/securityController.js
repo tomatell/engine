@@ -663,8 +663,11 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 	*/
 	function deflateUser(user, permissions) {
 		log.silly(permissions);
+		//FIXME use dot access, this is insecure
+		//TODO use common schema model instead fo manually crafted object
 		var name = '';
 		var surName = '';
+		var club = null;
 		if(!user.photoInfo || user.photoInfo.photo === undefined) {
 			user.photoInfo = {};
 			user.photoInfo.photo = 'img/no_photo.jpg';
@@ -681,12 +684,19 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 			surName = user.baseData.surName.v;
 		}
 
+		if (user.officer) {
+			club = user.officer.club;
+		} else {
+			club = null;
+		}
+
 		return {
 			id: user.id,
 			systemCredentials: {login: {loginName: user.systemCredentials.login.loginName},
 			permissions: permissions, profiles: user.systemCredentials.profiles || []},
 			photoInfo: {photo: user.photoInfo.photo},
-			baseData: {name: name, surName: surName}
+			baseData: {name: name, surName: surName},
+			officer: {club: club}
 		};
 
 	}
