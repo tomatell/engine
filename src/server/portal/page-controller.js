@@ -55,6 +55,7 @@ function PageController(mongoDriver) {
 	this.menuDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: menuCollection});
 	this.articlesDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: articlesCollection});
 	this.competitionDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitions'});
+	this.competitionGroupsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitionGroups'});
 	this.refereeReportsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'refereeReports'});
 	this.rostersDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'rosters'});
 
@@ -71,8 +72,40 @@ function PageController(mongoDriver) {
 	});
 }
 
+PageController.prototype.competitionGroupsList = function(req, res, next) {
+	this.competitionGroupsDao.list({}, function(err, data) {
+		if (err) {
+			log.error('Failed to get list of competition groups', err);
+			next(err);
+			return;
+		}
+
+		var result = [];
+
+		for (var i in data) {
+			result.push({
+				id: data[i].id,
+				name: data[i].baseData.name,
+				priority: data[i].baseData.priority,
+				parentGroup: data[i].baseData.parentGroup && data[i].baseData.parentGroup.oid || null
+			});
+		}
+
+		res.json(result);
+	});
+
+};
+
 PageController.prototype.competitionsList = function(req, res, next) {
-	this.competitionDao.list({}, function(err, data) {
+	var gid = req.query.gid;
+
+	var qf = QueryFilter.create();
+
+	if (gid) {
+	qf.addCriterium('baseData.competitionGroup.oid', QueryFilter.operation.EQUAL, gid);
+	}
+
+	this.competitionDao.list(qf, function(err, data) {
 		if (err) {
 			log.error('Failed to get list of competitions', err);
 			next(err);
@@ -255,10 +288,10 @@ PageController.prototype.competitionResults = function(req, res, next) {
 			var guestId = data[i].baseData.awayClub.oid;
 
 			if (typeof result[homeId] === 'undefined') {
-				result[homeId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0};
+				result[homeId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0, ballsWon: 0, ballsLost: 0};
 			}
 			if (typeof result[guestId] === 'undefined') {
-				result[guestId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0};
+				result[guestId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0, ballsWon: 0, ballsLost: 0};
 			}
 
 			if (['Schválený', 'Zatvorený'].indexOf(reportState) < 0) {
@@ -858,6 +891,13 @@ module.exports = {
 	saveSchema: function(req, res, next) {
 		if (pageController) {
 			pageController.saveSchema(req, res, next);
+		} else {
+			throw new Error('page-controller module not initialized');
+		}
+	},
+	competitionGroupsList: function(req, res, next) {
+		if (pageController) {
+			pageController.competitionGroupsList(req, res, next);
 		} else {
 			throw new Error('page-controller module not initialized');
 		}
