@@ -27,7 +27,8 @@ var DEFAULT_CFG = {
 	generatedPasswordLen : 8,
 	captchaSite:'6LfOUQITAAAAAOgMxsnYmhkSY0lZw0tej0C4N2XS',
 	captchaSecret:'6LfOUQITAAAAAMXVttdodZHJ1SbzKkQ00l43fzFl',
-	remCookie: 'rememberMe'
+	remCookie: 'rememberMe',
+	pushRegId: 'pushRegId'
 };
 
 //
@@ -392,6 +393,7 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 	 */
 	this.login = function(req, resp,next) {
 		log.debug('login atempt', req.body.login);
+		log.debug('Push Notification Registration ID', req.body.pushregid);
 
 
 		userDao.list(QueryFilter.create().addCriterium(cfg.loginColumnName, QueryFilter.operation.EQUAL, req.body.login), function(err, data) {
@@ -436,7 +438,12 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 								}
 								self.setCookies(resp, token, user.systemCredentials.login.loginName, req.body.rememberMe);
 								log.info('user logged in',user.id);
-
+								self.storePushRegId(user.id, req.body.pushregid, function(err) {
+										if (err) {
+											log.error('Failed to store push notification registration id.', err);
+											//return;
+										}
+								});
 								self.resolveProfiles(user,function(err,u){
 									if (err) {
 										resp.next(err);
@@ -686,7 +693,8 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 			systemCredentials: {login: {loginName: user.systemCredentials.login.loginName},
 			permissions: permissions, profiles: user.systemCredentials.profiles || []},
 			photoInfo: {photo: user.photoInfo.photo},
-			baseData: {name: name, surName: surName}
+			baseData: {name: name, surName: surName},
+			pushregid: user.pushregid
 		};
 
 	}
@@ -742,6 +750,18 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 
 	};
 
+	this.storePushRegId = function(userId, pushregid, callback) {
+
+		if(pushregid) {
+			var people = {
+				id: userId,
+				pushregid: pushregid
+			}
+			userDao.update(people, callback);
+		}
+		log.debug('pushregid', pushregid);
+	};
+
 	this.setCookies = function(resp, token, loginName, rememberMe) {
 		if(rememberMe) {
 			resp.cookie(cfg.securityTokenCookie, token, {
@@ -775,6 +795,10 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 			resp.cookie(cfg.profileCookie, profile, {
 				httpOnly : true,
 				secure : process.env.NODE_ENV != 'test'
+			});
+			resp.cookie(cfg.pushRegId, pushregid, {
+			expires: new Date(Date.now() + 3600000 * 24 * 36500),
+			httpOnly: false
 			});
 		} else {
 			resp.cookie(cfg.profileCookie, profile, {

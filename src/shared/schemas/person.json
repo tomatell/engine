@@ -30,6 +30,9 @@
 			},
 			"licence": {
 				"$ref": "uri://registries/people#person/properties/licence"
+			},
+			"pushregid" : {
+				"$ref": "uri://registries/people#person/properties/pushregid"
 			}
 		}
 	},
@@ -63,7 +66,10 @@
             },
 			"additionalDataReferee": {
                 "$ref": "uri://registries/people#person/properties/additionalDataReferee/properties/refereeLicence"
-            }
+            },
+            "pushregid" : {
+				"$ref": "uri://registries/people#person/properties/pushregid"
+			}
         }
 	}
 }

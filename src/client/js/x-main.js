@@ -10,7 +10,8 @@
 		'xpsui:controllers',
 		'pascalprecht.translate',
 		'ui.ace',
-		'reCAPTCHA'
+		'reCAPTCHA',
+		'ja.qr',
 
 		// 'x-security',
 		// 'personal-page',
@@ -83,6 +84,9 @@
 		$routeProvider.when('/registry/view/:schema/:id', {templateUrl: '/partials/x-registry-view.html', controller: 'xpsui:RegistryViewCtrl'});
 		$routeProvider.when('/registry/search/:schema', {templateUrl : 'partials/x-registry-search.html', controller : 'xpsui:RegistrySearchCtrl'});
 
+		$routeProvider.when('/2/registry/search/:schema', {templateUrl : 'partials/registry-search-v2.html', controller : 'xpsui:RegistrySearchV2Ctrl'});
+		$routeProvider.when('/2/registry/view/:schema/:id', {templateUrl: '/partials/registry-view-v2.html', controller: 'xpsui:RegistryViewV2Ctrl'});
+
 		$routeProvider.when('/registry/custom/:template/:schema/:id', {templateUrl: function(params) {
 			return '/dataset/get/partials/' + params.template;
 		}, controller: 'xpsui:RegistryCustomTemplateCtrl',permissions:['Registry - read']});
@@ -94,6 +98,7 @@
 		$routeProvider.when('/portal/edit/:id?', {templateUrl: '/partials/x-portal-edit.html', controller: 'xpsui:PortalEditorCtrl',permissions:['Portal - write']});
 		$routeProvider.when('/portal/menu', {templateUrl: '/partials/x-portal-menu.html', controller: 'xpsui:PortalEditorMenuCtrl',permissions:['Portal - write']});
 		$routeProvider.when('/portal/list', {templateUrl: '/partials/x-portal-list.html', controller: 'xpsui:PortalEditorListCtrl',permissions:['Portal - write']});
+		$routeProvider.when('/pushnotification', {templateUrl : 'partials/x-push-notification.html',  controller: 'xpsui:PushNotificationCtrl',permissions:['Security - read']})
 
 		$routeProvider.when('/schema/edit', {
 			templateUrl: 'partials/x-schema-editor-index.html',
@@ -129,7 +134,16 @@
 	 * Main function, initializes all required data and scopes. For configuration of $providers
 	 * use .config
 	 */
-	.run(["$rootScope", '$location', 'xpsui:SecurityService', '$cookies','xpsui:NotificationFactory', function($rootScope, $location, SecurityService,$cookies,notificationFactory) {
+	.run(["$rootScope", '$location', 'xpsui:SecurityService', '$cookies','xpsui:NotificationFactory', '$window', function($rootScope, $location, SecurityService,$cookies,notificationFactory, $window) {
+		if($window.navigator && $window.navigator.userAgent) {
+			if($window.navigator.userAgent.indexOf("Crosswalk") > -1 ) {
+				$rootScope.isMobile = true;
+			} else {
+				$rootScope.isMobile = false;
+			}
+		} else {
+			$rootScope.isMobile = false;
+		}
 		$rootScope.security = $rootScope.security || {};
 		// by default, current user is undefined, as there is noone logged in
 		$rootScope.hasPermissions=SecurityService.hasPermissions;

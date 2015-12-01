@@ -38,6 +38,9 @@ var eventSchedulerModule=require('./eventScheduler.js');
 
 var portalApiModule = require('./portal/api-controller.js');
 
+var pushNotificationServiceModule = require('./pushNotificationService.js');
+var pushNotificationService = new pushNotificationServiceModule.pushNotificationService();
+
 var app = express();
 
 // setup request logging
@@ -142,8 +145,9 @@ mongoDriver.init(config.mongoDbURI, function(err) {
 
 	var portalApi = new portalApiModule(mongoDriver);
 	app.post('/portalapi/getByTags', bodyParser.json(), function(req, res) {portalApi.getByTags(req, res);});
-	app.get('/portalapi/articleTagsDistinct',securityService.authenRequired, bodyParser.json(),function(req,res){udc.getArticleTagsDistinct(req,res);});
-
+	app.get('/portalapi/articleTagsDistinct',securityService.authenRequired
+		, bodyParser.json(),function(req,res){udc.getArticleTagsDistinct(req,res);});
+	app.post('/pushnotification/send', securityService.hasPermFilter('Registry - write').check,bodyParser.json(), function(req,res){pushNotificationService.sendPushNotification(req,res);});
 	// Static data
 //	app.use(express.static(path.join(process.cwd(), 'build', 'client')));
 
