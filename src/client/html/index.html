@@ -48,6 +48,10 @@
 	<script src="js/safeUrlEncoder.js"></script>
 	<script src="js/QueryFilter.js"></script>
 
+	<!-- QR Code generator -->
+	<script type="text/javascript" src="lib/angular-qr/lib/qrcode.js"></script>
+	<script type="text/javascript" src="lib/angular-qr/angular-qr.min.js"></script>
+
 
 </head>
 <body ng-app="x-registries" ng-class="{'login-page': !security.currentUser.systemCredentials.login.loginName}">
@@ -61,6 +65,7 @@
 
 	<nav>
 		<ul>
+			<li ng-show="isMobile"><a href="membery://index"><i class="icon-arrow-left"></i></a></li>
 			<li ng-show="hasPermissions(['System User'])"><span class="text-block"
 				>{{security.currentUser.baseData.name}}&nbsp;{{security.currentUser.baseData.surName}}</span></li>
 				<li ng-show="hasPermissions(['System User'])"><div class="x-login-photo" ng-style="{'background-image': 'url(' + security.currentUser.photoInfo.photo + ')'}"></div>
