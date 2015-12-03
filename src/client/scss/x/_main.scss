@@ -70,7 +70,6 @@ body{
 	}
 }
 
-
 .x-logo{
 	line-height: $fixed-header-height;
 	float: left;
@@ -79,6 +78,9 @@ body{
 	@media (min-width: $screen-md-min){
 		margin-left: 0px;
 	}
+	@media (min-width: 320px) {
+      margin-left: 40px;
+      padding-left: 5px; }
 
 	img{
 		//height: 24px;

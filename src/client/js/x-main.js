@@ -138,8 +138,13 @@
 		if($window.navigator && $window.navigator.userAgent) {
 			if($window.navigator.userAgent.indexOf("Crosswalk") > -1 ) {
 				$rootScope.isMobile = true;
+				$rootScope.isiOS = false;
+			} else if($window.navigator.userAgent.match(/iPad/i) || $window.navigator.userAgent.match(/iPhone/i)) {
+				$rootScope.isiOS = true;
+				$rootScope.isMobile = false;
 			} else {
 				$rootScope.isMobile = false;
+				$rootScope.isiOS = false;
 			}
 		} else {
 			$rootScope.isMobile = false;
