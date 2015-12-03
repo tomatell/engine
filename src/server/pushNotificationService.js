@@ -22,6 +22,7 @@ var pushNotificationService = function() {
 			for(var i = 0; i < req.body.pushregids.length; i++) {
 				registration_ids.push(req.body.pushregids[i]);
 			}
+			var url = 'https://unionsoft.tk:3443/dataset/get/mobileContents/banner.jpg';
 
 				var message = new gcm.Message();
 				// set data with another object 
@@ -38,27 +39,28 @@ var pushNotificationService = function() {
 
 				// set data with another object
 				message.setDataWithObject({
-    				timeStamp: datetime,
-    				msgcnt: registration_ids.length,
-    				title: 'Membery Notification',
-    				message: req.body.msg,
-    				sound: 'beep.wav'
+					timeStamp: datetime,
+					msgcnt: registration_ids.length,
+					title: 'Membery Notification',
+					message: req.body.msg,
+					bigPicture: url,
+					soundname: 'beep.wav'
 				});
 
 				// add new key-value to data if key does not exists 
 				//message.addDataWithKeyValue('Date/time', datetime);
- 
+
 				// set collapse key 
 				message.setCollapseKey('string');
- 
+
 				// set dry run 
 				message.setDryRun(false);
- 
+
 				// set delay while idle 
 				message.setDelayWhileIdle(true);
 
 				var sender = new gcm.Sender();
-				var url = 'https://www.google.sk/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png';
+				
 				// set api key
 				sender.setAPIKey(apikey);
 				//var dataMSG = '{\"data\": {\"timeStamp\": \"' + datetime + '\", \"msgcnt\": \"' + registration_ids.length +'\", \"title:\": \"Membery Notification\", \"message\": \"' + req.body.msg + '\" }}';
