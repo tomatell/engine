@@ -1,6 +1,8 @@
 /* jshint node:true */
 'use strict';
 
+var _ = require('lodash');
+var Q = require('q');
 var log = require('../logging.js').getLogger('page-controller.js');
 var config = require('../config.js');
 var QueryFilter = require('../QueryFilter.js');
@@ -55,6 +57,7 @@ function PageController(mongoDriver) {
 	this.menuDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: menuCollection});
 	this.articlesDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: articlesCollection});
 	this.competitionDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitions'});
+	this.competitionPartDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitionParts'});
 	this.competitionGroupsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'competitionGroups'});
 	this.refereeReportsDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'refereeReports'});
 	this.rostersDao = new universalDaoModule.UniversalDao(mongoDriver, {collectionName: 'rosters'});
@@ -166,7 +169,7 @@ PageController.prototype.competitionMatchesAll = function(req, res, next) {
 							matchNumber: data.baseData && data.baseData.matchNumber,
 							printTemplate: data.baseData && data.baseData.printTemplate,
 							started: data.technicalData && data.technicalData.events && data.technicalData.events.length > 0 ? true : false,
-							finished: ['Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false
+							finished: ['Zobrazený', 'Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false
 						};
 
 						if (r.round) {
@@ -219,7 +222,7 @@ PageController.prototype.competitionMatches = function(req, res, next) {
 				matchNumber: data[i].baseData && data[i].baseData.matchNumber,
 				printTemplate: data[i].baseData && data[i].baseData.printTemplate,
 				started: data[i].technicalData && data[i].technicalData.events && data[i].technicalData.events.length > 0 ? true : false,
-				finished: ['Schválený', 'Zatvorený'].indexOf(data[i].baseData.state) > -1 ? true : false
+				finished: ['Zobrazený', 'Schválený', 'Zatvorený'].indexOf(data[i].baseData.state) > -1 ? true : false
 			});
 		}
 
@@ -264,110 +267,275 @@ PageController.prototype.competitionResults = function(req, res, next) {
 
 	var qf = QueryFilter.create();
 
+	var model;
+
+	var self = this;
+
 	// FIXME make this config public in configuration
 	var fieldsPairing = {
 		'ROSTER_NAME': 'baseData.prName'
 	}
 	qf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
 
-	this.refereeReportsDao.list(qf, function(err, data) {
-		if (err) {
-			log.error('Failed to get list of matches for competition %s', cid, err);
+	pageController.competitionPartDao.list(qf, function(err2, parts) {
+		if (err2) {
+			log.error('Failed to get list of parts for competition %s', cid, err);
 			next(err);
 			return;
 		}
 
-		var result = {};
+		model = _.get(parts[0], 'baseData.competitionModel');
 
-		for (var i in data) {
-
-			var currentReport = data[i];
-			var reportState = objectTools.evalPath(currentReport, 'baseData.state');
-
-			var homeId = data[i].baseData.homeClub.oid;
-			var guestId = data[i].baseData.awayClub.oid;
-
-			if (typeof result[homeId] === 'undefined') {
-				result[homeId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0, ballsWon: 0, ballsLost: 0};
-			}
-			if (typeof result[guestId] === 'undefined') {
-				result[guestId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0, ballsWon: 0, ballsLost: 0};
-			}
-
-			if (['Schválený', 'Zatvorený'].indexOf(reportState) < 0) {
-				// Skip reports in another states
-				continue;
-			}
-
-			var scoreHome = parseInt(data[i].baseData.fullTimeScoreHome);
-			if (isNaN(scoreHome)) {
-				scoreHome = 0;
-			}
-
-			var scoreAway = parseInt(data[i].baseData.fullTimeScoreAway);
-			if (isNaN(scoreAway)) {
-				scoreAway = 0;
-			}
-
-			if ((scoreHome) > (scoreAway)) {
-				++result[homeId].wins;
-			} else if ((scoreHome) < (scoreAway)) {
-				++result[guestId].wins;
-			}
-
-			if ((scoreHome === 3) && ([0, 1].indexOf(scoreAway) > -1)) {
-				result[homeId].points += 3;
-				result[guestId].points += 0;
-			} else if ((scoreHome === 3) && (scoreAway === 2)) {
-				result[homeId].points += 2;
-				result[guestId].points += 1;
-			} else if ((scoreHome === 2) && (scoreAway === 3)) {
-				result[homeId].points += 1;
-				result[guestId].points += 2;
-			} else {
-				result[homeId].points += 0;
-				result[guestId].points += 3;
-			}
-
-			result[homeId].setsWon += scoreHome;
-			result[homeId].setsLost += scoreAway;
-			result[guestId].setsWon += scoreAway;
-			result[guestId].setsLost += scoreHome;
-
-			result[homeId].matches += 1;
-			result[guestId].matches += 1;
-
-		}
-
-		var rostersQf = QueryFilter.create();
-		//rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
-		pageController.rostersDao.list(rostersQf, function(err, data) {
+		pageController.refereeReportsDao.list(qf, function(err, data) {
 			if (err) {
-				log.error('Failed to get list of rosters for competition %s', cid, err);
+				log.error('Failed to get list of matches for competition %s', cid, err);
 				next(err);
 				return;
 			}
 
-			var rosters = {};
+			var result = {};
 
 			for (var i in data) {
-				rosters[data[i].id] = data[i].baseData.prName;
-			}
 
-			for (i in result) {
-				if (rosters[i]) {
-					result[i].name = rosters[i];
-				} else {
-					result[i].name = '-:-';
+				var currentReport = data[i];
+				var reportState = objectTools.evalPath(currentReport, 'baseData.state');
+
+				var homeId = data[i].baseData.homeClub.oid;
+				var guestId = data[i].baseData.awayClub.oid;
+
+				if (typeof result[homeId] === 'undefined') {
+					result[homeId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0, ballsWon: 0, ballsLost: 0};
 				}
+				if (typeof result[guestId] === 'undefined') {
+					result[guestId] = { points: 0, matches: 0, score: 0, wins: 0, setsWon: 0, setsLost: 0, ballsWon: 0, ballsLost: 0};
+				}
+
+				if (['Zobrazený', 'Schválený', 'Zatvorený'].indexOf(reportState) < 0) {
+					// Skip reports in another states
+					continue;
+				}
+
+				var scoreHome = parseInt(data[i].baseData.fullTimeScoreHome);
+				if (isNaN(scoreHome)) {
+					scoreHome = 0;
+				}
+
+				var scoreAway = parseInt(data[i].baseData.fullTimeScoreAway);
+				if (isNaN(scoreAway)) {
+					scoreAway = 0;
+				}
+
+				if ((scoreHome) > (scoreAway)) {
+					++result[homeId].wins;
+				} else if ((scoreHome) < (scoreAway)) {
+					++result[guestId].wins;
+				}
+
+				if (model === 'Model-01') {
+					if ((scoreHome === 3) && ([0, 1].indexOf(scoreAway) > -1)) {
+						result[homeId].points += 3;
+						result[guestId].points += 0;
+					} else if ((scoreHome === 3) && (scoreAway === 2)) {
+						result[homeId].points += 2;
+						result[guestId].points += 1;
+					} else if ((scoreHome === 2) && (scoreAway === 3)) {
+						result[homeId].points += 1;
+						result[guestId].points += 2;
+					} else {
+						result[homeId].points += 0;
+						result[guestId].points += 3;
+					}
+				} else if (model === 'Model-02' ) {
+					if ((scoreHome === 2) && ([0].indexOf(scoreAway) > -1)) {
+						result[homeId].points += 3;
+						result[guestId].points += 0;
+					} else if ((scoreHome === 2) && (scoreAway === 1)) {
+						result[homeId].points += 2;
+						result[guestId].points += 1;
+					} else if ((scoreHome === 1) && (scoreAway === 2)) {
+						result[homeId].points += 1;
+						result[guestId].points += 2;
+					} else {
+						result[homeId].points += 0;
+						result[guestId].points += 3;
+					}
+				} else if (model === 'Model-03' ) {
+					if ((scoreHome === 2) && ([0,1].indexOf(scoreAway) > -1)) {
+						result[homeId].points += 2;
+						result[guestId].points += 1;
+					} else {
+						result[homeId].points += 1;
+						result[guestId].points += 2;
+					}
+				} else if (model === 'Model-04' ) {
+					result[homeId].points += scoreHome;
+					result[guestId].points += scoreAway;
+				}
+
+				// count balls
+				var ballsStr = _.get(currentReport, 'baseData.countOfBalls', '') || '';
+				var ballsArr = ballsStr.split(',');
+				var mbh = 0;
+				var mbg = 0
+				var rlog = '';
+
+				for (var b = 0; b < ballsArr.length; ++b) {
+					var bs = ballsArr[b];
+					var bv = Math.abs(parseInt(bs));
+					var b1, b2;
+
+					if (model === 'Model-01') {
+						if (b < 4) {
+							if (bv < 24) {
+								b1 = bv;
+								b2 = 25;
+							} else {
+								b1 = bv;
+								b2 = b1 + 2;
+							}
+						} else {
+							if (bv < 14) {
+								b1 = bv;
+								b2 = 15;
+							} else {
+								b1 = bv;
+								b2 = b1 + 2;
+							}
+						}
+					} if (model === 'Model-02') {
+						if (b < 2) {
+							if (bv < 24) {
+								b1 = bv;
+								b2 = 25;
+							} else {
+								b1 = bv;
+								b2 = b1 + 2;
+							}
+						} else {
+							if (bv < 14) {
+								b1 = bv;
+								b2 = 15;
+							} else {
+								b1 = bv;
+								b2 = b1 + 2;
+							}
+						}
+					} if (model === 'Model-03') {
+						if (b < 2) {
+							if (bv < 24) {
+								b1 = bv;
+								b2 = 25;
+							} else {
+								b1 = bv;
+								b2 = b1 + 2;
+							}
+						} else {
+							if (bv < 14) {
+								b1 = bv;
+								b2 = 15;
+							} else {
+								b1 = bv;
+								b2 = b1 + 2;
+							}
+						}
+					} if (model === 'Model-04') {
+						if (bv < 24) {
+							b1 = bv;
+							b2 = 25;
+						} else {
+							b1 = bv;
+							b2 = b1 + 2;
+						}
+					}
+					
+					if (bs.indexOf('-') > -1) {
+						// home lost set
+						mbh += b1;
+						mbg += b2;
+					} else {
+						// home won set
+						mbh += b2;
+						mbg += b1;
+					}
+
+					rlog = rlog.concat(b1,':',b2, ' ')
+				}
+/*
+				if (homeId === '55fdcd9e08920bc4601782d4') {
+					log.info(mbh, mbg, rlog);
+				}
+				if (guestId === '55fdcd9e08920bc4601782d4') {
+					log.info(mbg, mbh, rlog);
+				}
+*/
+				result[homeId].ballsWon += mbh;
+				result[guestId].ballsWon += mbg;
+				result[homeId].ballsLost += mbg;
+				result[guestId].ballsLost += mbh;
+
+				result[homeId].setsWon += scoreHome;
+				result[homeId].setsLost += scoreAway;
+				result[guestId].setsWon += scoreAway;
+				result[guestId].setsLost += scoreHome;
+
+				result[homeId].matches += 1;
+				result[guestId].matches += 1;
+
 			}
 
-			var finres = [];
-			for (var i in result) {
-				finres.push(result[i]);
-			}
+			var rostersQf = QueryFilter.create();
+			//rostersQf.addCriterium('baseData.competition.oid', QueryFilter.operation.EQUAL, cid);
+			pageController.rostersDao.list(rostersQf, function(err, data) {
+				if (err) {
+					log.error('Failed to get list of rosters for competition %s', cid, err);
+					next(err);
+					return;
+				}
 
-			res.json(finres);
+				var rosters = {};
+
+				for (var i in data) {
+					rosters[data[i].id] = data[i].baseData.prName;
+				}
+
+				for (i in result) {
+					if (rosters[i]) {
+						result[i].name = rosters[i];
+					} else {
+						result[i].name = '-:-';
+					}
+				}
+
+				var finres = [];
+				for (var i in result) {
+					finres.push(result[i]);
+				}
+
+				if (model === 'Model-01' || model === 'Model-02') {
+					finres.sort(function(a, b) {
+						if (b.wins - a.wins === 0) {
+							if (b.points - a.points === 0) {
+								return (b.setsWon / b.setsLost) - (a.setsWon / a.setsLost);
+							} else {
+								return b.points - a.points;
+							}
+
+						} else {
+							return b.wins - a.wins;
+						}
+					});
+				} else {
+					finres.sort(function(a, b) {
+						if (b.points - a.points === 0) {
+							return (b.setsWon / b.setsLost) - (a.setsWon / a.setsLost);
+						} else {
+							return b.points - a.points;
+						}
+
+					});
+				}
+				res.json(finres);
+			});
 		});
 	});
 };
@@ -587,7 +755,7 @@ PageController.prototype.renderRefereeReport = function(req, res, next) {
 
 			data.render = {
 				started: data.technicalData && data.technicalData.events && data.technicalData.events.length > 0 ? true : false,
-				finished: ['Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false,
+				finished: ['Zobrazený', 'Schválený', 'Zatvorený'].indexOf(data.baseData.state) > -1 ? true : false,
 				showPrivate: req.query.private || false
 
 			};
