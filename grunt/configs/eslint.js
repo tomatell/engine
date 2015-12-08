@@ -1,7 +1,10 @@
 module.exports = {
 	eslint: {
 		server: {
-			src: ['src/server/SchemaConstants.js', 'src/server/SchemaTools.js', 'src/server/templateRegistry.js']
+			src: ['src/server/SchemaConstants.js',
+				'src/server/config.js',
+				'src/server/SchemaTools.js',
+				'src/server/templateRegistry.js']
 		},
 		client: {
 			src: ['src/client/js/xpsui/filters/*.js',
