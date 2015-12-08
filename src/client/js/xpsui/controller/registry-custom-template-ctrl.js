@@ -8,7 +8,7 @@
 			$scope.model = {};
 			$scope.currentSchemaUri = schemaUtilFactory.decodeUri($routeParams.schema);
 
-			if ($routeParams.template == 'playerLicenseCard.html' || $routeParams.template == 'playerHostingCard.html' || $routeParams.template == 'officerCard.html') {
+			if ($routeParams.template == 'playerLicenseCard.html' || $routeParams.template == 'playerHostingCard.html' || $routeParams.template == 'officerCard.html' || $routeParams.template == 'officerHostingCard.html') {
 				$scope.model = {};
 				$scope.currentSchemaUri = schemaUtilFactory.decodeUri($routeParams.schema);
 
@@ -49,6 +49,23 @@
 									{ 'path': 'model.obj.baseData', 'value': data.transferData }
 					];
 					var uri = '/registry/new/uri~3A~2F~2Fregistries~2Ftransfers~23views~2Ftransfers';
+					navigationService.navigateToPath(uri, copyFields);
+					$location.path(uri);
+				}).error(function(err) {
+					notificationFactory.error(err);
+				});
+				return;
+			}
+
+			if ($routeParams.template == 'createTransferOfficer.html') {
+				$http({ method : 'GET',
+					url: '/udao/getBySchema/uri~3A~2F~2Fregistries~2FtransferRequestsOfficer~23views~2FtransferOfficerSolver~2Fview'
+						+ '/' + $routeParams.id})
+				.success(function(data, status, headers, config) {
+					var copyFields = [
+									{ 'path': 'model.obj.baseData', 'value': data.transferData }
+					];
+					var uri = '/registry/new/uri~3A~2F~2Fregistries~2FtransfersOfficer~23views~2FtransfersOfficer';
 					navigationService.navigateToPath(uri, copyFields);
 					$location.path(uri);
 				}).error(function(err) {

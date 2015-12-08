@@ -142,34 +142,34 @@ var SchemaTools = function() {
 	var parseInternal = function(uri, schema, localPath) {
 		for (var prop in schema.def) {
 			switch (prop) {
-				case '$schema':
-				case 'id' :
-				case 'type' :
-				case schemaConstants.EXTENDS_KEYWORD:
-				case schemaConstants.REF_KEYWORD:
-					// skip schema keywords;
-					break;
-				default:
-					var propLocalPath = null;
-					var propUrl = null;
+			case '$schema':
+			case 'id' :
+			case 'type' :
+			case schemaConstants.EXTENDS_KEYWORD:
+			case schemaConstants.REF_KEYWORD:
+				// skip schema keywords;
+				break;
+			default:
+				var propLocalPath = null;
+				var propUrl = null;
 
-					if (schema.def[prop] && schema.def[prop].id && prop !== 'properties') {
-						// id is defined, lets override canonical resolution, but only if it is not inside properties
-						propUrl = URL.resolve(uri, schema.def[prop].id);
-						// make id argument absolute
-						schema.def[prop].id = propUrl;
-						propLocalPath = URL.parse(propUrl).hash;
-						propLocalPath = (propLocalPath && propLocalPath.length > 0 ? propLocalPath : '#');
-					} else {
-						propLocalPath = localPath + (localPath === '#' ? '' : '/') + prop;
-						propUrl = URL.resolve(uri, propLocalPath);
-					}
+				if (schema.def[prop] && schema.def[prop].id && prop !== 'properties') {
+					// id is defined, lets override canonical resolution, but only if it is not inside properties
+					propUrl = URL.resolve(uri, schema.def[prop].id);
+					// make id argument absolute
+					schema.def[prop].id = propUrl;
+					propLocalPath = URL.parse(propUrl).hash;
+					propLocalPath = (propLocalPath && propLocalPath.length > 0 ? propLocalPath : '#');
+				} else {
+					propLocalPath = localPath + (localPath === '#' ? '' : '/') + prop;
+					propUrl = URL.resolve(uri, propLocalPath);
+				}
 
-					if (schema.def[prop] && typeof schema.def[prop] === 'object') {
-						// dive only if it is object
-						that.registerSchema(propUrl, schema.def[prop], true);
-						parseInternal(propUrl, that.getSchema(propUrl), propLocalPath);
-					}
+				if (schema.def[prop] && typeof schema.def[prop] === 'object') {
+					// dive only if it is object
+					that.registerSchema(propUrl, schema.def[prop], true);
+					parseInternal(propUrl, that.getSchema(propUrl), propLocalPath);
+				}
 			}
 		}
 	};

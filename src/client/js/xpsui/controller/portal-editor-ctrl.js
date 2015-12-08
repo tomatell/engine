@@ -22,8 +22,6 @@
 				data: {}
 			});
 
-		// FIXME logging
-		console.log($routeParams);
 
 		$q.all([templatePromise, blocksPromise]).then(function(response) {
 			$scope.templates = response[0].data;

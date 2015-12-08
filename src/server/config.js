@@ -50,7 +50,7 @@ var config = {
 					prettyPrint: true,
 					timestamp: false,
 					silent: true
-				}
+							}
 			},
 			addLabel: true
 		};
