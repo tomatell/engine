@@ -22,7 +22,7 @@ var pushNotificationService = function() {
 			for(var i = 0; i < req.body.pushregids.length; i++) {
 				registration_ids.push(req.body.pushregids[i]);
 			}
-			var url = 'https://unionsoft.tk:3443/dataset/get/mobileContents/banner.jpg';
+			var url = 'http://www.membery.io/img/launcher.png';
 
 				var message = new gcm.Message();
 				// set data with another object 
@@ -42,6 +42,7 @@ var pushNotificationService = function() {
 					timeStamp: datetime,
 					msgcnt: registration_ids.length,
 					title: 'Membery Notification',
+					url: req.body.url,
 					message: req.body.msg,
 					bigPicture: url,
 					soundname: 'beep.wav'

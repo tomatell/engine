@@ -10,10 +10,12 @@
 		'xpsui:SchemaUtil',
 		'xpsui:NotificationFactory',
 		'xpsui:PushNotificationFactory',
-		function($scope, $routeParams, securityService, genericSearchFactory, schemaUtilFactory, notificationFactory, pushnotificationFactory) {
+		"$location",
+		function($scope, $routeParams, securityService, genericSearchFactory, schemaUtilFactory, notificationFactory, pushnotificationFactory, $location) {
 
 			var entityUri = 'uri://registries/userSecurity';
 			var pageSize=20;
+			var orgurl = $location.absUrl().replace('#/pushnotification', '');
 
 			$scope.userList = [];
 			$scope.selectedUser = null;
@@ -229,7 +231,7 @@
 			$scope.send = function() {
 				var c = convertCriteria($scope.searchCrit);
 				// add forced criteria
-
+				var url = $scope.pageurl;
 				$scope.lastCriteria=JSON.parse(JSON.stringify(c));
 
 				genericSearchFactory.getSearch(entityUri, c,convertSortBy( $scope.sortBy),0,pageSize).success(function(data) {
@@ -239,7 +241,7 @@
 							pushregids.push($scope.userList[i].pushregid);
 						}
 					}
-					if(pushnotificationFactory.sendPushNotification(pushregids, $scope.pushMsg)){
+					if(pushnotificationFactory.sendPushNotification(pushregids, $scope.pushMsg, url)){
 						notificationFactory.info({translationCode:'pushnotification.sent',time:3000});
 					} else {
 						notificationFactory.error(err);

@@ -557,6 +557,7 @@
 
 			"pushnotification.title":"Push Notification",
 			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
 			"pushnotification.send":"Odoslať",
 			"pushnotification.sent":"Push notification was sent successfully",
 			"pushnotification.selectall":"Select all",
@@ -1113,6 +1114,7 @@
 
 			"pushnotification.title":"Push Notification",
 			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
 			"pushnotification.send":"Odoslať",
 			"pushnotification.sent":"Push notification was sent successfully",
 			"pushnotification.selectall":"Select all",
@@ -1645,6 +1647,7 @@
 
 			"pushnotification.title":"Push Notification",
 			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
 			"pushnotification.send":"Send",
 			"pushnotification.sent":"Push notification was sent successfully",
 			"pushnotification.selectall":"Select all",
@@ -2199,6 +2202,7 @@ $translateProvider.translations('ja', {
 
 			"pushnotification.title":"Push Notification",
 			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
 			"pushnotification.send":"Send",
 			"pushnotification.sent":"Push notification was sent successfully",
 			"pushnotification.selectall":"Select all",
