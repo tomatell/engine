@@ -159,6 +159,23 @@
 
 		$rootScope.$on('$routeChangeStart', function() {
 			notificationFactory.clear();
+
+			// Check what web browser and version the user is using.  If it is not supported, show a warning.
+			var verOffset, fullVersion;
+			if ((verOffset=$window.navigator.userAgent.indexOf("Version"))!=-1) {
+   				fullVersion = $window.navigator.userAgent.substring(verOffset+8);
+			}
+			var isChrome = /Chrome/.test($window.navigator.userAgent) && /Google Inc/.test($window.navigator.vendor);
+			var isSafari = /Safari/.test($window.navigator.userAgent) && /Apple Computer/.test($window.navigator.vendor);
+
+			if(!isChrome && !isSafari) {
+				notificationFactory.warn("Unsupported web browser. Membery supports the following web browsers: Google Chrome, Safari");
+			} else if(isChrome && parseInt(fullVersion) < 45) {
+				 
+				notificationFactory.warn('Unsupprted version of Google Chrome. The supported version of Google Chrome is later than 45.');
+			} else if(isSafari && parseInt(fullVersion) < 8) {
+				notificationFactory.warn('Unsupprted version of Safari. The supported version of Safari is later than 8.');
+			}
 		});
 
 		// hang on route change, so we can check if user meets security criteria
