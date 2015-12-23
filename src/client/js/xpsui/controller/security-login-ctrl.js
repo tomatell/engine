@@ -16,6 +16,7 @@
 			// $scope.user = 'johndoe';
 			// $scope.password = 'johndoe';
 			var pushregid = $routeParams.regid;
+			var removeflg = $routeParams.removeflg;
 			$scope.user = '';
 			$scope.password = '';
 			if($cookies.rememberMe) {
@@ -31,7 +32,7 @@
 			* Login button click
 			*/
 			$scope.login = function() {
-				SecurityService.getLogin($scope.user, $scope.password, $scope.rememberMe, pushregid).success(function(user) {
+				SecurityService.getLogin($scope.user, $scope.password, $scope.rememberMe, pushregid, removeflg).success(function(user) {
 					//$cookies.rememberMe = $scope.rememberMe;
 					if (user.systemCredentials.profiles.length > 1) {
 						$scope.profiles=user.systemCredentials.profiles;

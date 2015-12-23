@@ -438,12 +438,26 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 								}
 								self.setCookies(resp, token, user.systemCredentials.login.loginName, req.body.rememberMe);
 								log.info('user logged in',user.id);
-								self.storePushRegId(user.id, req.body.pushregid, function(err) {
+								log.info('removeflg', req.body.removeflg);
+								if(req.body.removeflg == 1) {
+									self.deletePushRegId(user.id, req.body.pushregid, function(err) {
+										if (err) {
+											log.error('Failed to delete push notification registration id.', err);
+											//return;
+										} else {
+											log.info('Push notification registration id deleted', req.body.pushregid);
+										}
+									});
+								} else {
+									self.storePushRegId(user.id, req.body.pushregid, function(err) {
 										if (err) {
 											log.error('Failed to store push notification registration id.', err);
 											//return;
+										} else {
+											log.info('Push notification registration id stored', req.body.pushregid);
 										}
-								});
+									});
+								}
 								self.resolveProfiles(user,function(err,u){
 									if (err) {
 										resp.next(err);
@@ -760,6 +774,18 @@ var SecurityController = function(mongoDriver, schemaRegistry, options) {
 			userDao.update(people, callback);
 		}
 		log.debug('pushregid', pushregid);
+	};
+
+	this.deletePushRegId = function(userId, pushregid, callback) {
+
+		if(pushregid) {
+			var people = {
+				id: userId,
+				$unset: { pushregid: "" }
+			}
+			userDao.update(people, callback);
+		}
+		log.debug('pushregid deleted', pushregid);
 	};
 
 	this.setCookies = function(resp, token, loginName, rememberMe) {
