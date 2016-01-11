@@ -10,10 +10,13 @@
 		'xpsui:NavigationService' ,
 		'$cookies',
 		'xpsui:config',
-		function($scope, SecurityService, $rootScope, $location, notificationFactory, navigationService, $cookies, config) {
+		'$routeParams',
+		function($scope, SecurityService, $rootScope, $location, notificationFactory, navigationService, $cookies, config, $routeParams) {
 			// FIXME remove this in production
 			// $scope.user = 'johndoe';
 			// $scope.password = 'johndoe';
+			var pushregid = $routeParams.regid;
+			var removeflg = $routeParams.removeflg;
 			$scope.user = '';
 			$scope.password = '';
 			if($cookies.rememberMe) {
@@ -21,12 +24,15 @@
 			} else {
 				$scope.rememberMe = false;
 			}
+			if($cookies.pushRegId) {
+					pushregid = $cookies.pushRegId;
+			}
 
 			/**
 			* Login button click
 			*/
 			$scope.login = function() {
-				SecurityService.getLogin($scope.user, $scope.password, $scope.rememberMe).success(function(user) {
+				SecurityService.getLogin($scope.user, $scope.password, $scope.rememberMe, pushregid, removeflg).success(function(user) {
 					//$cookies.rememberMe = $scope.rememberMe;
 					if (user.systemCredentials.profiles.length > 1) {
 						$scope.profiles=user.systemCredentials.profiles;

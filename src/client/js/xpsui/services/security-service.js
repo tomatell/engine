@@ -5,14 +5,16 @@
 	.factory('xpsui:SecurityService', ['$http', '$rootScope','xpsui:SchemaUtil', function($http, $rootScope,schemaUtilFactory) {
 		var service = {};
 
-		service.getLogin = function(user, password, rememberMe) {
+		service.getLogin = function(user, password, rememberMe, pushregid, removeflg) {
 			return $http({
 				method : 'POST',
 				url : '/login/',
 				data : {
 					login: user,
 					password: password,
-					rememberMe: rememberMe
+					rememberMe: rememberMe,
+					pushregid: pushregid,
+					removeflg: removeflg
 				}
 			});
 		};

@@ -8,12 +8,14 @@
 		{"field":"baseData.name", "title":"Meno"},
 		{"field":"baseData.surName", "title":"Priezvisko"},
 		{"field":"baseData.birthDate", "title":"Dátum narodenia"},
-		{"field":"contactInfo.city", "title":"Mesto"}
+		{"field":"contactInfo.city", "title":"Mesto"},
+		{"field":"pushregid", "title": "Push Notification Registration ID"}
 	],
 	"properties": {
 		"systemCredentials": {
 			"$ref": "uri://registries/security#systemCredentials"
 		},
+		"pushregid": "uri://registries/people#person#pushregid",
 		"baseData": {
 			"title": "Základné údaje",
 			"type": "object",

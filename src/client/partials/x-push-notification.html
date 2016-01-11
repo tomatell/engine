@@ -1,0 +1,125 @@
+<div id="SearchPage">
+	<div>
+		<div>
+			<form>
+				<fieldset>
+				<!-- <div class="clearfix"> -->
+				<span class="x-fieldset-title">{{'pushnotification.title' | translate}}</span>
+				<div class="x-fieldset">
+					<div class="x-fieldset-label">
+						<label for="name">{{'pushnotification.textlabel' | translate}}</label>
+					</div>
+					<div>
+						<textarea ng-model="pushMsg" style="width:100%; height:200px;">
+							Enter a message to send through push notification.
+						</textarea>
+					</div>
+					<div class="x-fieldset-label">
+						<label for="name">{{'pushnotification.urllabel' | translate}}</label>
+					</div>
+					<div>
+						<textarea type="text" ng-model="pageurl" style="width:100%; height:30px;"></textarea>
+					</div>
+					<div class="pull-right">
+							<button ng-click="send()" class="btn-primary"><i class="icon-send"></i> {{'pushnotification.send' | translate}}</button>
+					</div>
+				</div>
+					<span class="x-fieldset-title">{{'generic.search.searching' | translate}} ({{schema.transCode || schema.title | translate}})</span>
+
+					<div ng-repeat="crit in searchCrit" class="x-fieldset-row">
+
+						<div class="x-fieldset-col-4">
+							<select ng-model="crit.attribute"
+							ng-options="att.title for att in searchDef.attributes"></select>
+						</div>
+						<div class="x-fieldset-col-2">
+							<select
+								ng-model="crit.operator"
+								ng-Init="crit.operator=searchDef.operators[0]"
+								ng-options="op.title for op in searchDef.operators"></select>
+						</div>
+						<div ng-show="!crit.objectLink" class="x-fieldset-col-4">
+							<input
+								type="text" id="name" name="name" ng-model="crit.value"
+								placeholder="value" class="ng-pristine ng-valid"
+								autocomplete="off" ng-keydown="fieldKeyDown($event);">
+
+						</div>
+						<div class="x-fieldset-col-2">
+							<button ng-click="removeCrit($index)" class="btn-clear">
+								<i class="icon-remove"></i> {{'security.user.edit.cancel' |translate}}
+							</button>
+						</div>
+					</div>
+
+					<div class="x-fieldset-row">
+						<div class="pull-left">
+							<button ng-click="addCrit()" class="btn-secondary"><i class="icon-add"></i> {{'security.user.edit.add' |translate}}</button>
+						</div>
+						<div class="pull-right">
+							<button ng-click="search()" class="btn-primary"><i class="icon-search"></i> {{'security.user.edit.search' |translate}}</button>
+						</div>
+					</div>
+				<!-- </div> -->
+				</fieldset>
+			</form>
+			
+			<div ng-show="userList">
+				<!-- <div class="x-fieldset"> -->
+				<fieldset>
+					<spam class="x-fieldset-title ng-binding">{{'generic.search.result.of.searching' | translate}}</spam>
+					<div>
+						<table>
+							<thead>
+								<tr>
+									<th ng-repeat="f in schema.listFields">{{f.transCode || f.title | translate}}</th>
+									<th><input type="checkbox" ng-model="selectedAll" ng-click="checkAll()" />{{'pushnotification.selectall' | translate}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-class="{'psui-active': (selectedUser===obj)}" ng-repeat="obj in userList" ng-click="goView($index)">
+									<td ng-repeat="f in schema.listFields">{{getVal("obj." +
+										f.field)}} {{$eval("obj."+f.field)}}</td>
+
+									<td><input ng-attr-id="{{$index}}" type="checkbox" ng-model="obj.Selected" ng-true-value="true" ng-false-value="false" checked="unchecked">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<div class="x-fieldset">
+						<div>
+							<div class="pull-right">
+								<button ng-click='searchNext()' class="btn-secondary"> >>> </button>
+							</div>
+						</div>
+				</fieldset>
+			
+			</div>
+		</div>
+
+		<div ng-show="selectedUser" class="x-fieldset">
+			
+			<div class="x-fieldset">
+				<!-- <fieldset class="in-sequence"> -->
+				<span class="x-fieldset-title">
+					{{'security.user.edit.profile' |translate}}
+				</span>
+				
+    <select size="10" id="myselection" multiple ng-multiple="true" ng-model="selectedColors" ng-options="c.name+' ('+c.shade+')' for c in colors"></select>
+
+    <button ng-click="doCustom()">Select Customization</button>
+
+    <div>
+        Selected Colors: {{selectedColors }}
+    </div>
+
+				<!-- </fieldset> -->
+
+
+			</div>
+		</div>
+	</div>
+
+</div>

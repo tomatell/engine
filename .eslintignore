@@ -1,0 +1,4 @@
+# files ignored by default
+
+# Ignore generators-generator.js
+src/client/js/xpsui/services/generators-generator.js

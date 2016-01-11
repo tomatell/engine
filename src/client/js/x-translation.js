@@ -553,7 +553,16 @@
 			"portal.edit.block.description":"Popis:",
 			"portal.menu.title":"Portálové menu",
 			"portal.menu.cancel":"Zrušiť",
-			"portal.menu.send":"Odoslať"
+			"portal.menu.send":"Odoslať",
+
+			"pushnotification.title":"Push Notification",
+			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
+			"pushnotification.send":"Odoslať",
+			"pushnotification.sent":"Push notification was sent successfully",
+			"pushnotification.selectall":"Select all",
+			"pushnotification.save":"Save",
+			"pushnotification.api":"API Key"
 		});
 
 		$translateProvider.translations('cz', {
@@ -1101,7 +1110,16 @@
 			"portal.edit.block.description":"Popis:",
 			"portal.menu.title":"Portálové menu",
 			"portal.menu.cancel":"Zrušit",
-			"portal.menu.send":"Odeslat"
+			"portal.menu.send":"Odeslat",
+
+			"pushnotification.title":"Push Notification",
+			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
+			"pushnotification.send":"Odoslať",
+			"pushnotification.sent":"Push notification was sent successfully",
+			"pushnotification.selectall":"Select all",
+			"pushnotification.save":"Save",
+			"pushnotification.api":"API Key"
 		});
 		
 		$translateProvider.translations('en', {
@@ -1625,7 +1643,16 @@
 			"portal.edit.block.description":"Description:",
 			"portal.menu.title":"Portal menu",
 			"portal.menu.cancel":"Cancel",
-			"portal.menu.send":"Send"
+			"portal.menu.send":"Send",
+
+			"pushnotification.title":"Push Notification",
+			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
+			"pushnotification.send":"Send",
+			"pushnotification.sent":"Push notification was sent successfully",
+			"pushnotification.selectall":"Select all",
+			"pushnotification.save":"Save",
+			"pushnotification.api":"API Key"
 		});
 
 $translateProvider.translations('ja', {
@@ -2171,7 +2198,16 @@ $translateProvider.translations('ja', {
 			"portal.edit.block.description":"Description:",
 			"portal.menu.title":"Portal menu",
 			"portal.menu.cancel":"Cancel",
-			"portal.menu.send":"Send"
+			"portal.menu.send":"Send",
+
+			"pushnotification.title":"Push Notification",
+			"pushnotification.textlabel":"Enter a message to send through push notification.",
+			"pushnotification.urllabel":"Page URL",
+			"pushnotification.send":"Send",
+			"pushnotification.sent":"Push notification was sent successfully",
+			"pushnotification.selectall":"Select all",
+			"pushnotification.save":"Save",
+			"pushnotification.api":"API Key"
 		});
 
 		//fallback for individual missing transCodes
